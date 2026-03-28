@@ -60,15 +60,32 @@ export default function SellerApplyPage() {
   if (!user) {
     return (
       <div className="container">
-        <div className="card space-y-3 p-4">
-          <p className="font-semibold">Login required</p>
-          <p className="text-sm text-[var(--muted)]">Please login before applying for seller access.</p>
+        <div className="card space-y-4 p-5">
+          <p className="text-lg font-semibold">Login required</p>
+          <p className="text-sm text-[var(--muted)]">
+            You need an account to apply for seller access and manage listings.
+          </p>
+          <div className="rounded border border-[var(--line)] p-3 text-sm">
+            <p className="font-semibold">With seller access you can:</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-[var(--muted)]">
+              <li>Create and edit your watch listings</li>
+              <li>Receive and manage buyer inquiries</li>
+              <li>Track listing status in your seller dashboard</li>
+            </ul>
+          </div>
+          <div className="rounded border border-[var(--line)] p-3 text-sm text-[var(--muted)]">
+            <p className="font-semibold text-[var(--text)]">Before applying:</p>
+            <p className="mt-1">Login and verify your email. Then complete the seller application form.</p>
+          </div>
           <Link
             href="/login?next=%2Fsell"
             className="inline-block rounded bg-[var(--brand)] px-3 py-1.5 text-white"
           >
             Go to Login
           </Link>
+          <p className="text-xs text-[var(--muted)]">
+            Don’t have an account? <Link href="/register" className="text-[var(--brand)]">Register first</Link>.
+          </p>
         </div>
       </div>
     );
