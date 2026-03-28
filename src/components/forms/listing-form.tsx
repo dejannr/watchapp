@@ -84,7 +84,10 @@ export function ListingForm({ listingId }: { listingId?: string }) {
 
   useEffect(() => {
     let active = true;
-    void apiRequest<Brend[]>('/brands')
+    void apiRequest<Brend[]>('/brands', 'GET', undefined, false, {
+      suppressLoadingIndicator: true,
+      suppressErrorToast: true,
+    })
       .then((data) => {
         if (!active) return;
         setBrendovi(Array.isArray(data) ? data : []);
@@ -116,7 +119,10 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   }, [isIzmeni, selectedDržava, setValue]);
 
   const loadListing = async (id: string) => {
-    const data = await apiRequest<ListingResponse>(`/seller/listings/${id}`, 'GET', undefined, true);
+    const data = await apiRequest<ListingResponse>(`/seller/listings/${id}`, 'GET', undefined, true, {
+      suppressLoadingIndicator: true,
+      suppressErrorToast: true,
+    });
     reset({
       title: data.title ?? '',
       description: data.description ?? '',

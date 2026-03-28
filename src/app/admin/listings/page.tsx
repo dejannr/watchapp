@@ -28,12 +28,32 @@ type AdministratorOglasiResponse = {
   };
 };
 
+const STATUS_LABELS: Record<string, string> = {
+  PENDING_REVIEW: 'Na proveri',
+  PUBLISHED: 'Objavljeno',
+  REJECTED: 'Odbijeno',
+  HIDDEN: 'Sakriveno',
+  SOLD: 'Prodato',
+  ARCHIVED: 'Arhivirano',
+  DRAFT: 'Nacrt',
+};
+
+const STATUS_BADGES: Record<string, string> = {
+  PENDING_REVIEW: 'bg-amber-100 text-amber-800 border-amber-200',
+  PUBLISHED: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+  REJECTED: 'bg-rose-100 text-rose-700 border-rose-200',
+  HIDDEN: 'bg-neutral-200 text-neutral-800 border-neutral-300',
+  SOLD: 'bg-indigo-100 text-indigo-800 border-indigo-200',
+  ARCHIVED: 'bg-zinc-200 text-zinc-800 border-zinc-300',
+  DRAFT: 'bg-slate-100 text-slate-700 border-slate-200',
+};
+
 function AdministratorOglasiPageContent() {
   const qc = useQueryClient();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const status = searchParams.get('status') ?? '';
+  const status = searchParams.get('status') ?? 'PENDING_REVIEW';
   const sellerId = searchParams.get('sellerId') ?? '';
   const brandId = searchParams.get('brandId') ?? '';
   const createdFrom = searchParams.get('createdFrom') ?? '';
@@ -92,10 +112,15 @@ function AdministratorOglasiPageContent() {
 
   return (
     <div className="container">
-      <div className="card p-5">
-        <h1 className="text-2xl font-bold">Moderacija oglasa</h1>
+      <div className="card p-5 sm:p-6">
+        <div className="mb-5">
+          <h1 className="text-2xl font-bold">Moderacija oglasa</h1>
+          <p className="mt-1 text-sm text-[var(--muted)]">
+            Pregledajte oglase, filtrirajte rezultate i brzo izvršite administrativne akcije.
+          </p>
+        </div>
         <form
-          className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5"
+          className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5"
           onSubmit={(e) => {
             e.preventDefault();
             const fd = new FormData(e.currentTarget);
@@ -108,7 +133,11 @@ function AdministratorOglasiPageContent() {
             router.push(`${pathname}?${params.toString()}`);
           }}
         >
-          <select name="status" defaultValue={status} className="rounded border p-2 text-sm">
+          <select
+            name="status"
+            defaultValue={status}
+            className="rounded-md border border-[var(--line)] bg-white p-2 text-sm"
+          >
             <option value="">Svi statusi</option>
             <option value="PENDING_REVIEW">Na čekanju provere</option>
             <option value="PUBLISHED">Objavljeno</option>
@@ -121,27 +150,27 @@ function AdministratorOglasiPageContent() {
           <input
             name="sellerId"
             defaultValue={sellerId}
-            className="rounded border p-2 text-sm"
+            className="rounded-md border border-[var(--line)] bg-white p-2 text-sm"
             placeholder="Prodavac ID"
           />
           <input
             name="brandId"
             defaultValue={brandId}
-            className="rounded border p-2 text-sm"
+            className="rounded-md border border-[var(--line)] bg-white p-2 text-sm"
             placeholder="Brend ID"
           />
           <input
             name="createdFrom"
             defaultValue={createdFrom}
-            className="rounded border p-2 text-sm"
+            className="rounded-md border border-[var(--line)] bg-white p-2 text-sm"
             placeholder="Kreirano od (GGGG-MM-DD)"
           />
           <div className="flex gap-2">
-            <button className="rounded bg-[var(--brand)] px-3 py-2 text-sm text-white" type="submit">
+            <button className="rounded-md bg-[var(--brand)] px-3 py-2 text-sm font-medium text-white" type="submit">
               Primeni
             </button>
             <button
-              className="rounded border border-[var(--line)] px-3 py-2 text-sm"
+              className="rounded-md border border-[var(--line)] px-3 py-2 text-sm"
               type="button"
               onClick={() => router.push(pathname)}
             >
@@ -149,19 +178,55 @@ function AdministratorOglasiPageContent() {
             </button>
           </div>
         </form>
-        {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
-        {success && <p className="mt-3 text-sm text-green-700">{success}</p>}
-        <div className="mt-3 space-y-2">
+        <div className="mt-4 grid gap-2 sm:grid-cols-3">
+          <div className="rounded-lg border border-[var(--line)] bg-[var(--surface-soft)] p-3">
+            <p className="text-xs uppercase tracking-wide text-[var(--muted)]">Ukupno</p>
+            <p className="mt-1 text-xl font-semibold">{listings.data?.pagination?.total ?? 0}</p>
+          </div>
+          <div className="rounded-lg border border-[var(--line)] bg-[var(--surface-soft)] p-3">
+            <p className="text-xs uppercase tracking-wide text-[var(--muted)]">Stranica</p>
+            <p className="mt-1 text-xl font-semibold">
+              {listings.data?.pagination?.page ?? page}/{listings.data?.pagination?.pageCount ?? 1}
+            </p>
+          </div>
+          <div className="rounded-lg border border-[var(--line)] bg-[var(--surface-soft)] p-3">
+            <p className="text-xs uppercase tracking-wide text-[var(--muted)]">Filter status</p>
+            <p className="mt-1 text-xl font-semibold">{status ? (STATUS_LABELS[status] ?? status) : 'Svi'}</p>
+          </div>
+        </div>
+        {error && <p className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+        {success && <p className="mt-4 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">{success}</p>}
+        <div className="mt-4 space-y-3">
           {(listings.data?.items ?? []).map((listing) => (
-            <div key={listing.id} className="rounded border p-3">
-              <p className="font-semibold">{listing.title}</p>
-              <p className="text-sm text-[var(--muted)]">{listing.status}</p>
-              <Link href={`/admin/listings/${listing.id}`} className="mt-1 inline-block text-xs text-[var(--brand)]">
-                Otvori detalje
-              </Link>
-              <div className="mt-2 flex flex-wrap gap-2 text-xs">
+            <div key={listing.id} className="rounded-xl border border-[var(--line)] p-4 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 space-y-1">
+                  <p className="truncate font-semibold">{listing.title}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span
+                      className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${
+                        STATUS_BADGES[listing.status] ?? 'bg-slate-100 text-slate-700 border-slate-200'
+                      }`}
+                    >
+                      {STATUS_LABELS[listing.status] ?? listing.status}
+                    </span>
+                    {listing.updatedAt && (
+                      <span className="text-xs text-[var(--muted)]">
+                        Ažurirano: {new Date(listing.updatedAt).toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <Link
+                  href={`/admin/listings/${listing.id}`}
+                  className="shrink-0 rounded-md border border-[var(--line)] px-2 py-1 text-xs font-medium text-[var(--brand)]"
+                >
+                  Otvori detalje
+                </Link>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs">
                 <button
-                  className="rounded border px-2 py-1 disabled:opacity-60"
+                  className="rounded-md border border-[var(--line)] px-3 py-1.5 font-medium disabled:opacity-60"
                   disabled={Boolean(activeAction)}
                   type="button"
                   onClick={() => void moderate(listing.id, 'approve')}
@@ -169,7 +234,7 @@ function AdministratorOglasiPageContent() {
                   {activeAction === `${listing.id}:approve` ? 'Odobravanje...' : 'Odobri'}
                 </button>
                 <button
-                  className="rounded border px-2 py-1 disabled:opacity-60"
+                  className="rounded-md border border-[var(--line)] px-3 py-1.5 font-medium disabled:opacity-60"
                   disabled={Boolean(activeAction)}
                   type="button"
                   onClick={() => void moderate(listing.id, 'reject')}
@@ -177,7 +242,7 @@ function AdministratorOglasiPageContent() {
                   {activeAction === `${listing.id}:reject` ? 'Odbijanje...' : 'Odbij'}
                 </button>
                 <button
-                  className="rounded border px-2 py-1 disabled:opacity-60"
+                  className="rounded-md border border-[var(--line)] px-3 py-1.5 font-medium disabled:opacity-60"
                   disabled={Boolean(activeAction)}
                   type="button"
                   onClick={() => void moderate(listing.id, 'hide')}
@@ -185,7 +250,7 @@ function AdministratorOglasiPageContent() {
                   {activeAction === `${listing.id}:hide` ? 'Sakrivanje...' : 'Sakrij'}
                 </button>
                 <button
-                  className="rounded border px-2 py-1 disabled:opacity-60"
+                  className="rounded-md border border-[var(--line)] px-3 py-1.5 font-medium disabled:opacity-60"
                   disabled={Boolean(activeAction)}
                   type="button"
                   onClick={() => void moderate(listing.id, 'restore')}
@@ -193,7 +258,7 @@ function AdministratorOglasiPageContent() {
                   {activeAction === `${listing.id}:restore` ? 'Vraćanje...' : 'Vrati'}
                 </button>
                 <button
-                  className="rounded border px-2 py-1 disabled:opacity-60"
+                  className="rounded-md border border-[var(--line)] px-3 py-1.5 font-medium disabled:opacity-60"
                   disabled={Boolean(activeAction)}
                   type="button"
                   onClick={() => void moderate(listing.id, 'mark-sold')}
@@ -203,12 +268,19 @@ function AdministratorOglasiPageContent() {
               </div>
             </div>
           ))}
+          {!listings.isLoading && (listings.data?.items?.length ?? 0) === 0 && (
+            <div className="rounded-lg border border-dashed border-[var(--line)] p-4 text-sm text-[var(--muted)]">
+              Nema oglasa za izabrane filtere.
+            </div>
+          )}
         </div>
-        <div className="mt-4 flex items-center justify-between text-sm">
-          <p className="text-[var(--muted)]">Ukupno: {listings.data?.pagination?.total ?? 0}</p>
+        <div className="mt-5 flex items-center justify-between text-sm">
+          <p className="text-[var(--muted)]">
+            Ukupno: {listings.data?.pagination?.total ?? 0}
+          </p>
           <div className="flex gap-2">
             <button
-              className="rounded border border-[var(--line)] px-3 py-1 disabled:opacity-50"
+              className="rounded-md border border-[var(--line)] px-3 py-1.5 disabled:opacity-50"
               disabled={page <= 1}
               onClick={() => {
                 const params = new URLSearchParams(searchParams.toString());
@@ -219,7 +291,7 @@ function AdministratorOglasiPageContent() {
               Prethodna
             </button>
             <button
-              className="rounded border border-[var(--line)] px-3 py-1 disabled:opacity-50"
+              className="rounded-md border border-[var(--line)] px-3 py-1.5 disabled:opacity-50"
               disabled={page >= (listings.data?.pagination?.pageCount ?? 1)}
               onClick={() => {
                 const params = new URLSearchParams(searchParams.toString());

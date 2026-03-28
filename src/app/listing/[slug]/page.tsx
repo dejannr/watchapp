@@ -46,6 +46,19 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
     )
     .slice(0, 4);
   const images = Array.isArray(listing?.images) ? listing.images : [];
+  const sellerProfile =
+    listing?.seller?.sellerProfile ??
+    listing?.seller?.sellerProfil ??
+    listing?.sellerProfile ??
+    listing?.sellerProfil ??
+    null;
+  const sellerDisplayName =
+    sellerProfile?.displayName ||
+    [listing?.seller?.firstName, listing?.seller?.lastName].filter(Boolean).join(' ').trim() ||
+    listing?.seller?.displayName ||
+    listing?.seller?.email ||
+    '';
+  const sellerSlug = sellerProfile?.slug || '';
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -101,10 +114,14 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
       <aside className="space-y-4">
         <div className="card p-4">
           <h3 className="font-semibold">Prodavac</h3>
-          <p>{listing.seller.sellerProfil?.displayName ?? 'Privatni prodavac'}</p>
-          <Link href={`/seller/${listing.seller.sellerProfil?.slug ?? ''}`} className="text-sm text-[var(--brand)]">
-            Pogledaj profil
-          </Link>
+          <p>{sellerDisplayName || 'Učitavanje prodavca...'}</p>
+          {sellerSlug ? (
+            <Link href={`/seller/${sellerSlug}`} className="text-sm text-[var(--brand)]">
+              Pogledaj profil
+            </Link>
+          ) : (
+            <p className="text-xs text-[var(--muted)]">Profil prodavca trenutno nije dostupan.</p>
+          )}
         </div>
         <InquiryForm listingId={listing.id} />
         <div className="card p-4">

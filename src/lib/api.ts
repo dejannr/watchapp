@@ -7,6 +7,7 @@ type RequestOptions = {
   suppressErrorToast?: boolean;
   suppressLoadingIndicator?: boolean;
 };
+const REQUEST_TIMEOUT_MS = 15000;
 
 export class ApiError extends Error {
   status: number;
@@ -17,16 +18,31 @@ export class ApiError extends Error {
   }
 }
 
-function emitRequestEvent(type: 'start' | 'end' | 'error', message?: string) {
+function emitRequestEvent(type: 'start' | 'end' | 'error', message?: string, requestId?: string) {
   if (typeof window === 'undefined') return;
   window.dispatchEvent(
     new CustomEvent('watchapp:request', {
-      detail: { type, message },
+      detail: { type, message, requestId },
     }),
   );
 }
 
 let refreshInFlight: Promise<string | null> | null = null;
+
+async function fetchWithTimeout(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === 'AbortError') {
+      throw new ApiError('Zahtev je istekao. Pokušajte ponovo.', 408);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
 async function parseError(res: Response) {
   let message = `HTTP ${res.status}`;
@@ -49,11 +65,17 @@ export async function refreshAccessToken() {
   }
 
   refreshInFlight = (async () => {
-    const res = await fetch(`${API_URL}/auth/refresh`, {
-      method: 'POST',
-      credentials: 'include',
-      cache: 'no-store',
-    });
+    let res: Response;
+    try {
+      res = await fetchWithTimeout(`${API_URL}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include',
+        cache: 'no-store',
+      });
+    } catch {
+      clearAccessToken();
+      return null;
+    }
     if (!res.ok) {
       clearAccessToken();
       return null;
@@ -93,7 +115,7 @@ async function doJsonRequest<T>(
     }
   }
 
-  const res = await fetch(`${API_URL}${path}`, {
+  const res = await fetchWithTimeout(`${API_URL}${path}`, {
     method,
     headers,
     credentials: 'include',
@@ -135,7 +157,7 @@ async function doFormRequest<T>(
     }
   }
 
-  const res = await fetch(`${API_URL}${path}`, {
+  const res = await fetchWithTimeout(`${API_URL}${path}`, {
     method,
     headers,
     credentials: 'include',
@@ -168,14 +190,15 @@ export async function apiRequest<T>(
   auth = false,
   options?: RequestOptions,
 ): Promise<T> {
+  const requestId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
   if (!options?.suppressLoadingIndicator) {
-    emitRequestEvent('start');
+    emitRequestEvent('start', undefined, requestId);
   }
   try {
     return await doJsonRequest<T>(path, method, body, auth, options, false);
   } finally {
     if (!options?.suppressLoadingIndicator) {
-      emitRequestEvent('end');
+      emitRequestEvent('end', undefined, requestId);
     }
   }
 }
@@ -187,14 +210,15 @@ export async function apiFormRequest<T>(
   auth = false,
   options?: RequestOptions,
 ): Promise<T> {
+  const requestId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
   if (!options?.suppressLoadingIndicator) {
-    emitRequestEvent('start');
+    emitRequestEvent('start', undefined, requestId);
   }
   try {
     return await doFormRequest<T>(path, method, formData, auth, options, false);
   } finally {
     if (!options?.suppressLoadingIndicator) {
-      emitRequestEvent('end');
+      emitRequestEvent('end', undefined, requestId);
     }
   }
 }
