@@ -1,65 +1,132 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { AnalyticsPageView } from '@/components/analytics-page-view';
+import { ListingCard } from '@/components/listing-card';
+import { API_URL } from '@/lib/config';
 
-export default function Home() {
+export default async function Home() {
+  const featuredRaw = await fetch(`${API_URL}/listings?limit=6`, { cache: 'no-store' })
+    .then((r) => r.json())
+    .catch(() => ({ items: [] }));
+  const brandsRaw = await fetch(`${API_URL}/brands`, { cache: 'no-store' })
+    .then((r) => r.json())
+    .catch(() => []);
+
+  const featuredItems: any[] = Array.isArray(featuredRaw?.items) ? featuredRaw.items : [];
+  const brands = Array.isArray(brandsRaw) ? brandsRaw : [];
+  const citySet = new Set<string>();
+  for (const item of featuredItems) {
+    if (typeof item?.locationCity === 'string' && item.locationCity.trim().length > 0) {
+      citySet.add(item.locationCity);
+    }
+  }
+  const cities = Array.from(citySet).slice(0, 8);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <div className="container space-y-10">
+      <AnalyticsPageView eventName="homepage_view" />
+      <section className="card grid gap-4 p-8 md:grid-cols-2">
+        <div className="space-y-4">
+          <p className="text-sm uppercase tracking-[0.2em] text-[var(--brand-soft)]">Watch Marketplace</p>
+          <h1 className="text-4xl font-bold leading-tight">Buy and Sell Authentic Timepieces Offline</h1>
+          <p className="text-[var(--muted)]">
+            Discover listings from private sellers and dealers. Search by brand, model, condition, and location.
+          </p>
+          <div className="flex gap-3">
+            <Link href="/browse" className="rounded bg-[var(--brand)] px-5 py-2 text-white">
+              Browse Listings
+            </Link>
+            <Link href="/sell" className="rounded border border-[var(--line)] px-5 py-2">
+              Become Seller
+            </Link>
+          </div>
+        </div>
+        <div className="rounded-xl border border-dashed border-[var(--line)] p-6 text-sm text-[var(--muted)]">
+          <p>How it works:</p>
+          <ol className="mt-2 list-decimal space-y-1 pl-5">
+            <li>Register and verify email.</li>
+            <li>Apply as seller and get approved.</li>
+            <li>Create listings and manage inquiries.</li>
+          </ol>
+        </div>
+      </section>
+
+      <section className="grid gap-3 sm:grid-cols-3">
+        <div className="card p-4">
+          <p className="text-sm uppercase tracking-wide text-[var(--brand-soft)]">Trust</p>
+          <p className="mt-1 font-semibold">Reviewed Listings</p>
+          <p className="text-sm text-[var(--muted)]">Every public listing passes admin moderation.</p>
+        </div>
+        <div className="card p-4">
+          <p className="text-sm uppercase tracking-wide text-[var(--brand-soft)]">Sellers</p>
+          <p className="mt-1 font-semibold">Verified Seller Profiles</p>
+          <p className="text-sm text-[var(--muted)]">Seller approval and verification level are visible.</p>
+        </div>
+        <div className="card p-4">
+          <p className="text-sm uppercase tracking-wide text-[var(--brand-soft)]">Safety</p>
+          <p className="mt-1 font-semibold">Secure Inquiry Flow</p>
+          <p className="text-sm text-[var(--muted)]">Inquiries are tracked with platform-side audit history.</p>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-2xl font-bold">Featured Listings</h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {featuredItems.map((listing: any) => (
+            <ListingCard key={listing.id} listing={listing} />
+          ))}
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-2xl font-bold">Popular Brands</h2>
+        <div className="flex flex-wrap gap-2">
+          {brands.slice(0, 18).map((brand: any) => (
+            <Link
+              key={brand.id}
+              href={`/browse?brand=${brand.slug}`}
+              className="rounded-full border border-[var(--line)] px-3 py-1 text-sm"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+              {brand.name}
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="card grid gap-4 p-6 md:grid-cols-[1fr_auto] md:items-center">
+        <div>
+          <h2 className="text-2xl font-bold">Sell Watches on ChronoMarket</h2>
+          <p className="text-[var(--muted)]">
+            Apply as a seller, get reviewed by admin, and publish trusted inventory for serious buyers.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+        <Link href="/sell" className="rounded bg-[var(--brand)] px-5 py-2 text-white">
+          Become a Seller
+        </Link>
+      </section>
+
+      <section className="card space-y-3 p-5">
+        <h2 className="text-lg font-semibold">Explore by Brand & City</h2>
+        <div className="flex flex-wrap gap-2 text-sm">
+          {brands.slice(0, 10).map((brand: any) => (
+            <Link
+              key={brand.id}
+              href={`/browse/brand/${brand.slug}`}
+              className="rounded border border-[var(--line)] px-3 py-1"
+            >
+              {brand.name}
+            </Link>
+          ))}
+          {cities.map((city) => (
+            <Link
+              key={city}
+              href={`/browse/city/${encodeURIComponent(city)}`}
+              className="rounded border border-[var(--line)] px-3 py-1"
+            >
+              {city}
+            </Link>
+          ))}
         </div>
-      </main>
+      </section>
     </div>
   );
 }
