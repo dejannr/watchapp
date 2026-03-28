@@ -1,8 +1,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 import { TopNav } from '@/components/top-nav';
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  weight: ['400', '500', '600', '700'],
+});
 
 export const metadata: Metadata = {
   title: 'Watch Marketplace MVP',
@@ -17,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body suppressHydrationWarning>
+      <body suppressHydrationWarning className={jakarta.variable}>
         <Providers>
           <header className="border-b border-[var(--line)] bg-[var(--card)]/90 backdrop-blur">
             <div className="container flex items-center justify-between py-4">

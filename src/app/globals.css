@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #f5f2eb;
-  --card: #fff9ef;
-  --text: #1d1911;
-  --muted: #665f52;
-  --brand: #7a2f14;
-  --brand-soft: #b74d24;
-  --line: #e3d9c7;
+  --bg: #0e1118;
+  --card: #171c26;
+  --text: #e7edf8;
+  --muted: #a6b2c7;
+  --brand: #c89a5a;
+  --brand-soft: #e0b97e;
+  --line: #2a3242;
 }
 
 * {
@@ -16,12 +16,17 @@
 
 body {
   margin: 0;
-  background:
-    radial-gradient(circle at 10% 10%, #f4e7ce 0%, transparent 45%),
-    radial-gradient(circle at 90% 5%, #efd7b9 0%, transparent 45%),
-    var(--bg);
+  color-scheme: dark;
+  background: var(--bg);
   color: var(--text);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-sans), system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-sans), system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
 }
 
 a {
@@ -50,4 +55,12 @@ button:not(:disabled):active {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 16px;
+}
+
+input,
+textarea,
+select {
+  background: #111725;
+  color: var(--text);
+  border-color: var(--line);
 }
