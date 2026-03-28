@@ -39,13 +39,19 @@ export function TopNav() {
 
   const unread = useQuery({
     queryKey: ['notifications-unread', user?.id],
-    queryFn: () => apiRequest<{ unread: number }>('/notifications/me/unread-count', 'GET', undefined, true),
+    queryFn: () =>
+      apiRequest<{ unread: number }>('/notifications/me/unread-count', 'GET', undefined, true, {
+        suppressLoadingIndicator: true,
+      }),
     enabled: loggedIn,
     refetchInterval: 5_000,
   });
   const chatUnread = useQuery({
     queryKey: ['chats-unread', user?.id],
-    queryFn: () => apiRequest<{ unread: number }>('/chats/unread-count', 'GET', undefined, true),
+    queryFn: () =>
+      apiRequest<{ unread: number }>('/chats/unread-count', 'GET', undefined, true, {
+        suppressLoadingIndicator: true,
+      }),
     enabled: loggedIn,
     refetchInterval: 5_000,
   });

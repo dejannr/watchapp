@@ -26,7 +26,7 @@ export async function apiRequest<T>(
   method: Method = 'GET',
   body?: unknown,
   auth = false,
-  options?: { suppressErrorToast?: boolean },
+  options?: { suppressErrorToast?: boolean; suppressLoadingIndicator?: boolean },
 ): Promise<T> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -38,7 +38,9 @@ export async function apiRequest<T>(
     }
   }
 
-  emitRequestEvent('start');
+  if (!options?.suppressLoadingIndicator) {
+    emitRequestEvent('start');
+  }
   try {
     const res = await fetch(`${API_URL}${path}`, {
       method,
@@ -68,7 +70,9 @@ export async function apiRequest<T>(
 
     return (await res.json()) as T;
   } finally {
-    emitRequestEvent('end');
+    if (!options?.suppressLoadingIndicator) {
+      emitRequestEvent('end');
+    }
   }
 }
 
@@ -77,7 +81,7 @@ export async function apiFormRequest<T>(
   method: Method,
   formData: FormData,
   auth = false,
-  options?: { suppressErrorToast?: boolean },
+  options?: { suppressErrorToast?: boolean; suppressLoadingIndicator?: boolean },
 ): Promise<T> {
   const headers: Record<string, string> = {};
   if (auth) {
@@ -87,7 +91,9 @@ export async function apiFormRequest<T>(
     }
   }
 
-  emitRequestEvent('start');
+  if (!options?.suppressLoadingIndicator) {
+    emitRequestEvent('start');
+  }
   try {
     const res = await fetch(`${API_URL}${path}`, {
       method,
@@ -117,6 +123,8 @@ export async function apiFormRequest<T>(
 
     return (await res.json()) as T;
   } finally {
-    emitRequestEvent('end');
+    if (!options?.suppressLoadingIndicator) {
+      emitRequestEvent('end');
+    }
   }
 }

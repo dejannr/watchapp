@@ -1,23 +1,24 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { use, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ApiError, apiRequest } from '@/lib/api';
 
-export default function SellerApplicationDetailPage({ params }: { params: { id: string } }) {
+export default function SellerApplicationDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const app = useQuery({
-    queryKey: ['seller-application', params.id],
-    queryFn: () => apiRequest<any>(`/admin/seller-applications/${params.id}`, 'GET', undefined, true),
+    queryKey: ['seller-application', id],
+    queryFn: () => apiRequest<any>(`/admin/seller-applications/${id}`, 'GET', undefined, true),
   });
 
   const approve = async () => {
     setError('');
     setSuccess('');
     try {
-      await apiRequest(`/admin/seller-applications/${params.id}/approve`, 'POST', {}, true);
+      await apiRequest(`/admin/seller-applications/${id}/approve`, 'POST', {}, true);
       setSuccess('Seller application approved.');
       await app.refetch();
     } catch (e) {
@@ -30,7 +31,7 @@ export default function SellerApplicationDetailPage({ params }: { params: { id: 
     setSuccess('');
     try {
       await apiRequest(
-        `/admin/seller-applications/${params.id}/reject`,
+        `/admin/seller-applications/${id}/reject`,
         'POST',
         { reasonCode: 'OTHER', rejectionNote: 'Rejected by admin review.' },
         true,

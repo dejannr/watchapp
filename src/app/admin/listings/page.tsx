@@ -3,10 +3,33 @@
 import Link from 'next/link';
 import { Suspense, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, apiRequest } from '@/lib/api';
 
+type AdminListingListItem = {
+  id: string;
+  title: string;
+  status: string;
+  updatedAt?: string;
+  sellerId?: string;
+  brand?: {
+    id: string;
+    name: string;
+    slug: string;
+  } | null;
+};
+
+type AdminListingsResponse = {
+  items: AdminListingListItem[];
+  pagination: {
+    page: number;
+    pageCount: number;
+    total: number;
+  };
+};
+
 function AdminListingsPageContent() {
+  const qc = useQueryClient();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -17,26 +40,53 @@ function AdminListingsPageContent() {
   const page = Number(searchParams.get('page') ?? '1');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [activeAction, setActiveAction] = useState<string | null>(null);
   const listings = useQuery({
     queryKey: ['admin-listings', status, sellerId, brandId, createdFrom, page],
     queryFn: () =>
-      apiRequest<{ items: any[]; pagination: { page: number; pageCount: number; total: number } }>(
+      apiRequest<AdminListingsResponse>(
         `/admin/listings?status=${encodeURIComponent(status)}&sellerId=${encodeURIComponent(sellerId)}&brandId=${encodeURIComponent(brandId)}&createdFrom=${encodeURIComponent(createdFrom)}&page=${page}&pageSize=12`,
         'GET',
         undefined,
         true,
+        { suppressLoadingIndicator: true },
       ),
+    staleTime: 30_000,
   });
 
   const moderate = async (id: string, action: 'approve' | 'reject' | 'hide' | 'restore' | 'mark-sold') => {
     setError('');
     setSuccess('');
+    setActiveAction(`${id}:${action}`);
     try {
-      await apiRequest(`/admin/listings/${id}/${action}`, 'POST', {}, true);
+      await apiRequest(`/admin/listings/${id}/${action}`, 'POST', {}, true, {
+        suppressLoadingIndicator: true,
+      });
+      const nextStatus =
+        action === 'approve' || action === 'restore'
+          ? 'PUBLISHED'
+          : action === 'reject'
+            ? 'REJECTED'
+            : action === 'hide'
+              ? 'HIDDEN'
+              : 'SOLD';
+      qc.setQueryData<AdminListingsResponse>(
+        ['admin-listings', status, sellerId, brandId, createdFrom, page],
+        (prev) =>
+          prev
+            ? {
+                ...prev,
+                items: prev.items.map((item) =>
+                  item.id === id ? { ...item, status: nextStatus } : item,
+                ),
+              }
+            : prev,
+      );
       setSuccess(`Listing ${action} successful.`);
-      await listings.refetch();
     } catch (e) {
       setError(e instanceof ApiError ? e.message : `Failed to ${action} listing`);
+    } finally {
+      setActiveAction(null);
     }
   };
 
@@ -110,20 +160,45 @@ function AdminListingsPageContent() {
                 Open detail
               </Link>
               <div className="mt-2 flex flex-wrap gap-2 text-xs">
-                <button className="rounded border px-2 py-1" onClick={() => void moderate(listing.id, 'approve')}>
-                  Approve
+                <button
+                  className="rounded border px-2 py-1 disabled:opacity-60"
+                  disabled={Boolean(activeAction)}
+                  type="button"
+                  onClick={() => void moderate(listing.id, 'approve')}
+                >
+                  {activeAction === `${listing.id}:approve` ? 'Approving...' : 'Approve'}
                 </button>
-                <button className="rounded border px-2 py-1" onClick={() => void moderate(listing.id, 'reject')}>
-                  Reject
+                <button
+                  className="rounded border px-2 py-1 disabled:opacity-60"
+                  disabled={Boolean(activeAction)}
+                  type="button"
+                  onClick={() => void moderate(listing.id, 'reject')}
+                >
+                  {activeAction === `${listing.id}:reject` ? 'Rejecting...' : 'Reject'}
                 </button>
-                <button className="rounded border px-2 py-1" onClick={() => void moderate(listing.id, 'hide')}>
-                  Hide
+                <button
+                  className="rounded border px-2 py-1 disabled:opacity-60"
+                  disabled={Boolean(activeAction)}
+                  type="button"
+                  onClick={() => void moderate(listing.id, 'hide')}
+                >
+                  {activeAction === `${listing.id}:hide` ? 'Hiding...' : 'Hide'}
                 </button>
-                <button className="rounded border px-2 py-1" onClick={() => void moderate(listing.id, 'restore')}>
-                  Restore
+                <button
+                  className="rounded border px-2 py-1 disabled:opacity-60"
+                  disabled={Boolean(activeAction)}
+                  type="button"
+                  onClick={() => void moderate(listing.id, 'restore')}
+                >
+                  {activeAction === `${listing.id}:restore` ? 'Restoring...' : 'Restore'}
                 </button>
-                <button className="rounded border px-2 py-1" onClick={() => void moderate(listing.id, 'mark-sold')}>
-                  Mark Sold
+                <button
+                  className="rounded border px-2 py-1 disabled:opacity-60"
+                  disabled={Boolean(activeAction)}
+                  type="button"
+                  onClick={() => void moderate(listing.id, 'mark-sold')}
+                >
+                  {activeAction === `${listing.id}:mark-sold` ? 'Updating...' : 'Mark Sold'}
                 </button>
               </div>
             </div>

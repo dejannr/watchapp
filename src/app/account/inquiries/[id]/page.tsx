@@ -1,23 +1,24 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { use, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ApiError, apiRequest } from '@/lib/api';
 
-export default function AccountInquiryDetailPage({ params }: { params: { id: string } }) {
+export default function AccountInquiryDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const inquiry = useQuery({
-    queryKey: ['buyer-inquiry-detail', params.id],
-    queryFn: () => apiRequest<any>(`/buyer/inquiries/${params.id}`, 'GET', undefined, true),
+    queryKey: ['buyer-inquiry-detail', id],
+    queryFn: () => apiRequest<any>(`/buyer/inquiries/${id}`, 'GET', undefined, true),
   });
 
   const close = async () => {
     setError('');
     setSuccess('');
     try {
-      await apiRequest(`/buyer/inquiries/${params.id}/close`, 'POST', { reason: 'Closed by buyer' }, true);
+      await apiRequest(`/buyer/inquiries/${id}/close`, 'POST', { reason: 'Closed by buyer' }, true);
       setSuccess('Inquiry closed.');
       await inquiry.refetch();
     } catch (e) {
