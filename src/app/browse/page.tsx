@@ -4,6 +4,18 @@ import { BrowseFilters } from '@/components/browse-filters';
 import { ListingCard } from '@/components/listing-card';
 import { API_URL } from '@/lib/config';
 
+type BrowseListing = {
+  id: string;
+  slug: string;
+  title: string;
+  priceAmount: number;
+  currency: string;
+  locationCity?: string | null;
+  locationCountry?: string | null;
+  brand?: { name: string };
+  images?: Array<{ url: string }>;
+};
+
 export const metadata: Metadata = {
   title: 'Browse Watches | ChronoMarket',
   description: 'Browse verified watch listings with structured filters.',
@@ -25,23 +37,21 @@ export default async function BrowsePage({
   const data = await fetch(`${API_URL}/listings?${queryString}`, { cache: 'no-store' })
     .then((r) => r.json())
     .catch(() => ({ items: [], meta: null }));
-  const items = Array.isArray(data?.items) ? data.items : [];
+  const items: BrowseListing[] = Array.isArray(data?.items) ? data.items : [];
 
   return (
-    <div className="container grid gap-6 md:grid-cols-[260px_1fr]">
+    <div className="container space-y-4">
       <AnalyticsPageView eventName="browse_view" properties={{ resultCount: items.length }} />
-      <aside>
-        <BrowseFilters />
-      </aside>
+      <div className="card flex items-center justify-between p-4">
+        <h1 className="text-2xl font-bold">Browse Listings</h1>
+        <span className="text-sm text-[var(--muted)]">
+          {data.meta ? `${data.meta.total} total` : ''}
+        </span>
+      </div>
+      <BrowseFilters />
       <section className="space-y-4">
-        <div className="card flex items-center justify-between p-4">
-          <h1 className="text-2xl font-bold">Browse Listings</h1>
-          <span className="text-sm text-[var(--muted)]">
-            {data.meta ? `${data.meta.total} total` : ''}
-          </span>
-        </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((listing: any) => (
+          {items.map((listing) => (
             <ListingCard key={listing.id} listing={listing} />
           ))}
         </div>

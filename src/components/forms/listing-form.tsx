@@ -38,6 +38,15 @@ type Brand = {
 
 type FormValues = z.infer<typeof listingSchema>;
 
+const COUNTRY_OPTIONS = [
+  'Srbija',
+  'Crna Gora',
+  'Bosna i Hercegovina',
+  'Hrvatska',
+  'Slovenija',
+  'Makedonija',
+] as const;
+
 export function ListingForm({ listingId }: { listingId?: string }) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -50,7 +59,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   const [notice, setNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const isEdit = Boolean(listingId);
 
-  const { register, handleSubmit, formState, reset } = useForm<FormValues>({
+  const { register, handleSubmit, formState, reset, watch } = useForm<FormValues>({
     defaultValues: {
       title: '',
       description: '',
@@ -71,6 +80,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   });
 
   const targetId = useMemo(() => listingId ?? createdId, [listingId, createdId]);
+  const selectedCountry = watch('locationCountry');
 
   useEffect(() => {
     let active = true;
@@ -176,6 +186,12 @@ export function ListingForm({ listingId }: { listingId?: string }) {
     }
     if (!values.priceAmount || Number(values.priceAmount) < 1) {
       const msg = 'Price is required.';
+      setError(msg);
+      setNotice({ type: 'error', message: msg });
+      return;
+    }
+    if (!values.locationCountry || values.locationCountry.trim().length === 0) {
+      const msg = 'Country is required.';
       setError(msg);
       setNotice({ type: 'error', message: msg });
       return;
@@ -320,8 +336,20 @@ export function ListingForm({ listingId }: { listingId?: string }) {
             Price <span className="text-red-600">*</span>
           </label>
           <input className="rounded border p-2" type="number" placeholder="Price" {...register('priceAmount', { valueAsNumber: true })} />
-          <input className="rounded border p-2" placeholder="City" {...register('locationCity')} />
-          <input className="rounded border p-2" placeholder="Country" {...register('locationCountry')} />
+          <select className="rounded border p-2" {...register('locationCountry')}>
+            <option value="">Select country *</option>
+            {COUNTRY_OPTIONS.map((country) => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </select>
+          <input
+            className="rounded border p-2 disabled:opacity-60"
+            placeholder={selectedCountry ? 'City' : 'Select country first'}
+            disabled={!selectedCountry}
+            {...register('locationCity')}
+          />
         </div>
       </section>
 

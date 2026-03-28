@@ -28,8 +28,8 @@ export default function RootLayout({
         <Providers>
           <header className="border-b border-[var(--line)] bg-[var(--card)]/90 backdrop-blur">
             <div className="container flex items-center justify-between py-4">
-              <Link href="/" className="text-xl font-bold tracking-wide text-[var(--brand)]">
-                ChronoMarket
+              <Link href="/" className="text-xl font-bold tracking-wide">
+                ChronoMarket<span className="text-[var(--brand)]">24</span>
               </Link>
               <TopNav />
             </div>
