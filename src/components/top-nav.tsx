@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-regular-svg-icons';
 import { useNotify } from '@/components/notifications-provider';
 import { apiRequest } from '@/lib/api';
 import { clearAccessToken, getAccessToken } from '@/lib/auth';
@@ -61,10 +63,14 @@ export function TopNav() {
 
   return (
     <nav className="flex items-center gap-4 text-sm">
-      <Link href="/browse">Pretraga</Link>
+      {loggedIn && <Link href="/browse">Pretraga</Link>}
 
-      {!loggedIn && <Link href="/login">Prijava</Link>}
-      {!loggedIn && <Link href="/register">Registracija</Link>}
+      {!loggedIn && (
+        <Link href="/login" className="inline-flex items-center gap-2">
+          <FontAwesomeIcon icon={faUser} className="h-5 w-5" aria-hidden="true" />
+          Prijavi se
+        </Link>
+      )}
 
       {loggedIn && user?.sellerStatus !== 'APPROVED' && <Link href="/sell">Postani prodavac</Link>}
       {loggedIn && user?.sellerStatus === 'APPROVED' && <Link href="/seller-dashboard">Prodavac</Link>}

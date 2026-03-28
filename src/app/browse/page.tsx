@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { AnalyticsPageView } from '@/components/analytics-page-view';
-import { PretragaFilters } from '@/components/browse-filters';
+import { BrowseFilters } from '@/components/browse-filters';
 import { ListingCard } from '@/components/listing-card';
 import { API_URL } from '@/lib/config';
 
@@ -42,7 +42,7 @@ export default async function PretragaPage({
   return (
     <div className="container space-y-4">
       <AnalyticsPageView eventName="browse_view" properties={{ resultCount: items.length }} />
-      <PretragaFilters />
+      <BrowseFilters />
       <section className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((listing) => (

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
@@ -28,7 +29,8 @@ export default function RootLayout({
         <Providers>
           <header className="border-b border-[var(--line)] bg-[var(--card)]/90 backdrop-blur">
             <div className="container flex items-center justify-between py-4">
-              <Link href="/" className="text-xl font-bold tracking-wide">
+              <Link href="/" className="inline-flex items-center gap-2 text-xl font-bold tracking-wide">
+                <Image src="/brand.png" alt="WatchStock logo" width={32} height={32} className="h-8 w-8" />
                 WatchStock
               </Link>
               <TopNav />
