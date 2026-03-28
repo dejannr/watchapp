@@ -86,29 +86,6 @@ export default async function Home() {
         </Link>
       </section>
 
-      <section className="card space-y-3 p-5">
-        <h2 className="text-lg font-semibold">Explore by Brand & City</h2>
-        <div className="flex flex-wrap gap-2 text-sm">
-          {brands.slice(0, 10).map((brand: any) => (
-            <Link
-              key={brand.id}
-              href={`/browse/brand/${brand.slug}`}
-              className="rounded border border-[var(--line)] px-3 py-1"
-            >
-              {brand.name}
-            </Link>
-          ))}
-          {cities.map((city) => (
-            <Link
-              key={city}
-              href={`/browse/city/${encodeURIComponent(city)}`}
-              className="rounded border border-[var(--line)] px-3 py-1"
-            >
-              {city}
-            </Link>
-          ))}
-        </div>
-      </section>
     </div>
   );
 }
