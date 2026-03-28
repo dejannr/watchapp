@@ -26,32 +26,32 @@ export default async function Home() {
       <AnalyticsPageView eventName="homepage_view" />
       <section className="card grid gap-4 p-8 md:grid-cols-2">
         <div className="space-y-4">
-          <p className="text-sm uppercase tracking-[0.2em] text-[var(--brand-soft)]">Watch Marketplace</p>
-          <h1 className="text-4xl font-bold leading-tight">Buy and Sell Authentic Timepieces Offline</h1>
+          <p className="text-sm uppercase tracking-[0.2em] text-[var(--brand-soft)]">Tržište satova</p>
+          <h1 className="text-4xl font-bold leading-tight">Kupujte i prodajte autentične satove van mreže</h1>
           <p className="text-[var(--muted)]">
-            Discover listings from private sellers and dealers. Search by brand, model, condition, and location.
+            Pronađite oglase privatnih prodavaca i dilera. Pretražujte po brendu, modelu, stanju i lokaciji.
           </p>
           <div className="flex gap-3">
             <Link href="/browse" className="rounded bg-[var(--brand)] px-5 py-2 text-white">
-              Browse Listings
+              Pregledaj oglase
             </Link>
             <Link href="/sell" className="rounded border border-[var(--line)] px-5 py-2">
-              Become Seller
+              Postani prodavac
             </Link>
           </div>
         </div>
         <div className="rounded-xl border border-dashed border-[var(--line)] p-6 text-sm text-[var(--muted)]">
-          <p>How it works:</p>
+          <p>Kako funkcioniše:</p>
           <ol className="mt-2 list-decimal space-y-1 pl-5">
-            <li>Register and verify email.</li>
-            <li>Apply as seller and get approved.</li>
-            <li>Create listings and manage inquiries.</li>
+            <li>Registrujte se i verifikujte e-poštu.</li>
+            <li>Prijavite se kao prodavac i sačekajte odobrenje.</li>
+            <li>Kreirajte oglase i upravljajte upitima.</li>
           </ol>
         </div>
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold">Featured Listings</h2>
+        <h2 className="text-2xl font-bold">Istaknuti oglasi</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {featuredItems.map((listing: any) => (
             <ListingCard key={listing.id} listing={listing} />
@@ -60,7 +60,7 @@ export default async function Home() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold">Popular Brands</h2>
+        <h2 className="text-2xl font-bold">Popularni brendovi</h2>
         <div className="flex flex-wrap gap-2">
           {brands.slice(0, 18).map((brand: any) => (
             <Link
@@ -76,13 +76,13 @@ export default async function Home() {
 
       <section className="card grid gap-4 p-6 md:grid-cols-[1fr_auto] md:items-center">
         <div>
-          <h2 className="text-2xl font-bold">Sell Watches on ChronoMarket</h2>
+          <h2 className="text-2xl font-bold">Prodajte satove na WatchStock-u</h2>
           <p className="text-[var(--muted)]">
-            Apply as a seller, get reviewed by admin, and publish trusted inventory for serious buyers.
+            Prijavite se kao prodavac, prođite proveru administratora i objavite pouzdan inventar za ozbiljne kupce.
           </p>
         </div>
         <Link href="/sell" className="rounded bg-[var(--brand)] px-5 py-2 text-white">
-          Become a Seller
+          Postani prodavac
         </Link>
       </section>
 

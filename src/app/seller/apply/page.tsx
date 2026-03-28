@@ -8,7 +8,7 @@ import { SellerApplyForm } from '@/components/forms/seller-apply-form';
 import { apiRequest } from '@/lib/api';
 import { useCurrentUser } from '@/hooks/use-current-user';
 
-type SellerProfile = {
+type ProdavacProfil = {
   id?: string;
   displayName: string;
   slug: string;
@@ -33,12 +33,12 @@ type SellerProfile = {
   };
 };
 
-export default function SellerApplyPage() {
+export default function ProdavacPrimeniPage() {
   const router = useRouter();
   const { data: user, isLoading: userLoading } = useCurrentUser();
-  const sellerProfile = useQuery({
+  const sellerProfil = useQuery({
     queryKey: ['seller-application-me'],
-    queryFn: () => apiRequest<SellerProfile>('/seller-application/me', 'GET', undefined, true),
+    queryFn: () => apiRequest<ProdavacProfil>('/seller-application/me', 'GET', undefined, true),
     enabled: Boolean(user),
     retry: false,
   });
@@ -52,7 +52,7 @@ export default function SellerApplyPage() {
   if (userLoading) {
     return (
       <div className="container">
-        <div className="card p-4 text-sm">Checking session...</div>
+        <div className="card p-4 text-sm">Provera sesije...</div>
       </div>
     );
   }
@@ -61,30 +61,30 @@ export default function SellerApplyPage() {
     return (
       <div className="container">
         <div className="card space-y-4 p-5">
-          <p className="text-lg font-semibold">Login required</p>
+          <p className="text-lg font-semibold">Potrebna je prijava</p>
           <p className="text-sm text-[var(--muted)]">
-            You need an account to apply for seller access and manage listings.
+            Potreban vam je nalog da biste tražili pristup za prodavca i upravljali oglasima.
           </p>
           <div className="rounded border border-[var(--line)] p-3 text-sm">
-            <p className="font-semibold">With seller access you can:</p>
+            <p className="font-semibold">Sa pristupom prodavca možete:</p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-[var(--muted)]">
-              <li>Create and edit your watch listings</li>
-              <li>Receive and manage buyer inquiries</li>
-              <li>Track listing status in your seller dashboard</li>
+              <li>Kreirati i uređivati svoje oglase satova</li>
+              <li>Primati i upravljati upitima kupaca</li>
+              <li>Pratiti status oglasa na kontrolnoj tabli prodavca</li>
             </ul>
           </div>
           <div className="rounded border border-[var(--line)] p-3 text-sm text-[var(--muted)]">
-            <p className="font-semibold text-[var(--text)]">Before applying:</p>
-            <p className="mt-1">Login and verify your email. Then complete the seller application form.</p>
+            <p className="font-semibold text-[var(--text)]">Pre prijave:</p>
+            <p className="mt-1">Prijavite se i verifikujte e-poštu. Zatim popunite obrazac za prijavu prodavca.</p>
           </div>
           <Link
             href="/login?next=%2Fsell"
             className="inline-block rounded bg-[var(--brand)] px-3 py-1.5 text-white"
           >
-            Go to Login
+            Idi na prijavu
           </Link>
           <p className="text-xs text-[var(--muted)]">
-            Don’t have an account? <Link href="/register" className="text-[var(--brand)]">Register first</Link>.
+            Nemate nalog? <Link href="/register" className="text-[var(--brand)]">Prvo se registrujte</Link>.
           </p>
         </div>
       </div>
@@ -99,9 +99,9 @@ export default function SellerApplyPage() {
     return (
       <div className="container">
         <div className="card space-y-3 p-4">
-          <p className="font-semibold">Application sent</p>
+          <p className="font-semibold">Prijava je poslata</p>
           <p className="text-sm text-[var(--muted)]">
-            Your seller request is pending admin review. You will get seller rights once approved.
+            Vaš zahtev za prodavca čeka proveru administratora. Prava prodavca dobićete nakon odobrenja.
           </p>
         </div>
       </div>
@@ -112,12 +112,12 @@ export default function SellerApplyPage() {
     return (
       <div className="container">
         <div className="card space-y-3 p-4">
-          <p className="font-semibold">Verify your email first</p>
+          <p className="font-semibold">Prvo verifikujte e-poštu</p>
           <p className="text-sm text-[var(--muted)]">
-            Seller applications are available only for active, email-verified accounts.
+            Prijave za prodavca dostupne su samo za aktivne naloge sa verifikovanom e-poštom.
           </p>
           <Link href="/verify-email" className="inline-block rounded bg-[var(--brand)] px-3 py-1.5 text-white">
-            Verify Email
+            Verifikuj e-poštu
           </Link>
         </div>
       </div>
@@ -125,12 +125,12 @@ export default function SellerApplyPage() {
   }
 
   const rejected = user.sellerStatus === 'REJECTED';
-  const latest = sellerProfile.data?.latestApplication;
-  if (sellerProfile.isError && !rejected) {
+  const latest = sellerProfil.data?.latestApplication;
+  if (sellerProfil.isError && !rejected) {
     return (
       <div className="container">
         <div className="card p-4 text-sm text-red-700">
-          Failed to load seller application status. Please refresh and try again.
+          Nije moguće učitati status prijave za prodavca. Osvežite stranicu i pokušajte ponovo.
         </div>
       </div>
     );
@@ -153,24 +153,24 @@ export default function SellerApplyPage() {
     <div className="container space-y-4">
       <div className="card p-4 text-sm">
         <p className="font-semibold">
-          {rejected ? 'Seller application declined' : 'Apply for seller access'}
+          {rejected ? 'Prijava za prodavca je odbijena' : 'Prijavite se za pristup prodavca'}
         </p>
         <p className="mt-1 text-[var(--muted)]">
           {rejected
-            ? 'Your previous request was declined. Update details and submit again.'
-            : 'Submit your seller profile details. Admin approval is required.'}
+            ? 'Vaš prethodni zahtev je odbijen. Ažurirajte podatke i pošaljite ponovo.'
+            : 'Pošaljite podatke profila prodavca. Potrebno je odobrenje administratora.'}
         </p>
         {rejected && (latest?.rejectionReasonCode || latest?.rejectionNote) && (
           <div className="mt-3 rounded border border-amber-200 bg-amber-50 p-2 text-amber-900">
-            <p className="font-semibold">Last rejection</p>
-            {latest.rejectionReasonCode && <p>Reason: {latest.rejectionReasonCode}</p>}
-            {latest.rejectionNote && <p>Note: {latest.rejectionNote}</p>}
+            <p className="font-semibold">Poslednje odbijanje</p>
+            {latest.rejectionReasonCode && <p>Razlog: {latest.rejectionReasonCode}</p>}
+            {latest.rejectionNote && <p>Napomena: {latest.rejectionNote}</p>}
           </div>
         )}
       </div>
       <SellerApplyForm
         initialValues={initialValues}
-        submitLabel={rejected ? 'Resubmit Application' : 'Submit Application'}
+        submitLabel={rejected ? 'Pošalji prijavu ponovo' : 'Pošalji prijavu'}
         mode={rejected ? 'resubmit' : 'create'}
         applicationId={latest?.id}
         onSubmitted={() => {

@@ -7,12 +7,12 @@ import { useCurrentUser } from '@/hooks/use-current-user';
 import { apiRequest } from '@/lib/api';
 
 const links = [
-  ['/account/profile', 'Profile'],
-  ['/account/favorites', 'Favorites'],
-  ['/account/notifications', 'Notifications'],
+  ['/account/profile', 'Profil'],
+  ['/account/favorites', 'Favoriti'],
+  ['/account/notifications', 'Obaveštenja'],
 ] as const;
 
-export default function AccountPage() {
+export default function NalogPage() {
   const { data: user } = useCurrentUser();
   const favorites = useQuery({
     queryKey: ['account-count-favorites'],
@@ -33,12 +33,12 @@ export default function AccountPage() {
 
   return (
     <div className="container space-y-4">
-      <h1 className="text-3xl font-bold">Account</h1>
+      <h1 className="text-3xl font-bold">Nalog</h1>
       <div className="card p-4 text-sm">
-        <p className="font-semibold">Seller application status</p>
-        <p className="text-[var(--muted)]">Current status: {user?.sellerStatus ?? 'NONE'}</p>
+        <p className="font-semibold">Status prijave za prodavca</p>
+        <p className="text-[var(--muted)]">Trenutni status: {user?.sellerStatus ?? 'NONE'}</p>
         <Link href="/sell" className="mt-2 inline-block text-[var(--brand)]">
-          Manage seller application
+          Uredi prijavu za prodavca
         </Link>
       </div>
       <div className="grid gap-3 sm:grid-cols-3">

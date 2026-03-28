@@ -25,7 +25,7 @@ export function TopNav() {
         ? user.displayName.trim()
         : user?.email
           ? user.email.split('@')[0]
-          : 'Account';
+          : 'Nalog';
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -61,16 +61,16 @@ export function TopNav() {
 
   return (
     <nav className="flex items-center gap-4 text-sm">
-      <Link href="/browse">Browse</Link>
+      <Link href="/browse">Pretraga</Link>
 
-      {!loggedIn && <Link href="/login">Login</Link>}
-      {!loggedIn && <Link href="/register">Register</Link>}
+      {!loggedIn && <Link href="/login">Prijava</Link>}
+      {!loggedIn && <Link href="/register">Registracija</Link>}
 
-      {loggedIn && user?.sellerStatus !== 'APPROVED' && <Link href="/sell">Become Seller</Link>}
-      {loggedIn && user?.sellerStatus === 'APPROVED' && <Link href="/seller-dashboard">Seller</Link>}
+      {loggedIn && user?.sellerStatus !== 'APPROVED' && <Link href="/sell">Postani prodavac</Link>}
+      {loggedIn && user?.sellerStatus === 'APPROVED' && <Link href="/seller-dashboard">Prodavac</Link>}
       {loggedIn && (
         <Link href="/account" className="relative pr-1">
-          Account
+          Nalog
           {(unread.data?.unread ?? 0) > 0 && (
             <span className="absolute -right-3 -top-2 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white">
               {unread.data?.unread}
@@ -80,7 +80,7 @@ export function TopNav() {
       )}
       {loggedIn && (
         <Link href="/chats" className="relative pr-1">
-          Chats
+          Poruke
           {(chatUnread.data?.unread ?? 0) > 0 && (
             <span className="absolute -right-3 -top-2 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white">
               {chatUnread.data?.unread}
@@ -88,7 +88,7 @@ export function TopNav() {
           )}
         </Link>
       )}
-      {(user?.role === 'ADMIN' || user?.roles?.includes('ADMIN')) && <Link href="/admin">Admin</Link>}
+      {(user?.role === 'ADMIN' || user?.roles?.includes('ADMIN')) && <Link href="/admin">Administrator</Link>}
 
       {loggedIn && (
         <div className="relative" ref={menuRef}>
@@ -107,7 +107,7 @@ export function TopNav() {
                 className="block rounded px-3 py-2 text-sm hover:bg-stone-100"
                 onClick={() => setMenuOpen(false)}
               >
-                Profile
+                Profil
               </Link>
               <button
                 className="block w-full rounded px-3 py-2 text-left text-sm hover:bg-stone-100 disabled:opacity-60"
@@ -122,7 +122,7 @@ export function TopNav() {
               qc.setQueryData(['auth-me'], null);
               qc.removeQueries({ queryKey: ['notifications-unread'] });
               qc.removeQueries({ queryKey: ['chats-unread'] });
-              notify.info('Logged out.');
+              notify.info('Odjavljeni ste.');
               setMenuOpen(false);
               router.push('/login');
                   router.refresh();
@@ -130,7 +130,7 @@ export function TopNav() {
                 }}
                 disabled={isLoggingOut}
               >
-                {isLoggingOut ? 'Logging out...' : 'Logout'}
+                {isLoggingOut ? 'Odjavljivanje...' : 'Odjava'}
               </button>
             </div>
           )}

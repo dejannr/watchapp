@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/api';
 
-type SellerDashboardData = {
+type ProdavacDashboardData = {
   listingCounts?: Record<string, number>;
-  latestInquiries?: Array<{
+  latestUpiti?: Array<{
     id: string;
     createdAt: string;
   }>;
@@ -20,32 +20,32 @@ function formatStatus(status: string) {
     .join(' ');
 }
 
-export default function SellerDashboardPage() {
+export default function ProdavacDashboardPage() {
   const dashboard = useQuery({
     queryKey: ['seller-dashboard'],
-    queryFn: () => apiRequest<SellerDashboardData>('/seller/dashboard', 'GET', undefined, true),
+    queryFn: () => apiRequest<ProdavacDashboardData>('/seller/dashboard', 'GET', undefined, true),
   });
   const listingCounts = dashboard.data?.listingCounts ?? {};
-  const totalListings = (Object.values(listingCounts) as Array<number | string | null | undefined>)
+  const totalOglasi = (Object.values(listingCounts) as Array<number | string | null | undefined>)
     .reduce((sum: number, value) => sum + Number(value ?? 0), 0);
-  const totalInquiries = dashboard.data?.latestInquiries?.length ?? 0;
+  const totalUpiti = dashboard.data?.latestUpiti?.length ?? 0;
 
   return (
     <div className="container space-y-4">
-      <h1 className="text-3xl font-bold">Seller Dashboard</h1>
+      <h1 className="text-3xl font-bold">Kontrolna tabla prodavca</h1>
       <div className="pt-1 pb-2">
         <div className="flex flex-wrap gap-2">
           <Link
             href="/seller-dashboard/listings/new"
             className="inline-flex rounded bg-[var(--brand)] px-4 py-2 text-white"
           >
-            Create Listing
+            Kreiraj oglas
           </Link>
           <Link
             href="/seller-dashboard/listings"
             className="inline-flex rounded border border-[var(--line)] px-4 py-2"
           >
-            My Listings
+            Moji oglasi
           </Link>
         </div>
       </div>
@@ -57,13 +57,13 @@ export default function SellerDashboardPage() {
           </div>
         ))}
         <div className="card p-3">
-          <p className="text-sm text-[var(--muted)]">Recent Inquiries</p>
-          <p className="text-2xl font-bold">{totalInquiries}</p>
+          <p className="text-sm text-[var(--muted)]">Nedavni upiti</p>
+          <p className="text-2xl font-bold">{totalUpiti}</p>
         </div>
       </div>
-      {totalListings === 0 && (
+      {totalOglasi === 0 && (
         <div className="card p-4 text-sm text-[var(--muted)]">
-          You do not have any listings yet. Create your first listing to start receiving buyer inquiries.
+          Još nemate nijedan oglas. Kreirajte prvi oglas da biste počeli da dobijate upite kupaca.
         </div>
       )}
     </div>

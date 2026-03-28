@@ -30,7 +30,7 @@ type ListingResponse = {
   rejectionNote?: string;
 };
 
-type Brand = {
+type Brend = {
   id: string;
   name: string;
   slug: string;
@@ -52,12 +52,12 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   const [success, setSuccess] = useState('');
   const [createdId, setCreatedId] = useState<string | null>(null);
   const [loadError, setLoadError] = useState('');
-  const [brands, setBrands] = useState<Brand[]>([]);
+  const [brands, setBrendovi] = useState<Brend[]>([]);
   const [images, setImages] = useState<Array<{ id: string; url: string }>>([]);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [notice, setNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const isEdit = Boolean(listingId);
+  const isIzmeni = Boolean(listingId);
 
   const { register, handleSubmit, formState, reset, watch, setValue } = useForm<FormValues>({
     defaultValues: {
@@ -80,14 +80,14 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   });
 
   const targetId = useMemo(() => listingId ?? createdId, [listingId, createdId]);
-  const selectedCountry = watch('locationCountry');
+  const selectedDržava = watch('locationCountry');
 
   useEffect(() => {
     let active = true;
-    void apiRequest<Brand[]>('/brands')
+    void apiRequest<Brend[]>('/brands')
       .then((data) => {
         if (!active) return;
-        setBrands(Array.isArray(data) ? data : []);
+        setBrendovi(Array.isArray(data) ? data : []);
       })
       .catch(() => undefined);
     return () => {
@@ -96,8 +96,8 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   }, []);
 
   useEffect(() => {
-    if (isEdit) return;
-    if (selectedCountry && selectedCountry.trim().length > 0) return;
+    if (isIzmeni) return;
+    if (selectedDržava && selectedDržava.trim().length > 0) return;
     let active = true;
     void apiRequest<{ locationCountry?: string }>('/seller/me', 'GET', undefined, true, {
       suppressErrorToast: true,
@@ -113,7 +113,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
     return () => {
       active = false;
     };
-  }, [isEdit, selectedCountry, setValue]);
+  }, [isIzmeni, selectedDržava, setValue]);
 
   const loadListing = async (id: string) => {
     const data = await apiRequest<ListingResponse>(`/seller/listings/${id}`, 'GET', undefined, true);
@@ -138,7 +138,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   };
 
   useEffect(() => {
-    if (!isEdit) return;
+    if (!isIzmeni) return;
     let active = true;
     void loadListing(listingId!)
       .then(() => {
@@ -146,12 +146,12 @@ export function ListingForm({ listingId }: { listingId?: string }) {
       })
       .catch((e) => {
         if (!active) return;
-        setLoadError(e instanceof Error ? e.message : 'Failed to load listing');
+        setLoadError(e instanceof Error ? e.message : 'Učitavanje oglasa nije uspelo');
       });
     return () => {
       active = false;
     };
-  }, [isEdit, listingId, reset]);
+  }, [isIzmeni, listingId, reset]);
 
   useEffect(() => {
     const onBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -187,37 +187,37 @@ export function ListingForm({ listingId }: { listingId?: string }) {
     setSuccess('');
     setNotice(null);
     if (!values.title || values.title.trim().length < 10) {
-      const msg = 'Title is required (min 10 characters).';
+      const msg = 'Naslov je obavezan (min 10 karaktera).';
       setError(msg);
       setNotice({ type: 'error', message: msg });
       return;
     }
     if (!values.description || values.description.trim().length < 30) {
-      const msg = 'Description is required (min 30 characters).';
+      const msg = 'Opis je obavezan (min 30 karaktera).';
       setError(msg);
       setNotice({ type: 'error', message: msg });
       return;
     }
     if (!values.brandId) {
-      const msg = 'Brand is required.';
+      const msg = 'Brend je obavezan.';
       setError(msg);
       setNotice({ type: 'error', message: msg });
       return;
     }
     if (!values.priceAmount || Number(values.priceAmount) < 1) {
-      const msg = 'Price is required.';
+      const msg = 'Cena je obavezna.';
       setError(msg);
       setNotice({ type: 'error', message: msg });
       return;
     }
     if (!values.locationCountry || values.locationCountry.trim().length === 0) {
-      const msg = 'Country is required.';
+      const msg = 'Država is required.';
       setError(msg);
       setNotice({ type: 'error', message: msg });
       return;
     }
     if (pendingFiles.length === 0 && images.length === 0) {
-      const msg = 'Image is required before saving draft.';
+      const msg = 'Slika je obavezna pre čuvanja nacrta.';
       setError(msg);
       setNotice({ type: 'error', message: msg });
       return;
@@ -231,16 +231,16 @@ export function ListingForm({ listingId }: { listingId?: string }) {
         setPendingFiles([]);
         await loadListing(result.id);
       }
-      setSuccess(`Draft saved (${result.status ?? 'updated'}).`);
-      setNotice({ type: 'success', message: `Draft saved (${result.status ?? 'updated'}).` });
+      setSuccess(`Nacrt je sačuvan (${result.status ?? 'updated'}).`);
+      setNotice({ type: 'success', message: `Nacrt je sačuvan (${result.status ?? 'updated'}).` });
     } catch (e) {
       if (e instanceof ApiError) {
         setError(e.message);
         setNotice({ type: 'error', message: e.message });
         return;
       }
-      setError(e instanceof Error ? e.message : 'Failed to save listing');
-      setNotice({ type: 'error', message: e instanceof Error ? e.message : 'Failed to save listing' });
+      setError(e instanceof Error ? e.message : 'Čuvanje oglasa nije uspelo');
+      setNotice({ type: 'error', message: e instanceof Error ? e.message : 'Čuvanje oglasa nije uspelo' });
     }
   });
 
@@ -251,14 +251,14 @@ export function ListingForm({ listingId }: { listingId?: string }) {
     try {
       const id = targetId;
       if (!id) {
-        throw new Error('Save draft first.');
+        throw new Error('Prvo sačuvajte nacrt.');
       }
       await apiRequest(`/seller/listings/${id}/submit`, 'POST', {}, true);
-      setSuccess('Listing submitted for admin review.');
-      setNotice({ type: 'success', message: 'Listing submitted for admin review.' });
+      setSuccess('Oglas je poslat administratoru na proveru.');
+      setNotice({ type: 'success', message: 'Oglas je poslat administratoru na proveru.' });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Submit failed');
-      setNotice({ type: 'error', message: e instanceof Error ? e.message : 'Submit failed' });
+      setError(e instanceof Error ? e.message : 'Slanje nije uspelo');
+      setNotice({ type: 'error', message: e instanceof Error ? e.message : 'Slanje nije uspelo' });
     } finally {
       setIsSubmittingReview(false);
     }
@@ -276,88 +276,88 @@ export function ListingForm({ listingId }: { listingId?: string }) {
         </div>
       )}
       <div className="card p-5">
-        <h1 className="text-xl font-bold">{isEdit ? 'Edit Listing' : 'Create Listing'}</h1>
+        <h1 className="text-xl font-bold">{isIzmeni ? 'Izmeni oglas' : 'Kreiraj oglas'}</h1>
         <p className="text-sm text-[var(--muted)]">
-          Save as draft anytime. Submit when required details and images are complete.
+          Sačuvajte kao nacrt u bilo kom trenutku. Pošaljite kada su obavezni podaci i slike kompletni.
         </p>
       </div>
 
       {loadError && <div className="card p-4 text-sm text-red-700">{loadError}</div>}
 
-      {isEdit && (
+      {isIzmeni && (
         <ListingModerationFeedback listingId={listingId!} />
       )}
 
       <section className="card space-y-3 p-5">
-        <h2 className="text-lg font-semibold">Basics</h2>
+        <h2 className="text-lg font-semibold">Osnovno</h2>
         <label className="text-sm font-medium">
-          Title <span className="text-red-600">*</span>
+          Naslov <span className="text-red-600">*</span>
         </label>
-        <input className="w-full rounded border p-2" placeholder="Title" {...register('title')} />
+        <input className="w-full rounded border p-2" placeholder="Naslov" {...register('title')} />
         <label className="text-sm font-medium">
-          Brand <span className="text-red-600">*</span>
+          Brend <span className="text-red-600">*</span>
         </label>
         <select className="w-full rounded border p-2" {...register('brandId')}>
-          <option value="">Select brand</option>
+          <option value="">Izaberite brend</option>
           {brands.map((brand) => (
             <option key={brand.id} value={brand.id}>
               {brand.name}
             </option>
           ))}
         </select>
-        <input className="w-full rounded border p-2" placeholder="Reference number" {...register('referenceNumber')} />
+        <input className="w-full rounded border p-2" placeholder="Referentni broj" {...register('referenceNumber')} />
       </section>
 
       <section className="card space-y-3 p-5">
-        <h2 className="text-lg font-semibold">Details & Specs</h2>
+        <h2 className="text-lg font-semibold">Detalji i specifikacije</h2>
         <div className="grid gap-3 sm:grid-cols-2">
-          <input className="rounded border p-2" type="number" placeholder="Year of production" {...register('yearOfProduction', { valueAsNumber: true })} />
+          <input className="rounded border p-2" type="number" placeholder="Godina proizvodnje" {...register('yearOfProduction', { valueAsNumber: true })} />
           <select className="rounded border p-2" {...register('movementType')}>
-            <option value="AUTOMATIC">Automatic</option>
-            <option value="MANUAL">Manual</option>
+            <option value="AUTOMATIC">Automatski</option>
+            <option value="MANUAL">Ručni</option>
             <option value="QUARTZ">Quartz</option>
-            <option value="SMART">Smart</option>
-            <option value="OTHER">Other</option>
+            <option value="SMART">Pametni</option>
+            <option value="OTHER">Drugo</option>
           </select>
-          <input className="rounded border p-2" placeholder="Case material" {...register('caseMaterial')} />
-          <input className="rounded border p-2" placeholder="Bracelet material" {...register('braceletMaterial')} />
+          <input className="rounded border p-2" placeholder="Materijal kućišta" {...register('caseMaterial')} />
+          <input className="rounded border p-2" placeholder="Materijal narukvice" {...register('braceletMaterial')} />
         </div>
       </section>
 
       <section className="card space-y-3 p-5">
-        <h2 className="text-lg font-semibold">Condition & Scope</h2>
+        <h2 className="text-lg font-semibold">Stanje i oprema</h2>
         <label className="text-sm font-medium">
-          Condition <span className="text-red-600">*</span>
+          Stanje <span className="text-red-600">*</span>
         </label>
         <select className="w-full rounded border p-2" {...register('condition')}>
-          <option value="NEW">New</option>
-          <option value="LIKE_NEW">Like New</option>
-          <option value="VERY_GOOD">Very Good</option>
-          <option value="GOOD">Good</option>
-          <option value="FAIR">Fair</option>
+          <option value="NEW">Novi oglas</option>
+          <option value="LIKE_NEW">Like Novi oglas</option>
+          <option value="VERY_GOOD">Vrlo dobro</option>
+          <option value="GOOD">Dobro</option>
+          <option value="FAIR">Solidno</option>
         </select>
         <div className="flex flex-wrap gap-4 text-sm">
           <label className="flex items-center gap-2">
-            <input type="checkbox" {...register('hasBox')} /> Box included
+            <input type="checkbox" {...register('hasBox')} /> Kutija uključena
           </label>
           <label className="flex items-center gap-2">
-            <input type="checkbox" {...register('hasPapers')} /> Papers included
+            <input type="checkbox" {...register('hasPapers')} /> Papiri uključeni
           </label>
           <label className="flex items-center gap-2">
-            <input type="checkbox" {...register('inquiryEnabled')} /> Inquiry enabled
+            <input type="checkbox" {...register('inquiryEnabled')} /> Upiti omogućeni
           </label>
         </div>
       </section>
 
       <section className="card space-y-3 p-5">
-        <h2 className="text-lg font-semibold">Price & Location</h2>
+        <h2 className="text-lg font-semibold">Cena i lokacija</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="text-sm font-medium sm:col-span-2">
-            Price <span className="text-red-600">*</span>
+            Cena <span className="text-red-600">*</span>
           </label>
-          <input className="rounded border p-2" type="number" placeholder="Price" {...register('priceAmount', { valueAsNumber: true })} />
+          <input className="rounded border p-2" type="number" placeholder="Cena" {...register('priceAmount', { valueAsNumber: true })} />
           <select className="rounded border p-2" {...register('locationCountry')}>
-            <option value="">Select country *</option>
+            <option value="">Izaberite državu *</option>
             {COUNTRY_OPTIONS.map((country) => (
               <option key={country} value={country}>
                 {country}
@@ -366,17 +366,17 @@ export function ListingForm({ listingId }: { listingId?: string }) {
           </select>
           <input
             className="rounded border p-2 disabled:opacity-60"
-            placeholder={selectedCountry ? 'City' : 'Select country first'}
-            disabled={!selectedCountry}
+            placeholder={selectedDržava ? 'Grad' : 'Prvo izaberite državu'}
+            disabled={!selectedDržava}
             {...register('locationCity')}
           />
         </div>
       </section>
 
       <section className="card space-y-3 p-5">
-        <h2 className="text-lg font-semibold">Media</h2>
+        <h2 className="text-lg font-semibold">Mediji</h2>
         <p className="text-xs text-[var(--muted)]">
-          Add exactly 1 image before submitting for review <span className="text-red-600">*</span>
+          Dodajte tačno 1 sliku pre slanja na proveru <span className="text-red-600">*</span>
         </p>
         <input
           className="w-full rounded border p-2"
@@ -389,10 +389,10 @@ export function ListingForm({ listingId }: { listingId?: string }) {
         />
         <p className="text-xs text-[var(--muted)]">
           {pendingFiles.length > 0
-            ? `${pendingFiles[0].name} selected. It will upload when you click Save Draft.`
+            ? `${pendingFiles[0].name} selected. It will upload when you click Sačuvaj nacrt.`
             : images.length > 0
-              ? 'Current image is saved.'
-              : 'Choose one image (required).'}
+              ? 'Trenutna slika je sačuvana.'
+              : 'Izaberite jednu sliku (obavezno).'}
         </p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
           {images.map((img) => (
@@ -407,14 +407,14 @@ export function ListingForm({ listingId }: { listingId?: string }) {
       </section>
 
       <section className="card space-y-3 p-5">
-        <h2 className="text-lg font-semibold">Description</h2>
+        <h2 className="text-lg font-semibold">Opis</h2>
         <label className="text-sm font-medium">
-          Description <span className="text-red-600">*</span>
+          Opis <span className="text-red-600">*</span>
         </label>
         <textarea
           className="w-full rounded border p-2"
           rows={8}
-          placeholder="Detailed description"
+          placeholder="Detaljan opis"
           {...register('description')}
         />
       </section>
@@ -428,7 +428,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
           disabled={formState.isSubmitting}
           type="submit"
         >
-          {formState.isSubmitting ? 'Saving...' : 'Save Draft'}
+          {formState.isSubmitting ? 'Čuvanje...' : 'Sačuvaj nacrt'}
         </button>
         <button
           className="rounded border border-[var(--line)] px-4 py-2 disabled:cursor-not-allowed disabled:opacity-60"
@@ -436,11 +436,11 @@ export function ListingForm({ listingId }: { listingId?: string }) {
           type="button"
           onClick={() => void submitForReview()}
         >
-          {isSubmittingReview ? 'Submitting...' : 'Submit for Review'}
+          {isSubmittingReview ? 'Slanje...' : 'Pošalji na proveru'}
         </button>
         {targetId && (
           <Link href={`/seller-dashboard/listings/${targetId}`} className="text-sm text-[var(--brand)]">
-            Open Listing Editor
+            Otvori uređivač oglasa
           </Link>
         )}
       </div>
@@ -465,9 +465,9 @@ function ListingModerationFeedback({ listingId }: { listingId: string }) {
   if (!data || data.status !== 'REJECTED') return null;
   return (
     <div className="card border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-      <p className="font-semibold">Moderation feedback</p>
-      <p>Reason: {data.rejectionReasonCode || 'Not specified'}</p>
-      <p>Note: {data.rejectionNote || 'No additional note.'}</p>
+      <p className="font-semibold">Povratna informacija moderacije</p>
+      <p>Razlog: {data.rejectionReasonCode || 'Nije navedeno'}</p>
+      <p>Napomena: {data.rejectionNote || 'Nema dodatne napomene.'}</p>
     </div>
   );
 }

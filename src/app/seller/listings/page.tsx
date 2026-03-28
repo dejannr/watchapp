@@ -6,7 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNotify } from '@/components/notifications-provider';
 import { ApiError, apiRequest } from '@/lib/api';
 
-type SellerListing = {
+type ProdavacListing = {
   id: string;
   title: string;
   slug: string;
@@ -26,7 +26,7 @@ const STATUS_OPTIONS = [
   'HIDDEN',
 ] as const;
 
-export default function SellerListingsPage() {
+export default function ProdavacOglasiPage() {
   const qc = useQueryClient();
   const notify = useNotify();
   const [statusFilter, setStatusFilter] = useState<(typeof STATUS_OPTIONS)[number]>('ALL');
@@ -34,7 +34,7 @@ export default function SellerListingsPage() {
 
   const listings = useQuery({
     queryKey: ['seller-listings'],
-    queryFn: () => apiRequest<SellerListing[]>('/seller/listings', 'GET', undefined, true),
+    queryFn: () => apiRequest<ProdavacListing[]>('/seller/listings', 'GET', undefined, true),
   });
 
   const action = useMutation({
@@ -62,20 +62,20 @@ export default function SellerListingsPage() {
     onSuccess: async (_, vars) => {
       notify.success(
         vars.op === 'submit'
-          ? 'Listing submitted for review.'
+          ? 'Oglas je poslat na proveru.'
           : vars.op === 'archive'
-            ? 'Listing archived.'
+            ? 'Oglas je arhiviran.'
             : vars.op === 'unarchive'
-              ? 'Listing moved back to draft.'
+              ? 'Oglas je vraćen u nacrt.'
               : vars.op === 'sold'
-                ? 'Listing marked as sold.'
-                : 'Listing deleted.',
+                ? 'Oglas je označen kao prodat.'
+                : 'Oglas je obrisan.',
       );
       setActiveAction(null);
       await qc.invalidateQueries({ queryKey: ['seller-listings'] });
     },
     onError: (e) => {
-      const msg = e instanceof ApiError ? e.message : 'Action failed';
+      const msg = e instanceof ApiError ? e.message : 'Akcija nije uspela';
       notify.error(msg);
       setActiveAction(null);
     },
@@ -92,7 +92,7 @@ export default function SellerListingsPage() {
     op: 'submit' | 'archive' | 'unarchive' | 'sold' | 'delete',
   ) => {
     if (op === 'delete') {
-      const ok = window.confirm('Delete this listing permanently?');
+      const ok = window.confirm('Obrisati ovaj oglas trajno?');
       if (!ok) return;
     }
     setActiveAction(`${listingId}:${op}`);
@@ -103,9 +103,9 @@ export default function SellerListingsPage() {
     <div className="container">
       <div className="card p-5">
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">My Listings</h1>
+          <h1 className="text-2xl font-bold">Moji oglasi</h1>
           <Link href="/seller-dashboard/listings/new" className="rounded bg-[var(--brand)] px-3 py-2 text-white">
-            New
+            Novi oglas
           </Link>
         </div>
         <div className="mb-3 flex items-center gap-2">
@@ -129,7 +129,7 @@ export default function SellerListingsPage() {
           {items.map((listing) => {
             const busy = activeAction?.startsWith(`${listing.id}:`) || false;
             const canSubmit = listing.status === 'DRAFT' || listing.status === 'REJECTED';
-            const canArchive =
+            const canArhiviraj =
               listing.status === 'PUBLISHED' || listing.status === 'PENDING_REVIEW';
             const canUnarchive = listing.status === 'ARCHIVED';
             const canMarkSold =
@@ -142,17 +142,17 @@ export default function SellerListingsPage() {
                     <p className="text-sm text-[var(--muted)]">{listing.status}</p>
                     {listing.updatedAt && (
                       <p className="text-xs text-[var(--muted)]">
-                        Updated {new Date(listing.updatedAt).toLocaleString()}
+                        Ažurirano {new Date(listing.updatedAt).toLocaleString()}
                       </p>
                     )}
                   </div>
                   <div className="flex flex-wrap items-center justify-end gap-2">
                     <Link href={`/seller-dashboard/listings/${listing.id}`} className="text-sm text-[var(--brand)]">
-                      Edit
+                      Izmeni
                     </Link>
                     {listing.status === 'PUBLISHED' && (
                       <Link href={`/listing/${listing.slug}`} className="text-sm text-[var(--brand)]">
-                        Public page
+                        Javna stranica
                       </Link>
                     )}
                   </div>
@@ -164,16 +164,16 @@ export default function SellerListingsPage() {
                       onClick={() => void runAction(listing.id, 'submit')}
                       disabled={busy}
                     >
-                      {activeAction === `${listing.id}:submit` ? 'Submitting...' : 'Submit Review'}
+                      {activeAction === `${listing.id}:submit` ? 'Slanje...' : 'Pošalji na proveru'}
                     </button>
                   )}
-                  {canArchive && (
+                  {canArhiviraj && (
                     <button
                       className="rounded border border-[var(--line)] px-2 py-1 text-xs disabled:opacity-60"
                       onClick={() => void runAction(listing.id, 'archive')}
                       disabled={busy}
                     >
-                      {activeAction === `${listing.id}:archive` ? 'Archiving...' : 'Archive'}
+                      {activeAction === `${listing.id}:archive` ? 'Arhiviranje...' : 'Arhiviraj'}
                     </button>
                   )}
                   {canUnarchive && (
@@ -182,7 +182,7 @@ export default function SellerListingsPage() {
                       onClick={() => void runAction(listing.id, 'unarchive')}
                       disabled={busy}
                     >
-                      {activeAction === `${listing.id}:unarchive` ? 'Restoring...' : 'Move To Draft'}
+                      {activeAction === `${listing.id}:unarchive` ? 'Vraćanje...' : 'Vrati u nacrt'}
                     </button>
                   )}
                   {canMarkSold && (
@@ -191,7 +191,7 @@ export default function SellerListingsPage() {
                       onClick={() => void runAction(listing.id, 'sold')}
                       disabled={busy}
                     >
-                      {activeAction === `${listing.id}:sold` ? 'Updating...' : 'Mark Sold'}
+                      {activeAction === `${listing.id}:sold` ? 'Ažuriranje...' : 'Označi kao prodato'}
                     </button>
                   )}
                   <button
@@ -199,7 +199,7 @@ export default function SellerListingsPage() {
                     onClick={() => void runAction(listing.id, 'delete')}
                     disabled={busy}
                   >
-                    {activeAction === `${listing.id}:delete` ? 'Deleting...' : 'Delete'}
+                    {activeAction === `${listing.id}:delete` ? 'Brisanje...' : 'Obriši'}
                   </button>
                 </div>
               </div>
@@ -208,8 +208,8 @@ export default function SellerListingsPage() {
           {!listings.isLoading && items.length === 0 && (
             <div className="rounded border border-dashed p-4 text-sm text-[var(--muted)]">
               {statusFilter === 'ALL'
-                ? 'No listings yet. Create your first listing.'
-                : `No listings in status ${statusFilter}.`}
+                ? 'Još nema oglasa. Kreirajte svoj prvi oglas.'
+                : `Nema oglasa sa statusom ${statusFilter}.`}
             </div>
           )}
         </div>

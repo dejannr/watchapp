@@ -26,43 +26,43 @@ export function RegisterForm() {
       const res = await apiRequest<{ verificationToken: string }>('/auth/register', 'POST', values);
       reset();
       setVerificationToken(res.verificationToken);
-      notify.success('Account created. Verify email to continue.');
+      notify.success('Nalog je kreiran. Verifikujte e-poštu za nastavak.');
     } catch (e) {
       if (e instanceof ApiError && e.status === 400) {
         setError(e.message);
         return;
       }
-      setError(e instanceof Error ? e.message : 'Registration failed');
+      setError(e instanceof Error ? e.message : 'Registracija nije uspela');
     }
   });
 
   return (
     <form onSubmit={onSubmit} className="card mx-auto max-w-md space-y-3 p-5">
-      <h1 className="text-xl font-bold">Register</h1>
+      <h1 className="text-xl font-bold">Registracija</h1>
       <p className="text-sm text-[var(--muted)]">
-        New accounts start as buyer accounts. You can apply to become a seller later.
+        Novi nalozi počinju kao kupci. Kasnije možete podneti zahtev za prodavca.
       </p>
-      <input className="w-full rounded border p-2" placeholder="Email" {...register('email')} />
+      <input className="w-full rounded border p-2" placeholder="E-pošta" {...register('email')} />
       <input
         className="w-full rounded border p-2"
         type="password"
-        placeholder="Password"
+        placeholder="Lozinka"
         {...register('password')}
       />
-      <input className="w-full rounded border p-2" placeholder="First name" {...register('firstName')} />
-      <input className="w-full rounded border p-2" placeholder="Last name" {...register('lastName')} />
+      <input className="w-full rounded border p-2" placeholder="Ime" {...register('firstName')} />
+      <input className="w-full rounded border p-2" placeholder="Prezime" {...register('lastName')} />
       {formState.errors.password && (
         <p className="text-sm text-red-700">{formState.errors.password.message}</p>
       )}
       {error && <p className="text-sm text-red-700">{error}</p>}
       {verificationToken && (
         <div className="rounded border border-green-200 bg-green-50 p-3 text-sm text-green-800">
-          <p>Account created. Click below to verify email in-app.</p>
+          <p>Nalog je kreiran. Kliknite ispod da verifikujete e-poštu u aplikaciji.</p>
           <Link
             href={`/verify-email?token=${encodeURIComponent(verificationToken)}`}
             className="mt-2 inline-block rounded bg-green-700 px-3 py-1 text-white"
           >
-            Verify Email Now
+            Verifikuj e-poštu sada
           </Link>
         </div>
       )}
@@ -70,7 +70,7 @@ export function RegisterForm() {
         className="rounded bg-[var(--brand)] px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
         disabled={formState.isSubmitting}
       >
-        {formState.isSubmitting ? 'Creating...' : 'Create Account'}
+        {formState.isSubmitting ? 'Kreiranje...' : 'Kreiraj nalog'}
       </button>
     </form>
   );

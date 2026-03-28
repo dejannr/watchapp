@@ -12,8 +12,8 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'Watch Marketplace MVP',
-  description: 'Multi-vendor watch marketplace MVP',
+  title: 'MVP tržišta satova',
+  description: 'MVP tržišta satova sa više prodavaca',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
 };
 
@@ -29,7 +29,7 @@ export default function RootLayout({
           <header className="border-b border-[var(--line)] bg-[var(--card)]/90 backdrop-blur">
             <div className="container flex items-center justify-between py-4">
               <Link href="/" className="text-xl font-bold tracking-wide">
-                ChronoMarket<span className="text-[var(--brand)]">24</span>
+                WatchStock
               </Link>
               <TopNav />
             </div>
@@ -37,7 +37,7 @@ export default function RootLayout({
           <main className="min-h-[80vh] py-8">{children}</main>
           <footer className="border-t border-[var(--line)] py-8 text-center text-sm text-[var(--muted)]">
             <div className="container">
-              Offline deal marketplace MVP. No online checkout or payment processing.
+              MVP tržišta za dogovor van mreže. Nema onlajn kupovine ni obrade plaćanja.
             </div>
           </footer>
         </Providers>

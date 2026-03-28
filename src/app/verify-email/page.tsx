@@ -4,7 +4,7 @@ import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ApiError, apiRequest } from '@/lib/api';
 
-function VerifyEmailPageContent() {
+function VerifikujEmailPageContent() {
   const searchParams = useSearchParams();
   const initialToken = searchParams.get('token') ?? '';
   const [token, setToken] = useState(initialToken);
@@ -20,36 +20,36 @@ function VerifyEmailPageContent() {
           setSuccess('');
           try {
             await apiRequest('/auth/verify-email', 'POST', { token });
-            setSuccess('Email verified. You can now login.');
+            setSuccess('E-pošta je verifikovana. Sada se možete prijaviti.');
           } catch (err) {
             if (err instanceof ApiError) {
               setError(err.message);
               return;
             }
-            setError('Verification failed');
+            setError('Verifikacija nije uspela');
           }
         }}
         className="card mx-auto max-w-md space-y-3 p-5"
       >
-        <h1 className="text-xl font-bold">Verify Email</h1>
+        <h1 className="text-xl font-bold">Verifikuj e-poštu</h1>
         <input
           className="w-full rounded border p-2"
           value={token}
           onChange={(e) => setToken(e.target.value)}
-          placeholder="Verification token"
+          placeholder="Verifikacioni token"
         />
         {error && <p className="text-sm text-red-700">{error}</p>}
         {success && <p className="text-sm text-green-700">{success}</p>}
-        <button className="rounded bg-[var(--brand)] px-4 py-2 text-white">Verify</button>
+        <button className="rounded bg-[var(--brand)] px-4 py-2 text-white">Verifikuj</button>
       </form>
     </div>
   );
 }
 
-export default function VerifyEmailPage() {
+export default function VerifikujEmailPage() {
   return (
-    <Suspense fallback={<div className="container">Loading...</div>}>
-      <VerifyEmailPageContent />
+    <Suspense fallback={<div className="container">Učitavanje...</div>}>
+      <VerifikujEmailPageContent />
     </Suspense>
   );
 }

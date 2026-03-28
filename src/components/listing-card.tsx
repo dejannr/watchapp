@@ -15,9 +15,9 @@ type Listing = {
 
 export function ListingCard({ listing }: { listing: Listing }) {
   const image = listing.images?.[0]?.url;
-  const city = listing.locationCity || 'City not specified';
-  const country = listing.locationCountry || 'Country not specified';
-  const flagByCountry: Record<string, string> = {
+  const city = listing.locationCity || 'Grad nije naveden';
+  const country = listing.locationCountry || 'Država nije navedena';
+  const flagByDržava: Record<string, string> = {
     Srbija: '🇷🇸',
     'Crna Gora': '🇲🇪',
     'Bosna i Hercegovina': '🇧🇦',
@@ -25,7 +25,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
     Slovenija: '🇸🇮',
     Makedonija: '🇲🇰',
   };
-  const flag = listing.locationCountry ? (flagByCountry[listing.locationCountry] ?? '🌍') : '🌍';
+  const flag = listing.locationCountry ? (flagByDržava[listing.locationCountry] ?? '🌍') : '🌍';
 
   return (
     <Link href={`/listing/${listing.slug}`} className="card block overflow-hidden">
@@ -35,7 +35,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
           <img src={image} alt={listing.title} className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-[var(--muted)]">
-            No image
+            Nema slike
           </div>
         )}
       </div>
@@ -52,7 +52,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
             textAlign: 'justify',
           }}
         >
-          {listing.description || 'No description'}
+          {listing.description || 'Nema opisa'}
         </p>
         <div className="mt-4 flex items-center justify-between text-sm">
           <span className="font-bold">

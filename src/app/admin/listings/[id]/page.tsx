@@ -7,7 +7,7 @@ import { ApiError, apiRequest } from '@/lib/api';
 
 type ActionType = 'approve' | 'reject' | 'hide' | 'restore' | 'mark-sold';
 type ListingImage = { id: string; url: string; altText?: string | null };
-type AdminListingDetail = {
+type AdministratorListingDetail = {
   id: string;
   title: string;
   status: string;
@@ -29,7 +29,7 @@ type AdminListingDetail = {
   images?: ListingImage[];
 };
 
-export default function AdminListingDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function AdministratorListingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const qc = useQueryClient();
   const { id } = use(params);
   const [error, setError] = useState('');
@@ -38,7 +38,7 @@ export default function AdminListingDetailPage({ params }: { params: Promise<{ i
   const listing = useQuery({
     queryKey: ['admin-listing-detail', id],
     queryFn: () =>
-      apiRequest<AdminListingDetail>(`/admin/listings/${id}`, 'GET', undefined, true, {
+      apiRequest<AdministratorListingDetail>(`/admin/listings/${id}`, 'GET', undefined, true, {
         suppressLoadingIndicator: true,
       }),
   });
@@ -46,7 +46,7 @@ export default function AdminListingDetailPage({ params }: { params: Promise<{ i
   const moderate = async (action: ActionType) => {
     setError('');
     setSuccess('');
-    const note = window.prompt('Admin note (optional):') || undefined;
+    const note = window.prompt('Napomena administratora (opciono):') || undefined;
     setIsModerating(true);
     try {
       await apiRequest(`/admin/listings/${id}/${action}`, 'POST', { note }, true, {
@@ -63,9 +63,9 @@ export default function AdminListingDetailPage({ params }: { params: Promise<{ i
       qc.setQueryData(['admin-listing-detail', id], (prev: unknown) =>
         prev && typeof prev === 'object' ? { ...(prev as Record<string, unknown>), status: nextStatus } : prev,
       );
-      setSuccess(`Listing ${action} successful.`);
+      setSuccess(`Akcija ${action} je uspešna.`);
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : `Failed to ${action} listing`);
+      setError(e instanceof ApiError ? e.message : `Akcija ${action} nad oglasom nije uspela`);
     } finally {
       setIsModerating(false);
     }
@@ -77,10 +77,10 @@ export default function AdminListingDetailPage({ params }: { params: Promise<{ i
   return (
     <div className="container space-y-4">
       <Link href="/admin/listings" className="text-sm text-[var(--brand)]">
-        Back to moderation queue
+        Nazad na red za moderaciju
       </Link>
       <div className="card space-y-4 p-5">
-        <h1 className="text-2xl font-bold">Listing Detail</h1>
+        <h1 className="text-2xl font-bold">Detalji oglasa</h1>
         {error && <p className="text-sm text-red-700">{error}</p>}
         {success && <p className="text-sm text-green-700">{success}</p>}
 
@@ -88,30 +88,30 @@ export default function AdminListingDetailPage({ params }: { params: Promise<{ i
           <>
             <div className="grid gap-3 md:grid-cols-2">
               <div className="space-y-1 text-sm">
-                <p><span className="font-semibold">Title:</span> {data.title}</p>
+                <p><span className="font-semibold">Naslov:</span> {data.title}</p>
                 <p><span className="font-semibold">Status:</span> {data.status}</p>
-                <p><span className="font-semibold">Seller:</span> {data.seller?.email} ({data.sellerId})</p>
-                <p><span className="font-semibold">Brand/Model:</span> {data.brand?.name} / {data.watchModel?.name || '-'}</p>
-                <p><span className="font-semibold">Price:</span> {data.priceAmount} {data.currency}</p>
-                <p><span className="font-semibold">Condition:</span> {data.condition}</p>
-                <p><span className="font-semibold">Reference:</span> {data.referenceNumber || '-'}</p>
-                <p><span className="font-semibold">Location:</span> {[data.locationCity, data.locationCountry].filter(Boolean).join(', ') || '-'}</p>
+                <p><span className="font-semibold">Prodavac:</span> {data.seller?.email} ({data.sellerId})</p>
+                <p><span className="font-semibold">Brend/Model:</span> {data.brand?.name} / {data.watchModel?.name || '-'}</p>
+                <p><span className="font-semibold">Cena:</span> {data.priceAmount} {data.currency}</p>
+                <p><span className="font-semibold">Stanje:</span> {data.condition}</p>
+                <p><span className="font-semibold">Referenca:</span> {data.referenceNumber || '-'}</p>
+                <p><span className="font-semibold">Lokacija:</span> {[data.locationCity, data.locationCountry].filter(Boolean).join(', ') || '-'}</p>
               </div>
               <div className="space-y-1 text-sm">
-                <p><span className="font-semibold">Published At:</span> {data.publishedAt ? new Date(data.publishedAt).toLocaleString() : '-'}</p>
-                <p><span className="font-semibold">Last Reviewed At:</span> {data.lastReviewedAt ? new Date(data.lastReviewedAt).toLocaleString() : '-'}</p>
-                <p><span className="font-semibold">Rejection Reason:</span> {data.rejectionReasonCode || '-'}</p>
-                <p><span className="font-semibold">Rejection Note:</span> {data.rejectionNote || '-'}</p>
+                <p><span className="font-semibold">Objavljeno:</span> {data.publishedAt ? new Date(data.publishedAt).toLocaleString() : '-'}</p>
+                <p><span className="font-semibold">Poslednja provera:</span> {data.lastReviewedAt ? new Date(data.lastReviewedAt).toLocaleString() : '-'}</p>
+                <p><span className="font-semibold">Razlog odbijanja:</span> {data.rejectionReasonCode || '-'}</p>
+                <p><span className="font-semibold">Napomena odbijanja:</span> {data.rejectionNote || '-'}</p>
               </div>
             </div>
 
             <div>
-              <p className="mb-2 font-semibold">Description</p>
+              <p className="mb-2 font-semibold">Opis</p>
               <p className="rounded border border-[var(--line)] p-3 text-sm text-[var(--muted)]">{data.description}</p>
             </div>
 
             <div>
-              <p className="mb-2 font-semibold">Images ({images.length})</p>
+              <p className="mb-2 font-semibold">Slike ({images.length})</p>
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {images.map((img) => (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -128,12 +128,12 @@ export default function AdminListingDetailPage({ params }: { params: Promise<{ i
             disabled={isModerating}
             onClick={() => void moderate('approve')}
           >
-            {isModerating ? 'Working...' : 'Approve'}
+            {isModerating ? 'Obrada...' : 'Odobri'}
           </button>
-          <button className="rounded border px-3 py-1.5 disabled:opacity-60" disabled={isModerating} onClick={() => void moderate('reject')}>Reject</button>
-          <button className="rounded border px-3 py-1.5 disabled:opacity-60" disabled={isModerating} onClick={() => void moderate('hide')}>Hide</button>
-          <button className="rounded border px-3 py-1.5 disabled:opacity-60" disabled={isModerating} onClick={() => void moderate('restore')}>Restore</button>
-          <button className="rounded border px-3 py-1.5 disabled:opacity-60" disabled={isModerating} onClick={() => void moderate('mark-sold')}>Mark Sold</button>
+          <button className="rounded border px-3 py-1.5 disabled:opacity-60" disabled={isModerating} onClick={() => void moderate('reject')}>Odbij</button>
+          <button className="rounded border px-3 py-1.5 disabled:opacity-60" disabled={isModerating} onClick={() => void moderate('hide')}>Sakrij</button>
+          <button className="rounded border px-3 py-1.5 disabled:opacity-60" disabled={isModerating} onClick={() => void moderate('restore')}>Vrati</button>
+          <button className="rounded border px-3 py-1.5 disabled:opacity-60" disabled={isModerating} onClick={() => void moderate('mark-sold')}>Označi kao prodato</button>
         </div>
       </div>
     </div>

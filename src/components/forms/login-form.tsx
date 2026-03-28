@@ -33,28 +33,28 @@ export function LoginForm() {
       );
       setAccessToken(res.accessToken);
       reset();
-      setSuccess(`Logged in as ${res.user.email}.`);
-      notify.success(`Logged in as ${res.user.email}. Redirecting...`);
+      setSuccess(`Prijavljeni ste kao ${res.user.email}.`);
+      notify.success(`Prijavljeni ste kao ${res.user.email}. Preusmeravanje...`);
       setTimeout(() => {
         window.location.href = next;
       }, 500);
     } catch (e) {
       if (e instanceof ApiError && e.status === 401) {
-        setError('Invalid credentials. Check email/password and try again.');
+        setError('Neispravni podaci za prijavu. Proverite e-poštu/lozinku i pokušajte ponovo.');
         return;
       }
-      setError(e instanceof Error ? e.message : 'Login failed');
+      setError(e instanceof Error ? e.message : 'Prijava failed');
     }
   });
 
   return (
     <form onSubmit={onSubmit} className="card mx-auto max-w-md space-y-3 p-5">
-      <h1 className="text-xl font-bold">Login</h1>
-      <input className="w-full rounded border p-2" placeholder="Email" {...register('email')} />
+      <h1 className="text-xl font-bold">Prijava</h1>
+      <input className="w-full rounded border p-2" placeholder="E-pošta" {...register('email')} />
       <input
         className="w-full rounded border p-2"
         type="password"
-        placeholder="Password"
+        placeholder="Lozinka"
         {...register('password')}
       />
       {formState.errors.password && (
@@ -66,7 +66,7 @@ export function LoginForm() {
         className="rounded bg-[var(--brand)] px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
         disabled={formState.isSubmitting}
       >
-        {formState.isSubmitting ? 'Logging in...' : 'Login'}
+        {formState.isSubmitting ? 'Prijavljivanje...' : 'Prijava'}
       </button>
     </form>
   );

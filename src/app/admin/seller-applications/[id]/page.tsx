@@ -5,7 +5,7 @@ import { use, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ApiError, apiRequest } from '@/lib/api';
 
-export default function SellerApplicationDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default function ProdavacApplicationDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -19,10 +19,10 @@ export default function SellerApplicationDetailPage({ params }: { params: Promis
     setSuccess('');
     try {
       await apiRequest(`/admin/seller-applications/${id}/approve`, 'POST', {}, true);
-      setSuccess('Seller application approved.');
+      setSuccess('Prijava prodavca je odobrena.');
       await app.refetch();
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Approval failed');
+      setError(e instanceof ApiError ? e.message : 'Odobravanje nije uspelo');
     }
   };
 
@@ -33,13 +33,13 @@ export default function SellerApplicationDetailPage({ params }: { params: Promis
       await apiRequest(
         `/admin/seller-applications/${id}/reject`,
         'POST',
-        { reasonCode: 'OTHER', rejectionNote: 'Rejected by admin review.' },
+        { reasonCode: 'OTHER', rejectionNote: 'Odbijeno nakon administratorske provere.' },
         true,
       );
-      setSuccess('Seller application rejected.');
+      setSuccess('Prijava prodavca je odbijena.');
       await app.refetch();
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : 'Rejection failed');
+      setError(e instanceof ApiError ? e.message : 'Odbijanje nije uspelo');
     }
   };
 
@@ -48,32 +48,32 @@ export default function SellerApplicationDetailPage({ params }: { params: Promis
   return (
     <div className="container space-y-4">
       <Link href="/admin/seller-applications" className="text-sm text-[var(--brand)]">
-        Back to seller applications
+        Nazad na prijave prodavaca
       </Link>
       <div className="card p-5">
-        <h1 className="text-2xl font-bold">Seller Application Detail</h1>
+        <h1 className="text-2xl font-bold">Detalji prijave prodavca</h1>
         {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
         {success && <p className="mt-2 text-sm text-green-700">{success}</p>}
 
         {data && (
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <div className="space-y-2 text-sm">
-              <p><span className="font-semibold">Applicant:</span> {data.user?.email}</p>
-              <p><span className="font-semibold">Display Name:</span> {data.displayName}</p>
-              <p><span className="font-semibold">Seller Type:</span> {data.sellerType}</p>
+              <p><span className="font-semibold">Podnosilac:</span> {data.user?.email}</p>
+              <p><span className="font-semibold">Javno ime:</span> {data.displayName}</p>
+              <p><span className="font-semibold">Tip prodavca:</span> {data.sellerType}</p>
               <p><span className="font-semibold">Status:</span> {data.status}</p>
-              <p><span className="font-semibold">City/Country:</span> {data.publicLocationCity}, {data.publicLocationCountry}</p>
-              <p><span className="font-semibold">Phone:</span> {data.phone}</p>
-              <p><span className="font-semibold">Website:</span> {data.website || '-'}</p>
+              <p><span className="font-semibold">Grad/Država:</span> {data.publicLocationCity}, {data.publicLocationCountry}</p>
+              <p><span className="font-semibold">Telefon:</span> {data.phone}</p>
+              <p><span className="font-semibold">Veb sajt:</span> {data.website || '-'}</p>
               <p><span className="font-semibold">Instagram:</span> {data.instagramHandle || '-'}</p>
             </div>
             <div className="space-y-2 text-sm">
-              <p className="font-semibold">About</p>
+              <p className="font-semibold">O prodavcu</p>
               <p className="rounded border border-[var(--line)] p-2 text-[var(--muted)]">{data.about}</p>
-              <p><span className="font-semibold">Submitted:</span> {new Date(data.submittedAt).toLocaleString()}</p>
-              <p><span className="font-semibold">Reviewed:</span> {data.reviewedAt ? new Date(data.reviewedAt).toLocaleString() : '-'}</p>
-              <p><span className="font-semibold">Rejection Reason:</span> {data.rejectionReasonCode || '-'}</p>
-              <p><span className="font-semibold">Rejection Note:</span> {data.rejectionNote || '-'}</p>
+              <p><span className="font-semibold">Poslato:</span> {new Date(data.submittedAt).toLocaleString()}</p>
+              <p><span className="font-semibold">Pregledano:</span> {data.reviewedAt ? new Date(data.reviewedAt).toLocaleString() : '-'}</p>
+              <p><span className="font-semibold">Razlog odbijanja:</span> {data.rejectionReasonCode || '-'}</p>
+              <p><span className="font-semibold">Napomena odbijanja:</span> {data.rejectionNote || '-'}</p>
             </div>
           </div>
         )}
@@ -84,14 +84,14 @@ export default function SellerApplicationDetailPage({ params }: { params: Promis
             disabled={!data || data.status !== 'PENDING'}
             onClick={() => void approve()}
           >
-            Approve
+            Odobri
           </button>
           <button
             className="rounded border border-[var(--line)] px-3 py-1.5 disabled:opacity-60"
             disabled={!data || data.status !== 'PENDING'}
             onClick={() => void reject()}
           >
-            Reject
+            Odbij
           </button>
         </div>
       </div>

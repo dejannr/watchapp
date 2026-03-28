@@ -44,59 +44,59 @@ export function BrowseFilters() {
         router.push(`${pathname}?${query.toString()}`);
       }}
     >
-      <h2 className="font-semibold">Find Your Watch</h2>
+      <h2 className="font-semibold">Pronađite svoj sat</h2>
 
       <div className="grid gap-2 md:grid-cols-6">
         <input
           name="q"
           defaultValue={defaults.q}
           className="rounded border p-2 text-sm md:col-span-2"
-          placeholder="Search"
+          placeholder="Pretraga"
         />
         <input
           name="brand"
           defaultValue={defaults.brand}
           className="rounded border p-2 text-sm"
-          placeholder="Brand slug"
+          placeholder="Slug brenda"
         />
         <input
           name="minPrice"
           defaultValue={defaults.minPrice}
           className="rounded border p-2 text-sm"
-          placeholder="Min price"
+          placeholder="Min cena"
         />
         <input
           name="maxPrice"
           defaultValue={defaults.maxPrice}
           className="rounded border p-2 text-sm"
-          placeholder="Max price"
+          placeholder="Maks cena"
         />
         <select name="condition" defaultValue={defaults.condition} className="rounded border p-2 text-sm">
-          <option value="">Any condition</option>
-          <option value="NEW">New</option>
-          <option value="LIKE_NEW">Like New</option>
-          <option value="VERY_GOOD">Very Good</option>
-          <option value="GOOD">Good</option>
-          <option value="FAIR">Fair</option>
+          <option value="">Bilo koje stanje</option>
+          <option value="NEW">Novo</option>
+          <option value="LIKE_NEW">Kao novo</option>
+          <option value="VERY_GOOD">Vrlo dobro</option>
+          <option value="GOOD">Dobro</option>
+          <option value="FAIR">Solidno</option>
         </select>
       </div>
 
       <div className="grid gap-2 md:grid-cols-[1fr_auto_auto]">
         <select name="sort" defaultValue={defaults.sort} className="w-full rounded border p-2 text-sm">
-          <option value="newest">Newest</option>
-          <option value="price_asc">Price low to high</option>
-          <option value="price_desc">Price high to low</option>
-          <option value="year_desc">Year desc</option>
+          <option value="newest">Najnovije</option>
+          <option value="price_asc">Cena od niže ka višoj</option>
+          <option value="price_desc">Cena od više ka nižoj</option>
+          <option value="year_desc">Godina opadajuće</option>
         </select>
         <button className="rounded bg-[var(--brand)] px-3 py-1.5 text-sm text-white" type="submit">
-          Apply
+          Primeni
         </button>
         <button
           className="rounded border border-[var(--line)] px-3 py-1.5 text-sm"
           type="button"
           onClick={() => router.push('/browse')}
         >
-          Clear
+          Obriši
         </button>
       </div>
 
@@ -114,34 +114,34 @@ export function BrowseFilters() {
         >
           <path d="M3 6l5 5 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
         </svg>
-        Advanced filters
+        Napredni filteri
       </button>
 
       {advancedOpen && (
         <div className="grid gap-2 border-t border-[var(--line)] pt-3 md:grid-cols-4">
-          <input name="model" defaultValue={defaults.model} className="rounded border p-2 text-sm" placeholder="Model slug" />
-          <input name="yearFrom" defaultValue={defaults.yearFrom} className="rounded border p-2 text-sm" placeholder="Year from" />
-          <input name="yearTo" defaultValue={defaults.yearTo} className="rounded border p-2 text-sm" placeholder="Year to" />
+          <input name="model" defaultValue={defaults.model} className="rounded border p-2 text-sm" placeholder="Slug modela" />
+          <input name="yearFrom" defaultValue={defaults.yearFrom} className="rounded border p-2 text-sm" placeholder="Godina od" />
+          <input name="yearTo" defaultValue={defaults.yearTo} className="rounded border p-2 text-sm" placeholder="Godina do" />
           <select
             name="sellerVerification"
             defaultValue={defaults.sellerVerification}
             className="rounded border p-2 text-sm"
           >
-            <option value="">Any seller verification</option>
-            <option value="BASIC_VERIFIED">Basic verified</option>
-            <option value="ENHANCED_VERIFIED">Enhanced verified</option>
+            <option value="">Bilo koja verifikacija prodavca</option>
+            <option value="BASIC_VERIFIED">Osnovno verifikovan</option>
+            <option value="ENHANCED_VERIFIED">Napredno verifikovan</option>
           </select>
-          <input name="locationCountry" defaultValue={defaults.locationCountry} className="rounded border p-2 text-sm" placeholder="Country" />
-          <input name="locationCity" defaultValue={defaults.locationCity} className="rounded border p-2 text-sm" placeholder="City" />
+          <input name="locationCountry" defaultValue={defaults.locationCountry} className="rounded border p-2 text-sm" placeholder="Država" />
+          <input name="locationCity" defaultValue={defaults.locationCity} className="rounded border p-2 text-sm" placeholder="Grad" />
           <select name="hasBox" defaultValue={defaults.hasBox} className="rounded border p-2 text-sm">
-            <option value="">Box: any</option>
-            <option value="true">With box</option>
-            <option value="false">No box</option>
+            <option value="">Kutija: bilo koja</option>
+            <option value="true">Sa kutijom</option>
+            <option value="false">Bez kutije</option>
           </select>
           <select name="hasPapers" defaultValue={defaults.hasPapers} className="rounded border p-2 text-sm">
-            <option value="">Papers: any</option>
-            <option value="true">With papers</option>
-            <option value="false">No papers</option>
+            <option value="">Papiri: bilo koji</option>
+            <option value="true">Sa papirima</option>
+            <option value="false">Bez papira</option>
           </select>
         </div>
       )}

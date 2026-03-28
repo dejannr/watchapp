@@ -6,7 +6,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ApiError, apiRequest } from '@/lib/api';
 
-type AdminListingListItem = {
+type AdministratorListingListItem = {
   id: string;
   title: string;
   status: string;
@@ -19,8 +19,8 @@ type AdminListingListItem = {
   } | null;
 };
 
-type AdminListingsResponse = {
-  items: AdminListingListItem[];
+type AdministratorOglasiResponse = {
+  items: AdministratorListingListItem[];
   pagination: {
     page: number;
     pageCount: number;
@@ -28,7 +28,7 @@ type AdminListingsResponse = {
   };
 };
 
-function AdminListingsPageContent() {
+function AdministratorOglasiPageContent() {
   const qc = useQueryClient();
   const router = useRouter();
   const pathname = usePathname();
@@ -44,7 +44,7 @@ function AdminListingsPageContent() {
   const listings = useQuery({
     queryKey: ['admin-listings', status, sellerId, brandId, createdFrom, page],
     queryFn: () =>
-      apiRequest<AdminListingsResponse>(
+      apiRequest<AdministratorOglasiResponse>(
         `/admin/listings?status=${encodeURIComponent(status)}&sellerId=${encodeURIComponent(sellerId)}&brandId=${encodeURIComponent(brandId)}&createdFrom=${encodeURIComponent(createdFrom)}&page=${page}&pageSize=12`,
         'GET',
         undefined,
@@ -70,7 +70,7 @@ function AdminListingsPageContent() {
             : action === 'hide'
               ? 'HIDDEN'
               : 'SOLD';
-      qc.setQueryData<AdminListingsResponse>(
+      qc.setQueryData<AdministratorOglasiResponse>(
         ['admin-listings', status, sellerId, brandId, createdFrom, page],
         (prev) =>
           prev
@@ -82,9 +82,9 @@ function AdminListingsPageContent() {
               }
             : prev,
       );
-      setSuccess(`Listing ${action} successful.`);
+      setSuccess(`Akcija ${action} je uspešna.`);
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : `Failed to ${action} listing`);
+      setError(e instanceof ApiError ? e.message : `Akcija ${action} nad oglasom nije uspela`);
     } finally {
       setActiveAction(null);
     }
@@ -93,7 +93,7 @@ function AdminListingsPageContent() {
   return (
     <div className="container">
       <div className="card p-5">
-        <h1 className="text-2xl font-bold">Listing Moderation</h1>
+        <h1 className="text-2xl font-bold">Moderacija oglasa</h1>
         <form
           className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-5"
           onSubmit={(e) => {
@@ -109,43 +109,43 @@ function AdminListingsPageContent() {
           }}
         >
           <select name="status" defaultValue={status} className="rounded border p-2 text-sm">
-            <option value="">All statuses</option>
-            <option value="PENDING_REVIEW">Pending review</option>
-            <option value="PUBLISHED">Published</option>
-            <option value="REJECTED">Rejected</option>
-            <option value="HIDDEN">Hidden</option>
-            <option value="SOLD">Sold</option>
-            <option value="ARCHIVED">Archived</option>
-            <option value="DRAFT">Draft</option>
+            <option value="">Svi statusi</option>
+            <option value="PENDING_REVIEW">Na čekanju provere</option>
+            <option value="PUBLISHED">Objavljeno</option>
+            <option value="REJECTED">Odbijeno</option>
+            <option value="HIDDEN">Sakriveno</option>
+            <option value="SOLD">Prodato</option>
+            <option value="ARCHIVED">Arhivirano</option>
+            <option value="DRAFT">Nacrt</option>
           </select>
           <input
             name="sellerId"
             defaultValue={sellerId}
             className="rounded border p-2 text-sm"
-            placeholder="Seller ID"
+            placeholder="Prodavac ID"
           />
           <input
             name="brandId"
             defaultValue={brandId}
             className="rounded border p-2 text-sm"
-            placeholder="Brand ID"
+            placeholder="Brend ID"
           />
           <input
             name="createdFrom"
             defaultValue={createdFrom}
             className="rounded border p-2 text-sm"
-            placeholder="Created from (YYYY-MM-DD)"
+            placeholder="Kreirano od (GGGG-MM-DD)"
           />
           <div className="flex gap-2">
             <button className="rounded bg-[var(--brand)] px-3 py-2 text-sm text-white" type="submit">
-              Apply
+              Primeni
             </button>
             <button
               className="rounded border border-[var(--line)] px-3 py-2 text-sm"
               type="button"
               onClick={() => router.push(pathname)}
             >
-              Clear
+              Obriši
             </button>
           </div>
         </form>
@@ -157,7 +157,7 @@ function AdminListingsPageContent() {
               <p className="font-semibold">{listing.title}</p>
               <p className="text-sm text-[var(--muted)]">{listing.status}</p>
               <Link href={`/admin/listings/${listing.id}`} className="mt-1 inline-block text-xs text-[var(--brand)]">
-                Open detail
+                Otvori detalje
               </Link>
               <div className="mt-2 flex flex-wrap gap-2 text-xs">
                 <button
@@ -166,7 +166,7 @@ function AdminListingsPageContent() {
                   type="button"
                   onClick={() => void moderate(listing.id, 'approve')}
                 >
-                  {activeAction === `${listing.id}:approve` ? 'Approving...' : 'Approve'}
+                  {activeAction === `${listing.id}:approve` ? 'Odobravanje...' : 'Odobri'}
                 </button>
                 <button
                   className="rounded border px-2 py-1 disabled:opacity-60"
@@ -174,7 +174,7 @@ function AdminListingsPageContent() {
                   type="button"
                   onClick={() => void moderate(listing.id, 'reject')}
                 >
-                  {activeAction === `${listing.id}:reject` ? 'Rejecting...' : 'Reject'}
+                  {activeAction === `${listing.id}:reject` ? 'Odbijanje...' : 'Odbij'}
                 </button>
                 <button
                   className="rounded border px-2 py-1 disabled:opacity-60"
@@ -182,7 +182,7 @@ function AdminListingsPageContent() {
                   type="button"
                   onClick={() => void moderate(listing.id, 'hide')}
                 >
-                  {activeAction === `${listing.id}:hide` ? 'Hiding...' : 'Hide'}
+                  {activeAction === `${listing.id}:hide` ? 'Sakrivanje...' : 'Sakrij'}
                 </button>
                 <button
                   className="rounded border px-2 py-1 disabled:opacity-60"
@@ -190,7 +190,7 @@ function AdminListingsPageContent() {
                   type="button"
                   onClick={() => void moderate(listing.id, 'restore')}
                 >
-                  {activeAction === `${listing.id}:restore` ? 'Restoring...' : 'Restore'}
+                  {activeAction === `${listing.id}:restore` ? 'Vraćanje...' : 'Vrati'}
                 </button>
                 <button
                   className="rounded border px-2 py-1 disabled:opacity-60"
@@ -198,14 +198,14 @@ function AdminListingsPageContent() {
                   type="button"
                   onClick={() => void moderate(listing.id, 'mark-sold')}
                 >
-                  {activeAction === `${listing.id}:mark-sold` ? 'Updating...' : 'Mark Sold'}
+                  {activeAction === `${listing.id}:mark-sold` ? 'Ažuriranje...' : 'Označi kao prodato'}
                 </button>
               </div>
             </div>
           ))}
         </div>
         <div className="mt-4 flex items-center justify-between text-sm">
-          <p className="text-[var(--muted)]">Total: {listings.data?.pagination?.total ?? 0}</p>
+          <p className="text-[var(--muted)]">Ukupno: {listings.data?.pagination?.total ?? 0}</p>
           <div className="flex gap-2">
             <button
               className="rounded border border-[var(--line)] px-3 py-1 disabled:opacity-50"
@@ -216,7 +216,7 @@ function AdminListingsPageContent() {
                 router.push(`${pathname}?${params.toString()}`);
               }}
             >
-              Prev
+              Prethodna
             </button>
             <button
               className="rounded border border-[var(--line)] px-3 py-1 disabled:opacity-50"
@@ -227,7 +227,7 @@ function AdminListingsPageContent() {
                 router.push(`${pathname}?${params.toString()}`);
               }}
             >
-              Next
+              Sledeća
             </button>
           </div>
         </div>
@@ -236,10 +236,10 @@ function AdminListingsPageContent() {
   );
 }
 
-export default function AdminListingsPage() {
+export default function AdministratorOglasiPage() {
   return (
-    <Suspense fallback={<div className="container">Loading...</div>}>
-      <AdminListingsPageContent />
+    <Suspense fallback={<div className="container">Učitavanje...</div>}>
+      <AdministratorOglasiPageContent />
     </Suspense>
   );
 }

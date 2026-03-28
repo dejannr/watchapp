@@ -6,7 +6,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { ApiError, apiRequest } from '@/lib/api';
 
-function AdminSellersPageContent() {
+function AdministratorProdavacsPageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -29,7 +29,7 @@ function AdminSellersPageContent() {
   return (
     <div className="container">
       <div className="card p-5">
-        <h1 className="text-2xl font-bold">Seller Approvals</h1>
+        <h1 className="text-2xl font-bold">Odobrenja prodavaca</h1>
         <form
           className="mt-3 grid gap-2 sm:grid-cols-[180px_1fr_auto]"
           onSubmit={(e) => {
@@ -45,19 +45,19 @@ function AdminSellersPageContent() {
           }}
         >
           <select name="status" defaultValue={status} className="rounded border p-2 text-sm">
-            <option value="PENDING">Pending</option>
-            <option value="APPROVED">Approved</option>
-            <option value="REJECTED">Rejected</option>
-            <option value="NONE">None</option>
+            <option value="PENDING">Na čekanju</option>
+            <option value="APPROVED">Odobrid</option>
+            <option value="REJECTED">Odbijed</option>
+            <option value="NONE">Nijedno</option>
           </select>
           <input
             name="q"
             defaultValue={q}
             className="rounded border p-2 text-sm"
-            placeholder="Search by email or display name"
+            placeholder="Pretraga po e-pošti ili javnom imenu"
           />
           <button className="rounded bg-[var(--brand)] px-3 py-2 text-sm text-white" type="submit">
-            Apply
+            Primeni
           </button>
         </form>
         {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
@@ -70,7 +70,7 @@ function AdminSellersPageContent() {
                 {app.displayName} · {app.sellerType} · {app.status}
               </p>
               <Link href={`/admin/seller-applications/${app.id}`} className="inline-block text-xs text-[var(--brand)]">
-                Open detail
+                Otvori detalje
               </Link>
               <div className="flex gap-2">
                 <button
@@ -81,14 +81,14 @@ function AdminSellersPageContent() {
                     setSuccess('');
                     try {
                       await apiRequest(`/admin/seller-applications/${app.id}/approve`, 'POST', {}, true);
-                      setSuccess(`Approved ${app.user.email}`);
+                      setSuccess(`Odobreno ${app.user.email}`);
                       await applications.refetch();
                     } catch (e) {
-                      setError(e instanceof ApiError ? e.message : 'Failed to approve seller');
+                      setError(e instanceof ApiError ? e.message : 'Odobravanje prodavca nije uspelo');
                     }
                   }}
                 >
-                  Approve
+                  Odobri
                 </button>
                 <button
                   className="rounded border border-[var(--line)] px-3 py-1"
@@ -100,24 +100,24 @@ function AdminSellersPageContent() {
                       await apiRequest(
                         `/admin/seller-applications/${app.id}/reject`,
                         'POST',
-                        { reasonCode: 'OTHER', rejectionNote: 'Rejected by admin review' },
+                        { reasonCode: 'OTHER', rejectionNote: 'Odbijeno nakon administratorske provere' },
                         true,
                       );
-                      setSuccess(`Rejected ${app.user.email}`);
+                      setSuccess(`Odbijeno ${app.user.email}`);
                       await applications.refetch();
                     } catch (e) {
-                      setError(e instanceof ApiError ? e.message : 'Failed to reject seller');
+                      setError(e instanceof ApiError ? e.message : 'Odbijanje prodavca nije uspelo');
                     }
                   }}
                 >
-                  Reject
+                  Odbij
                 </button>
               </div>
             </div>
           ))}
         </div>
         <div className="mt-4 flex items-center justify-between text-sm">
-          <p className="text-[var(--muted)]">Total: {applications.data?.pagination?.total ?? 0}</p>
+          <p className="text-[var(--muted)]">Ukupno: {applications.data?.pagination?.total ?? 0}</p>
           <div className="flex gap-2">
             <button
               className="rounded border border-[var(--line)] px-3 py-1 disabled:opacity-50"
@@ -128,7 +128,7 @@ function AdminSellersPageContent() {
                 router.push(`${pathname}?${params.toString()}`);
               }}
             >
-              Prev
+              Prethodna
             </button>
             <button
               className="rounded border border-[var(--line)] px-3 py-1 disabled:opacity-50"
@@ -139,7 +139,7 @@ function AdminSellersPageContent() {
                 router.push(`${pathname}?${params.toString()}`);
               }}
             >
-              Next
+              Sledeća
             </button>
           </div>
         </div>
@@ -148,10 +148,10 @@ function AdminSellersPageContent() {
   );
 }
 
-export default function AdminSellersPage() {
+export default function AdministratorProdavacsPage() {
   return (
-    <Suspense fallback={<div className="container">Loading...</div>}>
-      <AdminSellersPageContent />
+    <Suspense fallback={<div className="container">Učitavanje...</div>}>
+      <AdministratorProdavacsPageContent />
     </Suspense>
   );
 }

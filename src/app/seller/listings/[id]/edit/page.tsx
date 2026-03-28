@@ -1,6 +1,6 @@
 import { ListingForm } from '@/components/forms/listing-form';
 
-export default async function EditSellerListingPage({
+export default async function IzmeniProdavacListingPage({
   params,
 }: {
   params: Promise<{ id: string }>;

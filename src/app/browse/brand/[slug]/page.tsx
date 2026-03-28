@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { ListingCard } from '@/components/listing-card';
 import { API_URL } from '@/lib/config';
 
-export default async function BrandBrowsePage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function BrendPretragaPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const [brandRes, listingRes] = await Promise.all([
     fetch(`${API_URL}/brands`, { cache: 'no-store' }),
@@ -19,12 +19,12 @@ export default async function BrandBrowsePage({ params }: { params: Promise<{ sl
   return (
     <div className="container space-y-4">
       <div className="card p-4">
-        <h1 className="text-2xl font-bold">{brand.name} Listings</h1>
+        <h1 className="text-2xl font-bold">{brand.name} Oglasi</h1>
         <p className="text-sm text-[var(--muted)]">
-          Browse all published {brand.name} watches in marketplace.
+          Pretraga all published {brand.name} satove na tržištu.
         </p>
         <Link href={`/browse?brand=${slug}`} className="text-sm text-[var(--brand)]">
-          Open advanced filters
+          Otvori napredne filtere
         </Link>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

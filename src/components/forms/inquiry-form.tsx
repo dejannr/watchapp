@@ -38,7 +38,7 @@ export function InquiryForm({ listingId }: { listingId: string }) {
 
     const token = getAccessToken();
     if (!token) {
-      const message = 'You need to be logged in to send an inquiry.';
+      const message = 'Morate biti prijavljeni da biste poslali upit.';
       notify.info(message);
       setError(message);
       return;
@@ -53,35 +53,35 @@ export function InquiryForm({ listingId }: { listingId: string }) {
       );
       sessionStorage.removeItem(draftKey);
       reset();
-      setSuccess('Inquiry sent. Seller has been notified.');
-      notify.success('Inquiry sent. Seller has been notified.');
+      setSuccess('Upit je poslat. Prodavac je obavešten.');
+      notify.success('Upit je poslat. Prodavac je obavešten.');
       if (result.chatId) {
         router.push(`/chats/${result.chatId}`);
       }
     } catch (e) {
       if (e instanceof ApiError) {
         if (e.status === 401) {
-          const message = 'Session expired. Please login again to send inquiry.';
+          const message = 'Sesija je istekla. Prijavite se ponovo da biste poslali upit.';
           notify.info(message);
           setError(message);
           return;
         }
         if (e.status === 403) {
-          setError('Verify your email to send inquiries.');
+          setError('Verifikujte e-poštu da biste slali upite.');
           return;
         }
       }
-      setError(e instanceof Error ? e.message : 'Failed to submit inquiry');
+      setError(e instanceof Error ? e.message : 'Slanje upita nije uspelo');
     }
   });
 
   return (
     <form onSubmit={onSubmit} className="card space-y-3 p-4">
-      <h3 className="font-semibold">Contact Seller</h3>
+      <h3 className="font-semibold">Kontaktiraj prodavca</h3>
       <textarea
         className="w-full rounded border p-2"
         rows={4}
-        placeholder="Write your message"
+        placeholder="Napišite poruku"
         onFocus={() => {
           if (!started) {
             setStarted(true);
@@ -99,7 +99,7 @@ export function InquiryForm({ listingId }: { listingId: string }) {
         className="rounded bg-[var(--brand)] px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
         disabled={formState.isSubmitting}
       >
-        {formState.isSubmitting ? 'Sending...' : 'Send Inquiry'}
+        {formState.isSubmitting ? 'Slanje...' : 'Pošalji upit'}
       </button>
     </form>
   );

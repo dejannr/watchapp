@@ -15,7 +15,7 @@ type NotificationRow = {
   } | null;
 };
 
-export default function AccountNotificationsPage() {
+export default function NalogNotificationsPage() {
   const qc = useQueryClient();
   const notifications = useQuery({
     queryKey: ['notifications-me'],
@@ -26,7 +26,7 @@ export default function AccountNotificationsPage() {
     <div className="container">
       <div className="card p-5">
         <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Notifications</h1>
+          <h1 className="text-2xl font-bold">Obaveštenja</h1>
           <button
             className="rounded border border-[var(--line)] px-3 py-1 text-sm"
             onClick={async () => {
@@ -38,7 +38,7 @@ export default function AccountNotificationsPage() {
               ]);
             }}
           >
-            Mark all read
+            Označi sve kao pročitano
           </button>
         </div>
         <div className="space-y-2">
@@ -58,14 +58,14 @@ export default function AccountNotificationsPage() {
                       ]);
                     }}
                   >
-                    Mark read
+                    Označi kao pročitano
                   </button>
                 )}
               </div>
               <p className="text-sm text-[var(--muted)]">{item.message}</p>
               {item.dataJson?.chatId && (
                 <Link href={`/chats/${item.dataJson.chatId}`} className="text-xs text-[var(--brand)]">
-                  Open chat
+                  Otvori razgovor
                 </Link>
               )}
               <p className="mt-1 text-xs text-[var(--muted)]">
@@ -74,7 +74,7 @@ export default function AccountNotificationsPage() {
             </div>
           ))}
           {notifications.data?.length === 0 && (
-            <p className="text-sm text-[var(--muted)]">No notifications yet.</p>
+            <p className="text-sm text-[var(--muted)]">Još nema obaveštenja.</p>
           )}
         </div>
       </div>

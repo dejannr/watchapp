@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { LoginForm } from '@/components/forms/login-form';
 import { useCurrentUser } from '@/hooks/use-current-user';
 
-function LoginPageContent() {
+function PrijavaPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const next = searchParams.get('next') || '/';
@@ -21,7 +21,7 @@ function LoginPageContent() {
   if (isLoading) {
     return (
       <div className="container">
-        <div className="card mx-auto max-w-md p-4 text-sm">Checking session...</div>
+        <div className="card mx-auto max-w-md p-4 text-sm">Provera sesije...</div>
       </div>
     );
   }
@@ -33,29 +33,29 @@ function LoginPageContent() {
   return (
     <div className="container space-y-4">
       <div className="card mx-auto max-w-md p-4">
-        <h1 className="text-lg font-bold">Welcome back</h1>
+        <h1 className="text-lg font-bold">Dobrodošli nazad</h1>
         <p className="text-sm text-[var(--muted)]">
-          Login to manage favorites, send inquiries, and apply as a seller.
+          Prijavite se da upravljate favoritima, šaljete upite i prijavite se za prodavca.
         </p>
       </div>
       <LoginForm />
       <p className="text-center text-sm text-[var(--muted)]">
-        No account? <Link href="/register">Register</Link>
+        Nemate nalog? <Link href="/register">Registracija</Link>
       </p>
     </div>
   );
 }
 
-export default function LoginPage() {
+export default function PrijavaPage() {
   return (
     <Suspense
       fallback={
         <div className="container">
-          <div className="card mx-auto max-w-md p-4 text-sm">Loading...</div>
+          <div className="card mx-auto max-w-md p-4 text-sm">Učitavanje...</div>
         </div>
       }
     >
-      <LoginPageContent />
+      <PrijavaPageContent />
     </Suspense>
   );
 }

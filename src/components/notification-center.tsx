@@ -26,9 +26,9 @@ export function NotificationCenter({ compact = false }: { compact?: boolean }) {
   return (
     <div className="card p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Recent Notifications</h2>
+        <h2 className="text-lg font-semibold">Nedavna obaveštenja</h2>
         <Link href="/account/notifications" className="text-sm text-[var(--brand)]">
-          View all
+          Prikaži sve
         </Link>
       </div>
       <div className="space-y-2">
@@ -38,7 +38,7 @@ export function NotificationCenter({ compact = false }: { compact?: boolean }) {
             <p className="text-xs text-[var(--muted)]">{item.message}</p>
             {item.dataJson?.chatId && (
               <Link href={`/chats/${item.dataJson.chatId}`} className="text-xs text-[var(--brand)]">
-                Open chat
+                Otvori razgovor
               </Link>
             )}
             <p className="mt-1 text-xs text-[var(--muted)]">
@@ -47,7 +47,7 @@ export function NotificationCenter({ compact = false }: { compact?: boolean }) {
           </div>
         ))}
         {items.length === 0 && (
-          <p className="text-sm text-[var(--muted)]">No notifications yet.</p>
+          <p className="text-sm text-[var(--muted)]">Još nema obaveštenja.</p>
         )}
       </div>
     </div>

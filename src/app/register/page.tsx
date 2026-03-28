@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { RegisterForm } from '@/components/forms/register-form';
 import { useCurrentUser } from '@/hooks/use-current-user';
 
-export default function RegisterPage() {
+export default function RegistracijaPage() {
   const router = useRouter();
   const { data: user, isLoading } = useCurrentUser();
 
@@ -19,7 +19,7 @@ export default function RegisterPage() {
   if (isLoading) {
     return (
       <div className="container">
-        <div className="card mx-auto max-w-md p-4 text-sm">Checking session...</div>
+        <div className="card mx-auto max-w-md p-4 text-sm">Provera sesije...</div>
       </div>
     );
   }
@@ -32,7 +32,7 @@ export default function RegisterPage() {
     <div className="container space-y-4">
       <RegisterForm />
       <p className="text-center text-sm text-[var(--muted)]">
-        Already have account? <Link href="/login">Login</Link>
+        Već imate nalog? <Link href="/login">Prijava</Link>
       </p>
     </div>
   );

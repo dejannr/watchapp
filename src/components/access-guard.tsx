@@ -33,7 +33,7 @@ export function AccessGuard({
   if (isLoading) {
     return (
       <div className="container">
-        <div className="card p-4 text-sm">Checking session...</div>
+        <div className="card p-4 text-sm">Provera sesije...</div>
       </div>
     );
   }
@@ -41,7 +41,7 @@ export function AccessGuard({
   if (!user) {
     return (
       <div className="container">
-        <div className="card p-4 text-sm">Redirecting to login...</div>
+        <div className="card p-4 text-sm">Preusmeravanje na prijavu...</div>
       </div>
     );
   }
@@ -49,7 +49,7 @@ export function AccessGuard({
   if (requireAdmin && user?.role !== 'ADMIN') {
     return (
       <div className="container">
-        <div className="card p-4 text-sm">Admin access required.</div>
+        <div className="card p-4 text-sm">Potreban je administratorski pristup.</div>
       </div>
     );
   }
@@ -57,7 +57,7 @@ export function AccessGuard({
   if (requireApprovedSeller && user?.sellerStatus !== 'APPROVED') {
     return (
       <div className="container">
-        <div className="card p-4 text-sm">Approved seller access required.</div>
+        <div className="card p-4 text-sm">Potreban je pristup odobrenog prodavca.</div>
       </div>
     );
   }

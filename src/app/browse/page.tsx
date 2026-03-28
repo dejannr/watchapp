@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { AnalyticsPageView } from '@/components/analytics-page-view';
-import { BrowseFilters } from '@/components/browse-filters';
+import { PretragaFilters } from '@/components/browse-filters';
 import { ListingCard } from '@/components/listing-card';
 import { API_URL } from '@/lib/config';
 
-type BrowseListing = {
+type PretragaListing = {
   id: string;
   slug: string;
   title: string;
@@ -17,12 +17,12 @@ type BrowseListing = {
 };
 
 export const metadata: Metadata = {
-  title: 'Browse Watches | ChronoMarket',
-  description: 'Browse verified watch listings with structured filters.',
+  title: 'Pretraga satova | WatchStock',
+  description: 'Pretraga verified watch listings with structured filters.',
   alternates: { canonical: '/browse' },
 };
 
-export default async function BrowsePage({
+export default async function PretragaPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -37,12 +37,12 @@ export default async function BrowsePage({
   const data = await fetch(`${API_URL}/listings?${queryString}`, { cache: 'no-store' })
     .then((r) => r.json())
     .catch(() => ({ items: [], meta: null }));
-  const items: BrowseListing[] = Array.isArray(data?.items) ? data.items : [];
+  const items: PretragaListing[] = Array.isArray(data?.items) ? data.items : [];
 
   return (
     <div className="container space-y-4">
       <AnalyticsPageView eventName="browse_view" properties={{ resultCount: items.length }} />
-      <BrowseFilters />
+      <PretragaFilters />
       <section className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((listing) => (

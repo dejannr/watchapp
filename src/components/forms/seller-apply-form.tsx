@@ -12,7 +12,7 @@ type FormValues = z.infer<typeof sellerApplySchema>;
 
 export function SellerApplyForm({
   initialValues,
-  submitLabel = 'Apply',
+  submitLabel = 'Primeni',
   onSubmitted,
   mode = 'create',
   applicationId,
@@ -52,35 +52,35 @@ export function SellerApplyForm({
       } else {
         await apiRequest('/seller-application', 'POST', values, true);
       }
-      setSuccess('Application submitted successfully.');
-      notify.success('Seller application submitted successfully.');
+      setSuccess('Prijava je uspešno poslata.');
+      notify.success('Prijava za prodavca je uspešno poslata.');
       onSubmitted?.();
     } catch (e) {
       if (e instanceof ApiError && e.status === 401) {
-        setError('You must login before submitting seller application. Redirecting to login...');
-        notify.info('Please login first. Redirecting...');
+        setError('Morate se prijaviti pre slanja prijave za prodavca. Preusmeravanje na prijavu...');
+        notify.info('Molimo prvo se prijavite. Preusmeravanje...');
         setTimeout(() => {
           window.location.href = '/login';
         }, 900);
         return;
       }
-      setError(e instanceof Error ? e.message : 'Something went wrong');
+      setError(e instanceof Error ? e.message : 'Došlo je do greške');
     }
   });
 
   return (
     <form onSubmit={onSubmit} className="card mx-auto max-w-xl space-y-3 p-5">
-      <h1 className="text-xl font-bold">Seller Application</h1>
+      <h1 className="text-xl font-bold">Prijava za prodavca</h1>
       <select className="w-full rounded border p-2" {...register('sellerType')}>
-        <option value="PRIVATE">Private Seller</option>
-        <option value="BUSINESS">Business / Dealer</option>
+        <option value="PRIVATE">Privatni prodavac</option>
+        <option value="BUSINESS">Kompanija / Diler</option>
       </select>
-      <input className="w-full rounded border p-2" placeholder="Display name" {...register('displayName')} />
-      <input className="w-full rounded border p-2" placeholder="Business name (if business)" {...register('businessName')} />
-      <input className="w-full rounded border p-2" placeholder="Public slug" {...register('slug')} />
-      <textarea className="w-full rounded border p-2" placeholder="Short bio" {...register('bio')} />
+      <input className="w-full rounded border p-2" placeholder="Javno ime" {...register('displayName')} />
+      <input className="w-full rounded border p-2" placeholder="Naziv firme (ako je kompanija)" {...register('businessName')} />
+      <input className="w-full rounded border p-2" placeholder="Javni slug" {...register('slug')} />
+      <textarea className="w-full rounded border p-2" placeholder="Kratka biografija" {...register('bio')} />
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <input className="w-full rounded border p-2" placeholder="City" {...register('locationCity')} />
+        <input className="w-full rounded border p-2" placeholder="Grad" {...register('locationCity')} />
         <select className="w-full rounded border p-2" {...register('locationCountry')}>
           {countryOptions.map((country) => (
             <option key={country} value={country}>
@@ -89,17 +89,17 @@ export function SellerApplyForm({
           ))}
         </select>
       </div>
-      <input className="w-full rounded border p-2" placeholder="Contact email" {...register('contactEmail')} />
-      <input className="w-full rounded border p-2" placeholder="Contact phone" {...register('contactPhone')} />
-      <input className="w-full rounded border p-2" placeholder="Website URL" {...register('websiteUrl')} />
-      <input className="w-full rounded border p-2" placeholder="Instagram handle" {...register('instagramHandle')} />
+      <input className="w-full rounded border p-2" placeholder="Kontakt e-pošta" {...register('contactEmail')} />
+      <input className="w-full rounded border p-2" placeholder="Kontakt telefon" {...register('contactPhone')} />
+      <input className="w-full rounded border p-2" placeholder="Veb sajt URL" {...register('websiteUrl')} />
+      <input className="w-full rounded border p-2" placeholder="Instagram korisničko ime" {...register('instagramHandle')} />
       {error && <p className="text-sm text-red-700">{error}</p>}
       {success && <p className="text-sm text-green-700">{success}</p>}
       <button
         className="rounded bg-[var(--brand)] px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
         disabled={formState.isSubmitting}
       >
-        {formState.isSubmitting ? 'Submitting...' : submitLabel}
+        {formState.isSubmitting ? 'Slanje...' : submitLabel}
       </button>
     </form>
   );

@@ -12,17 +12,17 @@ export async function generateMetadata({
   const { slug } = await params;
   const res = await fetch(`${API_URL}/sellers/${slug}`, { cache: 'no-store' });
   if (!res.ok) {
-    return { title: 'Seller not found' };
+    return { title: 'Prodavac not found' };
   }
   const data = await res.json();
   return {
-    title: `${data.displayName} | Seller | ChronoMarket`,
-    description: data.bio?.slice(0, 160) ?? 'Seller profile',
+    title: `${data.displayName} | Prodavac | WatchStock`,
+    description: data.bio?.slice(0, 160) ?? 'Prodavac profile',
     alternates: { canonical: `/seller/${slug}` },
   };
 }
 
-export default async function SellerPublicPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ProdavacPublicPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const res = await fetch(`${API_URL}/sellers/${slug}`, { cache: 'no-store' });
   if (!res.ok) {
@@ -50,7 +50,7 @@ export default async function SellerPublicPage({ params }: { params: Promise<{ s
         </p>
       </section>
       <section>
-        <h2 className="mb-4 text-xl font-bold">Published Listings</h2>
+        <h2 className="mb-4 text-xl font-bold">Published Oglasi</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {listings.map((listing: any) => (
             <ListingCard key={listing.id} listing={listing} />

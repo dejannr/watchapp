@@ -62,7 +62,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
       <div className="pointer-events-none fixed right-4 top-4 z-[120] flex w-[min(360px,92vw)] flex-col gap-2">
         {pendingCount > 0 && (
           <div className="rounded border border-[var(--line)] bg-[var(--card)] px-3 py-2 text-sm shadow">
-            Working...
+            Obrada...
           </div>
         )}
         {toasts.map((toast) => (
