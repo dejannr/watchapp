@@ -3,20 +3,21 @@
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNotify } from '@/components/notifications-provider';
 import { apiRequest } from '@/lib/api';
-import { clearAccessToken } from '@/lib/auth';
+import { clearAccessToken, getAccessToken } from '@/lib/auth';
 import { useCurrentUser } from '@/hooks/use-current-user';
 
 export function TopNav() {
+  const qc = useQueryClient();
   const router = useRouter();
   const notify = useNotify();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const { data: user } = useCurrentUser();
-  const loggedIn = Boolean(user);
+  const loggedIn = Boolean(user && getAccessToken());
   const displayName =
     user?.firstName && user.firstName.trim().length > 0
       ? user.firstName.trim()
@@ -42,6 +43,7 @@ export function TopNav() {
     queryFn: () =>
       apiRequest<{ unread: number }>('/notifications/me/unread-count', 'GET', undefined, true, {
         suppressLoadingIndicator: true,
+        suppressErrorToast: true,
       }),
     enabled: loggedIn,
     refetchInterval: 5_000,
@@ -51,6 +53,7 @@ export function TopNav() {
     queryFn: () =>
       apiRequest<{ unread: number }>('/chats/unread-count', 'GET', undefined, true, {
         suppressLoadingIndicator: true,
+        suppressErrorToast: true,
       }),
     enabled: loggedIn,
     refetchInterval: 5_000,
@@ -111,14 +114,17 @@ export function TopNav() {
                 onClick={async () => {
                   setIsLoggingOut(true);
                   try {
-                    await apiRequest('/auth/logout', 'POST', {}, true);
-                  } catch {
-                    // no-op
-                  }
-                  clearAccessToken();
-                  notify.info('Logged out.');
-                  setMenuOpen(false);
-                  router.push('/login');
+                await apiRequest('/auth/logout', 'POST', {}, true);
+              } catch {
+                // no-op
+              }
+              clearAccessToken();
+              qc.setQueryData(['auth-me'], null);
+              qc.removeQueries({ queryKey: ['notifications-unread'] });
+              qc.removeQueries({ queryKey: ['chats-unread'] });
+              notify.info('Logged out.');
+              setMenuOpen(false);
+              router.push('/login');
                   router.refresh();
                   setIsLoggingOut(false);
                 }}

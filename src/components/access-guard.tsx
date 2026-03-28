@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCurrentUser } from '@/hooks/use-current-user';
-import { clearAccessToken, getAccessToken } from '@/lib/auth';
 
 export function AccessGuard({
   children,
@@ -15,22 +14,11 @@ export function AccessGuard({
   requireApprovedSeller?: boolean;
 }) {
   const router = useRouter();
-  const [mounted, setMounted] = useState(false);
-  const token = getAccessToken();
-  const { data: user, isLoading, isError } = useCurrentUser();
+  const { data: user, isLoading } = useCurrentUser();
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    if (!token && !isLoading) {
-      router.replace('/login');
-      return;
-    }
-    if (token && isError && !isLoading) {
-      clearAccessToken();
+    if (isLoading) return;
+    if (!user && !isLoading) {
       router.replace('/login');
       return;
     }
@@ -40,28 +28,20 @@ export function AccessGuard({
     if (requireApprovedSeller && !isLoading && user && user.sellerStatus !== 'APPROVED') {
       router.replace('/sell');
     }
-  }, [mounted, token, user, isLoading, isError, requireAdmin, requireApprovedSeller, router]);
-
-  if (!mounted) {
-    return (
-      <div className="container">
-        <div className="card p-4 text-sm">Checking session...</div>
-      </div>
-    );
-  }
-
-  if (!token) {
-    return (
-      <div className="container">
-        <div className="card p-4 text-sm">Redirecting to login...</div>
-      </div>
-    );
-  }
+  }, [user, isLoading, requireAdmin, requireApprovedSeller, router]);
 
   if (isLoading) {
     return (
       <div className="container">
         <div className="card p-4 text-sm">Checking session...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="container">
+        <div className="card p-4 text-sm">Redirecting to login...</div>
       </div>
     );
   }

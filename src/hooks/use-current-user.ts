@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { ApiError, apiRequest } from '@/lib/api';
+import { ApiError, apiRequest, refreshAccessToken } from '@/lib/api';
 import { clearAccessToken, getAccessToken } from '@/lib/auth';
 
 export type SessionUser = {
@@ -20,22 +20,38 @@ export type SessionUser = {
 };
 
 export function useCurrentUser() {
-  const token = getAccessToken();
-  return useQuery({
-    queryKey: ['auth-me', token],
+  return useQuery<SessionUser | null>({
+    queryKey: ['auth-me'],
     queryFn: async () => {
+      let token = getAccessToken();
+      if (!token) {
+        token = await refreshAccessToken();
+        if (!token) {
+          return null;
+        }
+      }
+
       try {
         return await apiRequest<SessionUser>('/auth/me', 'GET', undefined, true, {
           suppressErrorToast: true,
+          suppressLoadingIndicator: true,
         });
       } catch (error) {
-        if (error instanceof ApiError && error.status === 401) {
-          clearAccessToken();
+        if (error instanceof ApiError && error.status === 401 && token) {
+          const refreshed = await refreshAccessToken();
+          if (!refreshed) {
+            clearAccessToken();
+            return null;
+          }
+          return await apiRequest<SessionUser>('/auth/me', 'GET', undefined, true, {
+            suppressErrorToast: true,
+            suppressLoadingIndicator: true,
+          });
         }
         throw error;
       }
     },
-    enabled: Boolean(token),
     retry: false,
+    staleTime: 60_000,
   });
 }
