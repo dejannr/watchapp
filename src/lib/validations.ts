@@ -1,5 +1,14 @@
 import { z } from 'zod';
 
+export const countryOptions = [
+  'Srbija',
+  'Crna Gora',
+  'Bosna i Hercegovina',
+  'Hrvatska',
+  'Slovenija',
+  'Makedonija',
+] as const;
+
 export const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
@@ -19,7 +28,7 @@ export const sellerApplySchema = z.object({
   businessName: z.string().optional(),
   bio: z.string().min(80).optional().or(z.literal('')),
   locationCity: z.string().optional(),
-  locationCountry: z.string().optional(),
+  locationCountry: z.enum(countryOptions),
   contactEmail: z.string().email().optional().or(z.literal('')),
   contactPhone: z.string().optional(),
   websiteUrl: z.string().url().optional().or(z.literal('')),

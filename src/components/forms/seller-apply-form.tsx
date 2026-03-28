@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useNotify } from '@/components/notifications-provider';
 import { ApiError, apiRequest } from '@/lib/api';
-import { sellerApplySchema } from '@/lib/validations';
+import { countryOptions, sellerApplySchema } from '@/lib/validations';
 
 type FormValues = z.infer<typeof sellerApplySchema>;
 
@@ -35,7 +35,7 @@ export function SellerApplyForm({
       slug: initialValues?.slug ?? '',
       bio: initialValues?.bio ?? '',
       locationCity: initialValues?.locationCity ?? '',
-      locationCountry: initialValues?.locationCountry ?? '',
+      locationCountry: initialValues?.locationCountry ?? countryOptions[0],
       contactEmail: initialValues?.contactEmail ?? '',
       contactPhone: initialValues?.contactPhone ?? '',
       websiteUrl: initialValues?.websiteUrl ?? '',
@@ -81,11 +81,13 @@ export function SellerApplyForm({
       <textarea className="w-full rounded border p-2" placeholder="Short bio" {...register('bio')} />
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <input className="w-full rounded border p-2" placeholder="City" {...register('locationCity')} />
-        <input
-          className="w-full rounded border p-2"
-          placeholder="Country"
-          {...register('locationCountry')}
-        />
+        <select className="w-full rounded border p-2" {...register('locationCountry')}>
+          {countryOptions.map((country) => (
+            <option key={country} value={country}>
+              {country}
+            </option>
+          ))}
+        </select>
       </div>
       <input className="w-full rounded border p-2" placeholder="Contact email" {...register('contactEmail')} />
       <input className="w-full rounded border p-2" placeholder="Contact phone" {...register('contactPhone')} />

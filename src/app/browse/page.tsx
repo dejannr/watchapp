@@ -42,12 +42,6 @@ export default async function BrowsePage({
   return (
     <div className="container space-y-4">
       <AnalyticsPageView eventName="browse_view" properties={{ resultCount: items.length }} />
-      <div className="card flex items-center justify-between p-4">
-        <h1 className="text-2xl font-bold">Browse Listings</h1>
-        <span className="text-sm text-[var(--muted)]">
-          {data.meta ? `${data.meta.total} total` : ''}
-        </span>
-      </div>
       <BrowseFilters />
       <section className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

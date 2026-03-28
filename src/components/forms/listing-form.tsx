@@ -59,7 +59,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   const [notice, setNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const isEdit = Boolean(listingId);
 
-  const { register, handleSubmit, formState, reset, watch } = useForm<FormValues>({
+  const { register, handleSubmit, formState, reset, watch, setValue } = useForm<FormValues>({
     defaultValues: {
       title: '',
       description: '',
@@ -94,6 +94,26 @@ export function ListingForm({ listingId }: { listingId?: string }) {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (isEdit) return;
+    if (selectedCountry && selectedCountry.trim().length > 0) return;
+    let active = true;
+    void apiRequest<{ locationCountry?: string }>('/seller/me', 'GET', undefined, true, {
+      suppressErrorToast: true,
+      suppressLoadingIndicator: true,
+    })
+      .then((profile) => {
+        if (!active) return;
+        if (profile?.locationCountry) {
+          setValue('locationCountry', profile.locationCountry);
+        }
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [isEdit, selectedCountry, setValue]);
 
   const loadListing = async (id: string) => {
     const data = await apiRequest<ListingResponse>(`/seller/listings/${id}`, 'GET', undefined, true);
