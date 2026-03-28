@@ -50,24 +50,6 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-3">
-        <div className="card p-4">
-          <p className="text-sm uppercase tracking-wide text-[var(--brand-soft)]">Trust</p>
-          <p className="mt-1 font-semibold">Reviewed Listings</p>
-          <p className="text-sm text-[var(--muted)]">Every public listing passes admin moderation.</p>
-        </div>
-        <div className="card p-4">
-          <p className="text-sm uppercase tracking-wide text-[var(--brand-soft)]">Sellers</p>
-          <p className="mt-1 font-semibold">Verified Seller Profiles</p>
-          <p className="text-sm text-[var(--muted)]">Seller approval and verification level are visible.</p>
-        </div>
-        <div className="card p-4">
-          <p className="text-sm uppercase tracking-wide text-[var(--brand-soft)]">Safety</p>
-          <p className="mt-1 font-semibold">Secure Inquiry Flow</p>
-          <p className="text-sm text-[var(--muted)]">Inquiries are tracked with platform-side audit history.</p>
-        </div>
-      </section>
-
       <section className="space-y-4">
         <h2 className="text-2xl font-bold">Featured Listings</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
