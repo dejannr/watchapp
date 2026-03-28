@@ -7,6 +7,9 @@ import { clearAccessToken, getAccessToken } from '@/lib/auth';
 export type SessionUser = {
   id: string;
   email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  displayName?: string | null;
   roles: string[];
   role: 'USER' | 'SELLER' | 'ADMIN';
   userStatus: 'ACTIVE' | 'SUSPENDED' | 'PENDING_EMAIL_VERIFICATION';
