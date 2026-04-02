@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
@@ -13,7 +12,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'WatchStock',
+  title: 'Satovi24',
   description: 'MVP tržišta satova sa više prodavaca',
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
   icons: {
@@ -34,9 +33,9 @@ export default function RootLayout({
         <Providers>
           <header className="border-b border-[var(--line)] bg-[var(--card)]/90 backdrop-blur">
             <div className="container flex items-center justify-between py-4">
-              <Link href="/" className="inline-flex items-center gap-2 text-xl font-bold tracking-wide">
-                <Image src="/brand.png" alt="WatchStock logo" width={32} height={32} className="h-8 w-8" />
-                WatchStock
+              <Link href="/" className="inline-flex items-center text-xl font-bold tracking-wide">
+                <span>Satovi</span>
+                <span className="text-[var(--brand)]">24</span>
               </Link>
               <TopNav />
             </div>
@@ -46,7 +45,7 @@ export default function RootLayout({
             <div className="container space-y-8">
               <div className="grid gap-8 md:grid-cols-3">
                 <div className="space-y-2">
-                  <p className="text-base font-semibold text-[var(--text)]">WatchStock</p>
+                  <p className="text-base font-semibold text-[var(--text)]">Satovi24</p>
                   <p className="text-[var(--muted)]">
                     Marketplace za kupovinu i prodaju satova između verifikovanih prodavaca i ozbiljnih kupaca.
                   </p>
@@ -65,14 +64,14 @@ export default function RootLayout({
                 <div className="space-y-2">
                   <p className="font-semibold text-[var(--text)]">Napomena</p>
                   <p className="text-[var(--muted)]">
-                    WatchStock ne obrađuje online plaćanja. Kupoprodaja, plaćanje i preuzimanje dogovaraju se direktno
+                    Satovi24 ne obrađuje online plaćanja. Kupoprodaja, plaćanje i preuzimanje dogovaraju se direktno
                     između kupca i prodavca.
                   </p>
                 </div>
               </div>
 
               <div className="border-t border-[var(--line)] pt-4 text-xs text-[var(--muted)]">
-                © {new Date().getFullYear()} WatchStock. Sva prava zadržana.
+                © {new Date().getFullYear()} Satovi24. Sva prava zadržana.
               </div>
             </div>
           </footer>

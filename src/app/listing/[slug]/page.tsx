@@ -17,7 +17,7 @@ export async function generateMetadata({
   }
   const listing = await res.json();
   return {
-    title: `${listing.title} | WatchStock`,
+    title: `${listing.title} | Satovi24`,
     description: listing.description?.slice(0, 160) ?? 'Oglas sata',
     alternates: { canonical: `/listing/${slug}` },
   };

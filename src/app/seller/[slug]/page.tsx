@@ -16,7 +16,7 @@ export async function generateMetadata({
   }
   const data = await res.json();
   return {
-    title: `${data.displayName} | Prodavac | WatchStock`,
+    title: `${data.displayName} | Prodavac | Satovi24`,
     description: data.bio?.slice(0, 160) ?? 'Prodavac profile',
     alternates: { canonical: `/seller/${slug}` },
   };

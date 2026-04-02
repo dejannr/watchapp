@@ -17,7 +17,7 @@ type PretragaListing = {
 };
 
 export const metadata: Metadata = {
-  title: 'Pretraga satova | WatchStock',
+  title: 'Pretraga satova | Satovi24',
   description: 'Pretraga verified watch listings with structured filters.',
   alternates: { canonical: '/browse' },
 };

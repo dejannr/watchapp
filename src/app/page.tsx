@@ -76,7 +76,7 @@ export default async function Home() {
 
       <section className="card grid gap-4 p-6 md:grid-cols-[1fr_auto] md:items-center">
         <div>
-          <h2 className="text-2xl font-bold">Prodajte satove na WatchStock-u</h2>
+          <h2 className="text-2xl font-bold">Prodajte satove na Satovi24</h2>
           <p className="text-[var(--muted)]">
             Prijavite se kao prodavac, prođite proveru administratora i objavite pouzdan inventar za ozbiljne kupce.
           </p>
