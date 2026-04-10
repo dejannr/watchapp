@@ -15,6 +15,12 @@ type NotificationRow = {
   } | null;
 };
 
+function formatWhen(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString();
+}
+
 export default function NalogNotificationsPage() {
   const qc = useQueryClient();
   const notifications = useQuery({
@@ -22,13 +28,20 @@ export default function NalogNotificationsPage() {
     queryFn: () => apiRequest<NotificationRow[]>('/notifications/me', 'GET', undefined, true),
   });
 
+  const unreadCount = (notifications.data ?? []).filter((item) => !item.readAt).length;
+
   return (
     <div className="container">
       <div className="card p-5">
-        <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Obaveštenja</h1>
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-[var(--line)] pb-4">
+          <div>
+            <h1 className="text-2xl font-bold">Obaveštenja</h1>
+            <p className="mt-1 text-sm text-[var(--muted)]">
+              {unreadCount > 0 ? `${unreadCount} nepročitanih obaveštenja` : 'Sve je pročitano'}
+            </p>
+          </div>
           <button
-            className="rounded border border-[var(--line)] px-3 py-1 text-sm"
+            className="rounded-lg border border-[var(--line)] px-3 py-1.5 text-sm transition hover:bg-[var(--line)]"
             onClick={async () => {
               await apiRequest('/notifications/me/read-all', 'POST', {}, true);
               await notifications.refetch();
@@ -41,14 +54,33 @@ export default function NalogNotificationsPage() {
             Označi sve kao pročitano
           </button>
         </div>
-        <div className="space-y-2">
+
+        <div className="space-y-3">
           {(notifications.data ?? []).map((item) => (
-            <div key={item.id} className="rounded border p-3">
-              <div className="flex items-center justify-between gap-3">
-                <p className="font-semibold">{item.title}</p>
+            <div
+              key={item.id}
+              className={`rounded-xl border p-4 transition ${
+                item.readAt
+                  ? 'border-[var(--line)] bg-[var(--card)]'
+                  : 'border-[var(--brand)]/50 bg-[var(--line)]/30'
+              }`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    {!item.readAt && (
+                      <span className="inline-flex rounded-full bg-[var(--brand)]/20 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--brand)]">
+                        Novo
+                      </span>
+                    )}
+                    <p className="truncate text-xs text-[var(--muted)]">{formatWhen(item.createdAt)}</p>
+                  </div>
+                  <p className="mt-2 text-base font-semibold leading-snug">{item.title}</p>
+                </div>
+
                 {!item.readAt && (
                   <button
-                    className="rounded border border-[var(--line)] px-2 py-0.5 text-xs"
+                    className="shrink-0 rounded-md border border-[var(--line)] px-2.5 py-1 text-xs transition hover:bg-[var(--line)]"
                     onClick={async () => {
                       await apiRequest(`/notifications/${item.id}/read`, 'POST', {}, true);
                       await notifications.refetch();
@@ -62,19 +94,26 @@ export default function NalogNotificationsPage() {
                   </button>
                 )}
               </div>
-              <p className="text-sm text-[var(--muted)]">{item.message}</p>
+
+              <p className="mt-2 text-sm text-[var(--muted)]">{item.message}</p>
+
               {item.dataJson?.chatId && (
-                <Link href={`/chats/${item.dataJson.chatId}`} className="text-xs text-[var(--brand)]">
-                  Otvori razgovor
-                </Link>
+                <div className="mt-3">
+                  <Link
+                    href={`/chats/${item.dataJson.chatId}`}
+                    className="inline-flex items-center gap-1 text-xs font-medium text-[var(--brand)] hover:underline"
+                  >
+                    Otvori razgovor <span aria-hidden="true">↗</span>
+                  </Link>
+                </div>
               )}
-              <p className="mt-1 text-xs text-[var(--muted)]">
-                {new Date(item.createdAt).toLocaleString()}
-              </p>
             </div>
           ))}
+
           {notifications.data?.length === 0 && (
-            <p className="text-sm text-[var(--muted)]">Još nema obaveštenja.</p>
+            <div className="rounded-xl border border-dashed border-[var(--line)] p-8 text-center text-sm text-[var(--muted)]">
+              Još nema obaveštenja.
+            </div>
           )}
         </div>
       </div>
