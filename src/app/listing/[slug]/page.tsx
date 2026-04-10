@@ -3,7 +3,36 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { AnalyticsPageView } from '@/components/analytics-page-view';
 import { InquiryForm } from '@/components/forms/inquiry-form';
+import { ListingGallery } from '@/components/listing-gallery';
 import { API_URL } from '@/lib/config';
+
+type ListingImage = {
+  id?: string;
+  url: string;
+  altText?: string | null;
+};
+
+function formatCondition(value?: string) {
+  const map: Record<string, string> = {
+    NEW: 'Novo',
+    LIKE_NEW: 'Kao novo',
+    VERY_GOOD: 'Vrlo dobro',
+    GOOD: 'Dobro',
+    FAIR: 'Solidno',
+  };
+  return value ? (map[value] ?? value) : '-';
+}
+
+function formatMovement(value?: string) {
+  const map: Record<string, string> = {
+    AUTOMATIC: 'Automatski',
+    MANUAL: 'Ručni',
+    QUARTZ: 'Quartz',
+    SMART: 'Pametni',
+    OTHER: 'Drugo',
+  };
+  return value ? (map[value] ?? value) : '-';
+}
 
 export async function generateMetadata({
   params,
@@ -31,21 +60,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   }
   const listing = await listingRes.json();
 
-  const related = await fetch(`${API_URL}/listings?brand=${listing.brand?.slug ?? ''}&limit=8`, {
-    cache: 'no-store',
-  })
-    .then((r) => r.json())
-    .catch(() => ({ items: [] }));
-  const relatedItems = (Array.isArray(related?.items) ? related.items : [])
-    .filter((item: any) =>
-      item &&
-      item.id !== listing.id &&
-      typeof item.slug === 'string' &&
-      item.slug.trim().length > 0 &&
-      item.status === 'PUBLISHED',
-    )
-    .slice(0, 4);
-  const images = Array.isArray(listing?.images) ? listing.images : [];
+  const images: ListingImage[] = Array.isArray(listing?.images) ? listing.images : [];
   const sellerProfile =
     listing?.seller?.sellerProfile ??
     listing?.seller?.sellerProfil ??
@@ -59,6 +74,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
     listing?.seller?.email ||
     '';
   const sellerSlug = sellerProfile?.slug || '';
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -69,72 +85,96 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
       '@type': 'Offer',
       priceCurrency: listing.currency,
       price: listing.priceAmount,
-      availability: listing.status === 'PUBLISHED' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      availability:
+        listing.status === 'PUBLISHED'
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock',
     },
   };
 
+  const location = [listing.locationCity, listing.locationCountry].filter(Boolean).join(', ');
+
   return (
-    <div className="container grid gap-6 lg:grid-cols-[1.5fr_1fr]">
+    <div className="container space-y-6">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <AnalyticsPageView
         eventName="listing_view"
         properties={{ listingId: listing.id, sellerId: listing.seller?.id, brand: listing.brand?.name }}
       />
-      <section className="space-y-4">
-        <div className="card p-4">
-          <h1 className="text-3xl font-bold">{listing.title}</h1>
-          <p className="mt-1 text-sm text-[var(--muted)]">
-            {listing.brand?.name} {listing.watchModel?.name ? `· ${listing.watchModel.name}` : ''}
-          </p>
-          <p className="mt-3 text-xl font-semibold">
-            {listing.priceAmount.toLocaleString()} {listing.currency}
-          </p>
-        </div>
-        <div className="card grid gap-2 p-4 sm:grid-cols-2">
-          {images.map((img: any) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={img.id} src={img.url} alt={img.altText ?? listing.title} className="h-52 w-full rounded object-cover" />
-          ))}
-        </div>
-        <div className="card space-y-3 p-4">
-          <h2 className="text-xl font-semibold">Opis</h2>
-          <p className="text-[var(--muted)]">{listing.description}</p>
-          <table className="w-full text-sm">
-            <tbody>
-              <tr><td>Stanje</td><td>{listing.condition}</td></tr>
-              <tr><td>Mehanizam</td><td>{listing.movementType ?? '-'}</td></tr>
-              <tr><td>Referenca</td><td>{listing.referenceNumber ?? '-'}</td></tr>
-              <tr><td>Godina</td><td>{listing.yearOfProduction ?? '-'}</td></tr>
-              <tr><td>Lokacija</td><td>{[listing.locationCity, listing.locationCountry].filter(Boolean).join(', ')}</td></tr>
-              <tr><td>Kutija/Papiri</td><td>{listing.hasBox ? 'Kutija' : 'Bez kutije'} / {listing.hasPapers ? 'Papiri' : 'Bez papira'}</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-      <aside className="space-y-4">
-        <div className="card p-4">
-          <h3 className="font-semibold">Prodavac</h3>
-          <p>{sellerDisplayName || 'Učitavanje prodavca...'}</p>
-          {sellerSlug ? (
-            <Link href={`/seller/${sellerSlug}`} className="text-sm text-[var(--brand)]">
-              Pogledaj profil
-            </Link>
-          ) : (
-            <p className="text-xs text-[var(--muted)]">Profil prodavca trenutno nije dostupan.</p>
+
+      <div className="space-y-2">
+        <p className="text-xs uppercase tracking-[0.12em] text-[var(--muted)]">Oglas</p>
+        <h1 className="text-3xl font-bold leading-tight">{listing.title}</h1>
+        <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]">
+          <span className="rounded-full border border-[var(--line)] px-2.5 py-1">{listing.brand?.name ?? 'Brend'}</span>
+          {listing.watchModel?.name && (
+            <span className="rounded-full border border-[var(--line)] px-2.5 py-1">{listing.watchModel.name}</span>
           )}
+          {location && <span>{location}</span>}
         </div>
-        <InquiryForm listingId={listing.id} />
-        <div className="card p-4">
-          <h3 className="mb-2 font-semibold">Slični oglasi</h3>
-          <div className="space-y-2 text-sm">
-            {relatedItems.length > 0 ? relatedItems.map((item: any) => (
-              <Link key={item.id} href={`/listing/${item.slug}`} className="block rounded border p-2 hover:bg-stone-50">
-                {item.title}
-              </Link>
-            )) : <p className="text-[var(--muted)]">Nema povezanih javnih oglasa.</p>}
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-[1.65fr_1fr] lg:items-start">
+        <section className="space-y-6">
+          <ListingGallery images={images} title={listing.title} />
+
+          <div className="card p-5">
+            <h2 className="text-lg font-semibold">Specifikacije</h2>
+            <div className="mt-4 grid grid-cols-1 gap-0 border border-[var(--line)] text-sm sm:grid-cols-2">
+              {[
+                ['Stanje', formatCondition(listing.condition)],
+                ['Mehanizam', formatMovement(listing.movementType)],
+                ['Referentni broj', listing.referenceNumber ?? '-'],
+                ['Godina proizvodnje', listing.yearOfProduction ?? '-'],
+                ['Lokacija', location || '-'],
+                [
+                  'Kutija i papiri',
+                  `${listing.hasBox ? 'Kutija' : 'Bez kutije'} / ${listing.hasPapers ? 'Papiri' : 'Bez papira'}`,
+                ],
+              ].map(([label, value], index) => (
+                <div
+                  key={`${label}-${index}`}
+                  className="grid grid-cols-[140px_1fr] gap-2 border-b border-[var(--line)] p-3 last:border-b-0 sm:[&:nth-last-child(2)]:border-b-0"
+                >
+                  <span className="text-[var(--muted)]">{label}</span>
+                  <span className="font-medium">{String(value)}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </aside>
+
+          <div className="card p-5">
+            <h2 className="text-lg font-semibold">Opis</h2>
+            <p className="mt-3 whitespace-pre-wrap leading-7 text-[var(--muted)]">
+              {listing.description || 'Prodavac nije uneo dodatni opis.'}
+            </p>
+          </div>
+        </section>
+
+        <aside className="space-y-4 lg:sticky lg:top-5">
+          <div className="card p-5">
+            <p className="text-xs uppercase tracking-[0.1em] text-[var(--muted)]">Cena</p>
+            <p className="mt-1 text-3xl font-bold">
+              {listing.priceAmount.toLocaleString()} {listing.currency}
+            </p>
+            <p className="mt-2 text-xs text-[var(--muted)]">Cena je informativna. Detalji dogovora idu direktno sa prodavcem.</p>
+          </div>
+
+          <div className="card space-y-2 p-5">
+            <h3 className="font-semibold">Prodavac</h3>
+            <p className="text-sm">{sellerDisplayName || 'Prodavac'}</p>
+            {sellerSlug ? (
+              <Link href={`/seller/${sellerSlug}`} className="text-sm text-[var(--brand)] hover:underline">
+                Pogledaj profil prodavca
+              </Link>
+            ) : (
+              <p className="text-xs text-[var(--muted)]">Profil prodavca trenutno nije dostupan.</p>
+            )}
+          </div>
+
+          <InquiryForm listingId={listing.id} />
+        </aside>
+      </div>
     </div>
   );
 }
