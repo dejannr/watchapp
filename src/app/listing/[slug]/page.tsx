@@ -116,7 +116,9 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
 
       <div className="grid gap-6 lg:grid-cols-[1.65fr_1fr] lg:items-start">
         <section className="space-y-6">
-          <ListingGallery images={images} title={listing.title} />
+          <div className="w-full max-w-[760px]">
+            <ListingGallery images={images} title={listing.title} />
+          </div>
 
           <div className="card p-5">
             <h2 className="text-lg font-semibold">Specifikacije</h2>
