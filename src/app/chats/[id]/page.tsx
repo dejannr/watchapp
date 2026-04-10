@@ -10,7 +10,7 @@ type RazgovorDetail = {
   id: string;
   buyerId: string;
   sellerId: string;
-  listing?: { title?: string; slug?: string };
+  listing?: { title?: string; slug?: string; images?: Array<{ url: string }> };
   inquiry?: { id: string; status: string };
   buyer?: {
     firstName?: string | null;
@@ -94,6 +94,7 @@ export default function RazgovorDetailPage({ params }: { params: Promise<{ id: s
   });
 
   const title = useMemo(() => chat.data?.listing?.title ?? 'Razgovor', [chat.data?.listing?.title]);
+  const listingImage = useMemo(() => chat.data?.listing?.images?.[0]?.url ?? '', [chat.data?.listing?.images]);
   const counterpartyLine = useMemo(() => {
     if (!chat.data || !currentKorisnik) return 'Učitavanje razgovora...';
     if (currentKorisnik.id === chat.data.buyerId) {
@@ -107,19 +108,46 @@ export default function RazgovorDetailPage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="container space-y-4">
-      <Link href="/chats" className="text-sm text-[var(--brand)]">Nazad na razgovore</Link>
-      <div className="card p-4">
-        <h1 className="text-2xl font-bold">{title}</h1>
-        <p className="text-xs text-[var(--muted)]">{counterpartyLine}</p>
+      <div className="flex items-center gap-2 text-xs text-[var(--muted)]">
+        <Link
+          href="/chats"
+          className="inline-flex items-center gap-1 font-medium transition hover:text-[var(--text)]"
+        >
+          <span aria-hidden="true">‹</span>
+          Razgovori
+        </Link>
+        <span aria-hidden="true">/</span>
+        <span className="truncate">Detalji razgovora</span>
       </div>
-      <div className="card space-y-3 p-4">
-        <div className="max-h-[55vh] space-y-2 overflow-auto pr-1">
+      <div className="card p-4">
+        <div className="flex items-start gap-3">
+          <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--bg)]">
+            {listingImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={listingImage} alt={title} className="h-full w-full object-cover" />
+            ) : (
+              <div className="flex h-full items-center justify-center text-[10px] text-[var(--muted)]">Bez slike</div>
+            )}
+          </div>
+          <div className="min-w-0">
+            <h1 className="truncate text-2xl font-bold">{title}</h1>
+            <p className="text-xs text-[var(--muted)]">{counterpartyLine}</p>
+            {chat.data?.listing?.slug && (
+              <Link href={`/listing/${chat.data.listing.slug}`} className="text-xs text-[var(--brand)] hover:underline">
+                Otvori oglas
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="card space-y-3 p-3 sm:p-4">
+        <div className="max-h-[58vh] space-y-2 overflow-auto rounded-lg border border-[var(--line)] bg-[var(--bg)] p-3">
           {(messages.data ?? []).map((msg) => {
             const mine = currentKorisnik?.id === msg.senderId;
             return (
               <div
                 key={msg.id}
-                className={`max-w-[85%] rounded border border-[var(--line)] p-2 text-sm ${mine ? 'ml-auto bg-[var(--line)]' : 'bg-[var(--card)]'}`}
+                className={`max-w-[85%] rounded-xl border border-[var(--line)] p-2 text-sm ${mine ? 'ml-auto bg-[var(--line)]' : 'bg-[var(--card)]'}`}
               >
                 <p className="text-xs text-[var(--muted)]">{mine ? 'Vi' : personName(msg.sender)}</p>
                 <p>{msg.body}</p>
@@ -140,10 +168,10 @@ export default function RazgovorDetailPage({ params }: { params: Promise<{ id: s
             value={body}
             onChange={(e) => setBody(e.target.value)}
             placeholder="Napišite poruku..."
-            className="w-full rounded border px-3 py-2"
+            className="w-full rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2"
           />
           <button
-            className="rounded bg-[var(--brand)] px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-lg bg-[var(--brand)] px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
             disabled={send.isPending || !body.trim()}
           >
             {send.isPending ? 'Slanje...' : 'Pošalji'}

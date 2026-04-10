@@ -9,7 +9,7 @@ type RazgovorListItem = {
   id: string;
   buyerId: string;
   sellerId: string;
-  listing?: { title?: string; slug?: string };
+  listing?: { title?: string; slug?: string; images?: Array<{ url: string }> };
   inquiry?: { id: string; status: string };
   messages?: Array<{
     body: string;
@@ -45,6 +45,17 @@ function personName(person?: {
   return 'Korisnik';
 }
 
+function formatLastMessageAt(value?: string) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const now = new Date();
+  const sameDay = date.toDateString() === now.toDateString();
+  return sameDay
+    ? date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    : date.toLocaleDateString();
+}
+
 export default function PorukePage() {
   const { data: currentKorisnik } = useCurrentUser();
   const chats = useQuery({
@@ -56,7 +67,7 @@ export default function PorukePage() {
   return (
     <div className="container space-y-4">
       <h1 className="text-2xl font-bold">Poruke</h1>
-      <div className="card p-4">
+      <div className="card p-3 sm:p-4">
         {chats.isLoading && <p className="text-sm text-[var(--muted)]">Učitavanje razgovora...</p>}
         {!chats.isLoading && (chats.data ?? []).length === 0 && (
           <p className="text-sm text-[var(--muted)]">Još nema razgovora. Počnite slanjem upita na oglasu.</p>
@@ -68,15 +79,33 @@ export default function PorukePage() {
               ? `Prodavac: ${personName(chat.seller)}`
               : `Kupac: ${personName(chat.buyer)}`;
             const preview = chat.messages?.[0]?.body ?? 'Još nema poruka';
+            const image = chat.listing?.images?.[0]?.url;
             return (
               <Link
                 key={chat.id}
                 href={`/chats/${chat.id}`}
-                className="relative block rounded border border-[var(--line)] p-3 hover:bg-[var(--line)]"
+                className="relative block rounded-xl border border-[var(--line)] p-3 transition hover:bg-[var(--line)]"
               >
-                <p className="font-semibold">{chat.listing?.title ?? 'Razgovor o oglasu'}</p>
-                <p className="text-xs text-[var(--muted)]">{counterparty}</p>
-                <p className="mt-1 text-sm text-[var(--muted)] line-clamp-2">{preview}</p>
+                <div className="flex items-start gap-3">
+                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-[var(--line)] bg-[var(--bg)]">
+                    {image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={image} alt={chat.listing?.title ?? 'Oglas'} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-[10px] text-[var(--muted)]">Bez slike</div>
+                    )}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="truncate font-semibold">{chat.listing?.title ?? 'Razgovor o oglasu'}</p>
+                      <span className="shrink-0 text-[11px] text-[var(--muted)]">
+                        {formatLastMessageAt(chat.lastMessageAt)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[var(--muted)]">{counterparty}</p>
+                    <p className="mt-1 text-sm text-[var(--muted)] line-clamp-2">{preview}</p>
+                  </div>
+                </div>
                 {(chat.unreadCount ?? 0) > 0 && (
                   <span className="absolute right-3 top-3 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-xs font-semibold text-white">
                     {chat.unreadCount}
