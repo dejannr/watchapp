@@ -41,7 +41,7 @@ export default function RootLayout({
                   width={180}
                   height={40}
                   priority
-                  className="h-10 w-auto"
+                  style={{ width: 'auto', height: 'auto', maxHeight: '40px' }}
                 />
                 <span className="text-xl tracking-wide">
                   <span className="font-bold">Satovi</span>

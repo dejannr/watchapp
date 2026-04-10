@@ -55,7 +55,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
   const [isFileDropActive, setIsFileDropActive] = useState(false);
   const [draggingImageId, setDraggingImageId] = useState<string | null>(null);
-  const [isLoadingListing, setIsLoadingListing] = useState(false);
+  const [isLoadingListing, setIsLoadingListing] = useState(Boolean(listingId));
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const notify = useNotify();
@@ -302,6 +302,17 @@ export function ListingForm({ listingId }: { listingId?: string }) {
     }
   };
 
+  if (isIzmeni && isLoadingListing) {
+    return (
+      <div className="mx-auto max-w-6xl">
+        <div className="card flex items-center gap-3 p-4 text-sm text-[var(--muted)]">
+          <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-[var(--line)] border-t-[var(--brand)]" />
+          Učitavanje oglasa...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={onSaveDraft} className="mx-auto max-w-6xl space-y-4">
       <div className="card p-5">
@@ -313,13 +324,6 @@ export function ListingForm({ listingId }: { listingId?: string }) {
 
       {isIzmeni && (
         <ListingModerationFeedback listingId={listingId!} />
-      )}
-
-      {isIzmeni && isLoadingListing && (
-        <div className="card flex items-center gap-3 p-4 text-sm text-[var(--muted)]">
-          <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-[var(--line)] border-t-[var(--brand)]" />
-          Učitavanje oglasa...
-        </div>
       )}
 
       <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
