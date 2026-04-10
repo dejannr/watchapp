@@ -9,6 +9,7 @@ type RazgovorListItem = {
   id: string;
   buyerId: string;
   sellerId: string;
+  listingImageUrl?: string | null;
   listing?: { title?: string; slug?: string; images?: Array<{ url: string }> };
   inquiry?: { id: string; status: string };
   messages?: Array<{
@@ -79,7 +80,7 @@ export default function PorukePage() {
               ? `Prodavac: ${personName(chat.seller)}`
               : `Kupac: ${personName(chat.buyer)}`;
             const preview = chat.messages?.[0]?.body ?? 'Još nema poruka';
-            const image = chat.listing?.images?.[0]?.url;
+            const image = chat.listingImageUrl ?? chat.listing?.images?.[0]?.url;
             return (
               <Link
                 key={chat.id}
@@ -95,15 +96,13 @@ export default function PorukePage() {
                       <div className="flex h-full items-center justify-center text-[10px] text-[var(--muted)]">Bez slike</div>
                     )}
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="truncate font-semibold">{chat.listing?.title ?? 'Razgovor o oglasu'}</p>
-                      <span className="shrink-0 text-[11px] text-[var(--muted)]">
-                        {formatLastMessageAt(chat.lastMessageAt)}
-                      </span>
-                    </div>
+                  <div className="relative min-w-0 flex-1 pr-14">
+                    <p className="truncate pr-8 font-semibold">{chat.listing?.title ?? 'Razgovor o oglasu'}</p>
                     <p className="text-xs text-[var(--muted)]">{counterparty}</p>
-                    <p className="mt-1 text-sm text-[var(--muted)] line-clamp-2">{preview}</p>
+                    <p className="mt-1 text-sm text-[var(--muted)] line-clamp-2 pr-2">{preview}</p>
+                    <p className="absolute bottom-0 right-0 text-[11px] text-[var(--muted)]">
+                      {formatLastMessageAt(chat.lastMessageAt)}
+                    </p>
                   </div>
                 </div>
                 {(chat.unreadCount ?? 0) > 0 && (
