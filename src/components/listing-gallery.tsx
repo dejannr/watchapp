@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 type ListingImage = {
   id?: string;
@@ -12,6 +12,14 @@ export function ListingGallery({ images, title }: { images: ListingImage[]; titl
   const safeImages = useMemo(() => images.filter((img) => typeof img?.url === 'string' && img.url.length > 0), [images]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [zoom, setZoom] = useState<{ visible: boolean; x: number; y: number; paneX: number; paneY: number }>({
+    visible: false,
+    x: 50,
+    y: 50,
+    paneX: 0,
+    paneY: 0,
+  });
+  const imageRef = useRef<HTMLImageElement | null>(null);
 
   const hasMultiple = safeImages.length > 1;
   const goPrev = () => {
@@ -47,17 +55,62 @@ export function ListingGallery({ images, title }: { images: ListingImage[]; titl
   }
 
   const active = safeImages[Math.min(activeIndex, safeImages.length - 1)];
+  const zoomScale = 3.6;
+  const zoomPaneSize = 300;
 
   return (
     <div className="space-y-3">
       <div className="group card relative overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
+          ref={imageRef}
           src={active.url}
           alt={active.altText ?? title}
           className="aspect-square w-full cursor-zoom-in bg-[var(--bg)] object-cover"
           onClick={() => setIsOpen(true)}
+          onMouseEnter={() => setZoom((z) => ({ ...z, visible: true }))}
+          onMouseLeave={() => setZoom((z) => ({ ...z, visible: false }))}
+          onMouseMove={(e) => {
+            if (!imageRef.current) return;
+            const rect = imageRef.current.getBoundingClientRect();
+            const relativeX = e.clientX - rect.left;
+            const relativeY = e.clientY - rect.top;
+            const x = (relativeX / rect.width) * 100;
+            const y = (relativeY / rect.height) * 100;
+            const paneX = Math.max(0, Math.min(rect.width - zoomPaneSize, relativeX - zoomPaneSize / 2));
+            const paneY = Math.max(0, Math.min(rect.height - zoomPaneSize, relativeY - zoomPaneSize / 2));
+            setZoom({
+              visible: true,
+              x: Math.max(0, Math.min(100, x)),
+              y: Math.max(0, Math.min(100, y)),
+              paneX,
+              paneY,
+            });
+          }}
         />
+        {zoom.visible && !isOpen && (
+          <div
+            className="pointer-events-none absolute hidden overflow-hidden rounded-xl border border-white/70 shadow-2xl md:block"
+            style={{
+              width: `${zoomPaneSize}px`,
+              height: `${zoomPaneSize}px`,
+              left: `${zoom.paneX}px`,
+              top: `${zoom.paneY}px`,
+            }}
+            aria-hidden="true"
+          >
+            <div
+              className="h-full w-full"
+              style={{
+                backgroundImage: `url(${active.url})`,
+                backgroundRepeat: 'no-repeat',
+                backgroundSize: `${zoomScale * 100}%`,
+                backgroundPosition: `${zoom.x}% ${zoom.y}%`,
+              }}
+              aria-hidden="true"
+            />
+          </div>
+        )}
         {hasMultiple && (
           <>
             <button
