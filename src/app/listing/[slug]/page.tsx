@@ -128,10 +128,35 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                 ['Mehanizam', formatMovement(listing.movementType)],
                 ['Referentni broj', listing.referenceNumber ?? '-'],
                 ['Godina proizvodnje', listing.yearOfProduction ?? '-'],
-                ['Lokacija', location || '-'],
+                ['Grad', listing.locationCity ?? '-'],
+                ['Država', listing.locationCountry ?? '-'],
                 [
-                  'Kutija i papiri',
-                  `${listing.hasBox ? 'Kutija' : 'Bez kutije'} / ${listing.hasPapers ? 'Papiri' : 'Bez papira'}`,
+                  'Kutija',
+                  listing.hasBox ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800">
+                      <span aria-hidden="true">✓</span>
+                      Uključena
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800">
+                      <span aria-hidden="true">✕</span>
+                      Nije uključena
+                    </span>
+                  ),
+                ],
+                [
+                  'Papiri',
+                  listing.hasPapers ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800">
+                      <span aria-hidden="true">✓</span>
+                      Uključeni
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-800">
+                      <span aria-hidden="true">✕</span>
+                      Nisu uključeni
+                    </span>
+                  ),
                 ],
               ].map(([label, value], index) => (
                 <div
@@ -139,7 +164,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                   className="grid grid-cols-[140px_1fr] gap-2 border-b border-[var(--line)] p-3 last:border-b-0 sm:[&:nth-last-child(2)]:border-b-0"
                 >
                   <span className="text-[var(--muted)]">{label}</span>
-                  <span className="font-medium">{String(value)}</span>
+                  <span className="font-medium">{value as any}</span>
                 </div>
               ))}
             </div>
