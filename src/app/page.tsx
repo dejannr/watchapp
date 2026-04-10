@@ -4,7 +4,7 @@ import { ListingCard } from '@/components/listing-card';
 import { API_URL } from '@/lib/config';
 
 export default async function Home() {
-  const featuredRaw = await fetch(`${API_URL}/listings?limit=6`, { cache: 'no-store' })
+  const featuredRaw = await fetch(`${API_URL}/listings?limit=10`, { cache: 'no-store' })
     .then((r) => r.json())
     .catch(() => ({ items: [] }));
   const brandsRaw = await fetch(`${API_URL}/brands`, { cache: 'no-store' })
@@ -52,9 +52,9 @@ export default async function Home() {
 
       <section className="space-y-4">
         <h2 className="text-2xl font-bold">Istaknuti oglasi</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {featuredItems.map((listing: any) => (
-            <ListingCard key={listing.id} listing={listing} />
+            <ListingCard key={listing.id} listing={listing} showDescription={false} />
           ))}
         </div>
       </section>

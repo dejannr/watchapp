@@ -13,7 +13,7 @@ type Listing = {
   images?: Array<{ url: string }>;
 };
 
-export function ListingCard({ listing }: { listing: Listing }) {
+export function ListingCard({ listing, showDescription = true }: { listing: Listing; showDescription?: boolean }) {
   const image = listing.images?.[0]?.url;
   const city = listing.locationCity || 'Grad nije naveden';
   const country = listing.locationCountry || 'Država nije navedena';
@@ -28,8 +28,8 @@ export function ListingCard({ listing }: { listing: Listing }) {
   const flag = listing.locationCountry ? (flagByDržava[listing.locationCountry] ?? '🌍') : '🌍';
 
   return (
-    <Link href={`/listing/${listing.slug}`} className="card block overflow-hidden">
-      <div className="aspect-[4/3] bg-stone-200">
+    <Link href={`/listing/${listing.slug}`} className="card block">
+      <div className="aspect-[4/3] overflow-hidden rounded-t-[16px] bg-stone-200">
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={image} alt={listing.title} className="h-full w-full object-cover" />
@@ -39,23 +39,24 @@ export function ListingCard({ listing }: { listing: Listing }) {
           </div>
         )}
       </div>
-      <div className="space-y-2 p-4">
-        <p className="text-xs uppercase text-[var(--muted)]">{listing.brand?.name}</p>
-        <h3 className="truncate font-semibold">{listing.title}</h3>
-        <p
-          className="text-xs text-[var(--muted)]"
-          style={{
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            textAlign: 'justify',
-          }}
-        >
-          {listing.description || 'Nema opisa'}
-        </p>
-        <div className="mt-4 flex items-center justify-between text-sm">
-          <span className="font-bold">
+      <div className="space-y-1 p-3">
+        <h3 className="truncate text-[13px] font-semibold">{listing.title}</h3>
+        {showDescription && (
+          <p
+            className="text-xs text-[var(--muted)]"
+            style={{
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textAlign: 'justify',
+            }}
+          >
+            {listing.description || 'Nema opisa'}
+          </p>
+        )}
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-[13px] font-medium">
             {listing.priceAmount.toLocaleString()} {listing.currency}
           </span>
           <span className="inline-flex items-center gap-1">
