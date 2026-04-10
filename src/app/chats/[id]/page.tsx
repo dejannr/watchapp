@@ -119,7 +119,7 @@ export default function RazgovorDetailPage({ params }: { params: Promise<{ id: s
             return (
               <div
                 key={msg.id}
-                className={`max-w-[85%] rounded border p-2 text-sm ${mine ? 'ml-auto bg-stone-100' : 'bg-white'}`}
+                className={`max-w-[85%] rounded border border-[var(--line)] p-2 text-sm ${mine ? 'ml-auto bg-[var(--line)]' : 'bg-[var(--card)]'}`}
               >
                 <p className="text-xs text-[var(--muted)]">{mine ? 'Vi' : personName(msg.sender)}</p>
                 <p>{msg.body}</p>

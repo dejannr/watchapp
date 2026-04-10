@@ -16,6 +16,17 @@ type PretragaListing = {
   images?: Array<{ url: string }>;
 };
 
+type BrandOption = {
+  name: string;
+  slug: string;
+};
+
+function isBrandOption(value: unknown): value is BrandOption {
+  if (!value || typeof value !== 'object') return false;
+  const item = value as Record<string, unknown>;
+  return typeof item.name === 'string' && typeof item.slug === 'string';
+}
+
 export const metadata: Metadata = {
   title: 'Pretraga satova | Satovi24',
   description: 'Pretraga verified watch listings with structured filters.',
@@ -38,11 +49,17 @@ export default async function PretragaPage({
     .then((r) => r.json())
     .catch(() => ({ items: [], meta: null }));
   const items: PretragaListing[] = Array.isArray(data?.items) ? data.items : [];
+  const brands: unknown = await fetch(`${API_URL}/brands`, { cache: 'no-store' })
+    .then((r) => r.json())
+    .catch(() => []);
+  const brandOptions: BrandOption[] = Array.isArray(brands)
+    ? brands.filter(isBrandOption)
+    : [];
 
   return (
     <div className="container space-y-4">
       <AnalyticsPageView eventName="browse_view" properties={{ resultCount: items.length }} />
-      <BrowseFilters />
+      <BrowseFilters brands={brandOptions} />
       <section className="space-y-4">
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((listing) => (

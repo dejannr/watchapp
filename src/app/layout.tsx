@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
@@ -33,9 +34,19 @@ export default function RootLayout({
         <Providers>
           <header className="border-b border-[var(--line)] bg-[var(--card)]/90 backdrop-blur">
             <div className="container flex items-center justify-between py-4">
-              <Link href="/" className="inline-flex items-center text-xl font-bold tracking-wide">
-                <span>Satovi</span>
-                <span className="text-[var(--brand)]">24</span>
+              <Link href="/" className="inline-flex items-center gap-2">
+                <Image
+                  src="/logo-satovi.png"
+                  alt="Satovi24"
+                  width={180}
+                  height={40}
+                  priority
+                  className="h-10 w-auto"
+                />
+                <span className="text-xl tracking-wide">
+                  <span className="font-bold">Satovi</span>
+                  <span className="font-semibold text-[var(--brand)]">24</span>
+                </span>
               </Link>
               <TopNav />
             </div>

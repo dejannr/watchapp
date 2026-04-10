@@ -110,13 +110,13 @@ export function TopNav() {
             <div className="absolute right-0 z-30 mt-2 min-w-40 rounded border border-[var(--line)] bg-[var(--card)] p-1 shadow">
               <Link
                 href="/account/profile"
-                className="block rounded px-3 py-2 text-sm hover:bg-stone-100"
+                className="block rounded px-3 py-2 text-sm hover:bg-[var(--line)]"
                 onClick={() => setMenuOpen(false)}
               >
                 Profil
               </Link>
               <button
-                className="block w-full rounded px-3 py-2 text-left text-sm hover:bg-stone-100 disabled:opacity-60"
+                className="block w-full rounded px-3 py-2 text-left text-sm hover:bg-[var(--line)] disabled:opacity-60"
                 onClick={async () => {
                   setIsLoggingOut(true);
                   try {

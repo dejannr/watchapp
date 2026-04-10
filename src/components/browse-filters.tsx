@@ -3,7 +3,16 @@
 import { useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-export function BrowseFilters() {
+type BrandOption = {
+  name: string;
+  slug: string;
+};
+
+type BrowseFiltersProps = {
+  brands: BrandOption[];
+};
+
+export function BrowseFilters({ brands }: BrowseFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -27,6 +36,10 @@ export function BrowseFilters() {
       sort: searchParams.get('sort') ?? 'newest',
     }),
     [searchParams],
+  );
+  const hasSelectedBrand = useMemo(
+    () => brands.some((brand) => brand.slug === defaults.brand),
+    [brands, defaults.brand],
   );
 
   return (
@@ -53,12 +66,15 @@ export function BrowseFilters() {
           className="rounded border p-2 text-sm md:col-span-2"
           placeholder="Pretraga"
         />
-        <input
-          name="brand"
-          defaultValue={defaults.brand}
-          className="rounded border p-2 text-sm"
-          placeholder="Slug brenda"
-        />
+        <select name="brand" defaultValue={defaults.brand} className="rounded border p-2 text-sm">
+          <option value="">Svi brendovi</option>
+          {!hasSelectedBrand && defaults.brand && <option value={defaults.brand}>{defaults.brand}</option>}
+          {brands.map((brand) => (
+            <option key={brand.slug} value={brand.slug}>
+              {brand.name}
+            </option>
+          ))}
+        </select>
         <input
           name="minPrice"
           defaultValue={defaults.minPrice}

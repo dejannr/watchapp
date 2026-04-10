@@ -72,7 +72,7 @@ export default function PorukePage() {
               <Link
                 key={chat.id}
                 href={`/chats/${chat.id}`}
-                className="relative block rounded border border-[var(--line)] p-3 hover:bg-stone-50"
+                className="relative block rounded border border-[var(--line)] p-3 hover:bg-[var(--line)]"
               >
                 <p className="font-semibold">{chat.listing?.title ?? 'Razgovor o oglasu'}</p>
                 <p className="text-xs text-[var(--muted)]">{counterparty}</p>
