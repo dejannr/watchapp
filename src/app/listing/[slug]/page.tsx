@@ -1,6 +1,8 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { AnalyticsPageView } from '@/components/analytics-page-view';
 import { FavoriteToggleButton } from '@/components/favorite-toggle-button';
 import { InquiryForm } from '@/components/forms/inquiry-form';
@@ -193,7 +195,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                 <span className="decoration-1 underline-offset-2 group-hover:underline">
                   {sellerDisplayName || 'Prodavac'}
                 </span>
-                <span aria-hidden="true" className="text-xs leading-none opacity-80">↗</span>
+                <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="h-2.5 w-2.5 opacity-80" aria-hidden="true" />
               </Link>
             ) : (
               <p className="text-sm">{sellerDisplayName || 'Prodavac'}</p>

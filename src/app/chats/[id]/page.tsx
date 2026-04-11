@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { use, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { LoadingCard } from '@/components/loading-card';
 import { ApiError, apiRequest } from '@/lib/api';
 import { useCurrentUser } from '@/hooks/use-current-user';
@@ -156,7 +158,7 @@ export default function RazgovorDetailPage({ params }: { params: Promise<{ id: s
                   className="group inline-flex max-w-full items-center gap-1 text-lg font-semibold hover:text-[var(--brand)]"
                 >
                   <span className="truncate decoration-1 underline-offset-2 group-hover:underline">{title}</span>
-                  <span aria-hidden="true" className="text-sm leading-none opacity-80">↗</span>
+                  <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="text-[14px] opacity-80" aria-hidden="true" />
                 </Link>
               ) : (
                 <h1 className="truncate text-lg font-semibold">{title}</h1>

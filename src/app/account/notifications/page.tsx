@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { apiRequest } from '@/lib/api';
 
 type NotificationRow = {
@@ -103,7 +105,8 @@ export default function NalogNotificationsPage() {
                     href={`/chats/${item.dataJson.chatId}`}
                     className="inline-flex items-center gap-1 text-xs font-medium text-[var(--brand)] hover:underline"
                   >
-                    Otvori razgovor <span aria-hidden="true">↗</span>
+                    Otvori razgovor
+                    <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="h-3 w-3 opacity-80" aria-hidden="true" />
                   </Link>
                 </div>
               )}
