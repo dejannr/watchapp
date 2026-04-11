@@ -108,7 +108,11 @@ export function ListingCard({ listing, showDescription = true }: { listing: List
         <div className="aspect-[4/3] overflow-hidden rounded-t-[16px] bg-stone-200">
           {image ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={image} alt={listing.title} className="h-full w-full object-cover" />
+            <img
+              src={image}
+              alt={listing.title}
+              className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover/card:scale-105"
+            />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-[var(--muted)]">
               Nema slike
