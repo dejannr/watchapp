@@ -57,7 +57,7 @@ export function FavoriteToggleButton({ listingId }: { listingId: string }) {
   return (
     <button
       type="button"
-      className={`mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition ${
+      className={`mt-3 inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition disabled:cursor-not-allowed ${
         isFavorited
           ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
           : 'border-[var(--line)] bg-[var(--card)] text-[var(--text)] hover:bg-[var(--line)]'

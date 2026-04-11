@@ -83,7 +83,7 @@ export function ListingCard({ listing, showDescription = true }: { listing: List
       <button
         type="button"
         aria-label={isFavorited ? 'Ukloni iz favorita' : 'Dodaj u favorite'}
-        className={`absolute right-2 top-2 z-20 rounded-full border p-1.5 transition ${
+        className={`absolute right-2 top-2 z-20 cursor-pointer rounded-full border p-1.5 transition disabled:cursor-not-allowed ${
           isFavorited
             ? 'border-[var(--brand)] bg-[var(--brand)] text-white opacity-100'
             : 'border-white/80 bg-black/35 text-white opacity-0 group-hover/card:opacity-100'
@@ -93,6 +93,7 @@ export function ListingCard({ listing, showDescription = true }: { listing: List
           e.stopPropagation();
           favoriteMutation.mutate();
         }}
+        disabled={favoriteMutation.isPending}
       >
         <svg viewBox="0 0 24 24" className="h-4 w-4" fill={isFavorited ? 'currentColor' : 'none'} xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path

@@ -4,6 +4,7 @@ import { Metadata } from 'next';
 import { AnalyticsPageView } from '@/components/analytics-page-view';
 import { FavoriteToggleButton } from '@/components/favorite-toggle-button';
 import { InquiryForm } from '@/components/forms/inquiry-form';
+import { ListingBackBreadcrumb } from '@/components/listing-back-breadcrumb';
 import { ListingGallery } from '@/components/listing-gallery';
 import { API_URL } from '@/lib/config';
 
@@ -96,7 +97,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
   const location = [listing.locationCity, listing.locationCountry].filter(Boolean).join(', ');
 
   return (
-    <div className="container space-y-6">
+    <div className="container space-y-3">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <AnalyticsPageView
         eventName="listing_view"
@@ -104,15 +105,8 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
       />
 
       <div className="space-y-2">
-        <p className="text-xs uppercase tracking-[0.12em] text-[var(--muted)]">Oglas</p>
+        <ListingBackBreadcrumb />
         <h1 className="text-3xl font-bold leading-tight">{listing.title}</h1>
-        <div className="flex flex-wrap items-center gap-2 text-sm text-[var(--muted)]">
-          <span className="rounded-full border border-[var(--line)] px-2.5 py-1">{listing.brand?.name ?? 'Brend'}</span>
-          {listing.watchModel?.name && (
-            <span className="rounded-full border border-[var(--line)] px-2.5 py-1">{listing.watchModel.name}</span>
-          )}
-          {location && <span>{location}</span>}
-        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1.65fr_1fr] lg:items-start">
