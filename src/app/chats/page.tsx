@@ -33,6 +33,14 @@ type RazgovorListItem = {
     lastName?: string | null;
     displayName?: string | null;
   };
+  saleProposal?: {
+    id: string;
+    proposerId: string;
+    acceptedAt?: string | null;
+    proposedPriceAmount?: number | null;
+    proposedCurrency?: string | null;
+    reviews?: Array<{ reviewerId: string }>;
+  } | null;
   unreadCount?: number;
 };
 
@@ -80,6 +88,18 @@ export default function PorukePage() {
             const counterparty = isKupac
               ? `Prodavac: ${personName(chat.seller)}`
               : `Kupac: ${personName(chat.buyer)}`;
+            const proposal = chat.saleProposal;
+            const myId = currentKorisnik?.id ?? '';
+            const myReviewDone = Boolean(proposal?.reviews?.some((row) => row.reviewerId === myId));
+            const saleStatus = !proposal
+              ? null
+              : !proposal.acceptedAt
+                ? proposal.proposerId === myId
+                  ? { label: 'Čeka potvrdu', textClass: 'text-amber-700', dotClass: 'bg-amber-500' }
+                  : { label: 'Čeka tvoju potvrdu', textClass: 'text-rose-700', dotClass: 'bg-rose-500' }
+                : myReviewDone
+                  ? { label: 'Prodato', textClass: 'text-emerald-700', dotClass: 'bg-emerald-500' }
+                  : { label: 'Čeka recenziju', textClass: 'text-blue-700', dotClass: 'bg-blue-500' };
             const preview = chat.messages?.[0]?.body ?? 'Još nema poruka';
             const image = chat.listingImageUrl ?? chat.listing?.images?.[0]?.url;
             return (
@@ -98,8 +118,18 @@ export default function PorukePage() {
                     )}
                   </div>
                   <div className="relative min-w-0 flex-1 pr-14">
-                    <p className="truncate pr-8 font-semibold">{chat.listing?.title ?? 'Razgovor o oglasu'}</p>
-                    <p className="text-xs text-[var(--muted)]">{counterparty}</p>
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="truncate font-semibold">{chat.listing?.title ?? 'Razgovor o oglasu'}</p>
+                    </div>
+                    <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs">
+                      <p className="text-[var(--muted)]">{counterparty}</p>
+                      {saleStatus && (
+                        <span className={`inline-flex items-center gap-1 ${saleStatus.textClass}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${saleStatus.dotClass}`} />
+                          {saleStatus.label}
+                        </span>
+                      )}
+                    </div>
                     <p className="mt-1 text-sm text-[var(--muted)] line-clamp-2 pr-2">{preview}</p>
                     <p className="absolute bottom-0 right-0 text-[11px] text-[var(--muted)]">
                       {formatLastMessageAt(chat.lastMessageAt)}
