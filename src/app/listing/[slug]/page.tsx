@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { AnalyticsPageView } from '@/components/analytics-page-view';
+import { FavoriteToggleButton } from '@/components/favorite-toggle-button';
 import { InquiryForm } from '@/components/forms/inquiry-form';
 import { ListingGallery } from '@/components/listing-gallery';
 import { API_URL } from '@/lib/config';
@@ -185,6 +186,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
               {listing.priceAmount.toLocaleString()} {listing.currency}
             </p>
             <p className="mt-2 text-xs text-[var(--muted)]">Cena je informativna. Detalji dogovora idu direktno sa prodavcem.</p>
+            <FavoriteToggleButton listingId={listing.id} />
           </div>
 
           <div className="card space-y-2 p-5">
