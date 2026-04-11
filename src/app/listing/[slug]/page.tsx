@@ -185,13 +185,18 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
 
           <div className="card space-y-2 p-5">
             <h3 className="font-semibold">Prodavac</h3>
-            <p className="text-sm">{sellerDisplayName || 'Prodavac'}</p>
             {sellerSlug ? (
-              <Link href={`/seller/${sellerSlug}`} className="text-sm text-[var(--brand)] hover:underline">
-                Pogledaj profil prodavca
+              <Link
+                href={`/seller/${sellerSlug}`}
+                className="group inline-flex items-center gap-1 text-sm text-[var(--brand)]"
+              >
+                <span className="decoration-1 underline-offset-2 group-hover:underline">
+                  {sellerDisplayName || 'Prodavac'}
+                </span>
+                <span aria-hidden="true" className="text-xs leading-none opacity-80">↗</span>
               </Link>
             ) : (
-              <p className="text-xs text-[var(--muted)]">Profil prodavca trenutno nije dostupan.</p>
+              <p className="text-sm">{sellerDisplayName || 'Prodavac'}</p>
             )}
           </div>
 
