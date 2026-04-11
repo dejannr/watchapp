@@ -40,13 +40,23 @@ const STATUS_LABELS: Record<(typeof STATUS_OPTIONS)[number], string> = {
 };
 
 const STATUS_BADGE_CLASS: Record<ProdavacListing['status'], string> = {
-  DRAFT: 'bg-slate-100 text-slate-700 border-slate-200',
-  PENDING_REVIEW: 'bg-amber-100 text-amber-800 border-amber-200',
-  PUBLISHED: 'bg-emerald-100 text-emerald-800 border-emerald-200',
-  REJECTED: 'bg-rose-100 text-rose-700 border-rose-200',
-  ARCHIVED: 'bg-zinc-200 text-zinc-800 border-zinc-300',
-  SOLD: 'bg-indigo-100 text-indigo-800 border-indigo-200',
-  HIDDEN: 'bg-neutral-200 text-neutral-800 border-neutral-300',
+  DRAFT: 'bg-slate-50 text-slate-700 border-slate-200',
+  PENDING_REVIEW: 'bg-amber-50 text-amber-800 border-amber-200',
+  PUBLISHED: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+  REJECTED: 'bg-rose-50 text-rose-700 border-rose-200',
+  ARCHIVED: 'bg-zinc-100 text-zinc-800 border-zinc-300',
+  SOLD: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+  HIDDEN: 'bg-neutral-100 text-neutral-800 border-neutral-300',
+};
+
+const STATUS_DOT_CLASS: Record<ProdavacListing['status'], string> = {
+  DRAFT: 'bg-slate-500',
+  PENDING_REVIEW: 'bg-amber-500',
+  PUBLISHED: 'bg-emerald-500',
+  REJECTED: 'bg-rose-500',
+  ARCHIVED: 'bg-zinc-500',
+  SOLD: 'bg-indigo-500',
+  HIDDEN: 'bg-neutral-500',
 };
 
 export default function ProdavacOglasiPage() {
@@ -205,22 +215,27 @@ export default function ProdavacOglasiPage() {
             </p>
           </div>
         </div>
-        <div className="mb-4 flex items-center gap-2">
-          <label className="text-sm text-[var(--muted)]" htmlFor="status-filter">
-            Status
-          </label>
-          <select
-            id="status-filter"
-            className="rounded-md border border-[var(--line)] bg-white px-3 py-2 text-sm"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as (typeof STATUS_OPTIONS)[number])}
-          >
-            {STATUS_OPTIONS.map((status) => (
-              <option key={status} value={status}>
-                {STATUS_LABELS[status]}
-              </option>
-            ))}
-          </select>
+        <div className="mb-4">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--muted)]">Status filter</p>
+          <div className="flex flex-wrap gap-2">
+            {STATUS_OPTIONS.map((status) => {
+              const isActive = statusFilter === status;
+              return (
+                <button
+                  key={status}
+                  type="button"
+                  onClick={() => setStatusFilter(status)}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
+                    isActive
+                      ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
+                      : 'border-[var(--line)] bg-[var(--surface-soft)] text-[var(--text)]/80 hover:border-[var(--line)] hover:bg-[var(--card)] hover:text-[var(--text)] hover:shadow-sm'
+                  }`}
+                >
+                  {STATUS_LABELS[status]}
+                </button>
+              );
+            })}
+          </div>
         </div>
         <div className="space-y-3">
           {listings.isLoading && <LoadingCard message="Učitavanje oglasa..." />}
@@ -248,20 +263,26 @@ export default function ProdavacOglasiPage() {
                     )}
                   </div>
                   <div className="flex min-w-0 flex-1 items-start justify-between gap-3">
-                    <div className="space-y-1">
-                      <p className="font-semibold leading-tight">{listing.title}</p>
-                      <span
-                        className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${STATUS_BADGE_CLASS[listing.status]}`}
-                      >
-                        {STATUS_LABELS[listing.status]}
-                      </span>
-                      {listing.updatedAt && (
-                        <p className="text-xs text-[var(--muted)]">
-                          Ažurirano {new Date(listing.updatedAt).toLocaleString()}
-                        </p>
-                      )}
+                    <div className="min-w-0 space-y-2">
+                      <p className="line-clamp-2 font-semibold leading-tight">{listing.title}</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span
+                          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${STATUS_BADGE_CLASS[listing.status]}`}
+                        >
+                          <span
+                            aria-hidden="true"
+                            className={`h-1.5 w-1.5 rounded-full ${STATUS_DOT_CLASS[listing.status]}`}
+                          />
+                          {STATUS_LABELS[listing.status]}
+                        </span>
+                        {listing.updatedAt && (
+                          <p className="text-xs text-[var(--muted)]">
+                            Ažurirano {new Date(listing.updatedAt).toLocaleString()}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div className="flex flex-wrap items-center justify-end gap-2">
+                    <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
                       <Link
                         href={`/seller-dashboard/listings/${listing.id}`}
                         className="rounded-md border border-[var(--line)] px-2 py-1 text-xs font-medium text-[var(--brand)]"

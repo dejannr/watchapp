@@ -1,1 +1,1 @@
-export { default } from '../seller/dashboard/page';
+export { default } from '../seller/listings/page';
