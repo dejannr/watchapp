@@ -97,7 +97,7 @@ export default function Home() {
       <section className="card grid gap-4 p-8 md:grid-cols-2">
         <div className="space-y-4">
           <p className="text-sm uppercase tracking-[0.2em] text-[var(--brand-soft)]">Tržište satova</p>
-          <h1 className="text-4xl font-bold leading-tight">Kupujte i prodajte autentične satove van mreže</h1>
+          <h1 className="text-4xl font-bold leading-tight">Kupujte i prodajte proverene satove na jednom mestu</h1>
           <p className="text-[var(--muted)]">
             Pronađite oglase privatnih prodavaca i dilera. Pretražujte po brendu, modelu, stanju i lokaciji.
           </p>
@@ -110,13 +110,28 @@ export default function Home() {
             </Link>
           </div>
         </div>
-        <div className="rounded-xl border border-dashed border-[var(--line)] p-6 text-sm text-[var(--muted)]">
-          <p>Kako funkcioniše:</p>
-          <ol className="mt-2 list-decimal space-y-1 pl-5">
-            <li>Registrujte se i verifikujte e-poštu.</li>
-            <li>Prijavite se kao prodavac i sačekajte odobrenje.</li>
-            <li>Kreirajte oglase i upravljajte upitima.</li>
-          </ol>
+        <div className="rounded-xl border border-dashed border-[var(--line)] bg-[var(--card)]/70 p-6">
+          <p className="text-sm font-semibold text-[var(--text)]">Kako početi</p>
+          <div className="mt-3 space-y-3 text-sm text-[var(--muted)]">
+            <div className="flex items-start gap-3">
+              <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--card)] text-xs text-[var(--text)]">
+                1
+              </span>
+              <p>Napravite nalog i verifikujte e-poštu.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--card)] text-xs text-[var(--text)]">
+                2
+              </span>
+              <p>Pretražite oglase ili podnesite prijavu za prodavca.</p>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--card)] text-xs text-[var(--text)]">
+                3
+              </span>
+              <p>Objavite sat i komunicirajte sa kupcima kroz poruke.</p>
+            </div>
+          </div>
         </div>
       </section>
 
