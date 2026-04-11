@@ -178,10 +178,17 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
         <aside className="space-y-4 lg:sticky lg:top-5">
           <div className="card p-5">
             <p className="text-xs uppercase tracking-[0.1em] text-[var(--muted)]">Cena</p>
-            <p className="mt-1 text-3xl font-bold">
-              {listing.priceAmount.toLocaleString()} {listing.currency}
-            </p>
-            <p className="mt-2 text-xs text-[var(--muted)]">Cena je informativna. Detalji dogovora idu direktno sa prodavcem.</p>
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              {listing.status === 'SOLD' ? (
+                <span className="text-sm font-semibold uppercase tracking-wide text-emerald-700">
+                  PRODATO
+                </span>
+              ) : (
+                <p className="text-3xl font-bold">
+                  {listing.priceAmount.toLocaleString()} {listing.currency}
+                </p>
+              )}
+            </div>
             <FavoriteToggleButton listingId={listing.id} />
           </div>
 
@@ -202,7 +209,14 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             )}
           </div>
 
-          <InquiryForm listingId={listing.id} />
+          {listing.status === 'SOLD' ? (
+            <div className="card p-5">
+              <p className="text-sm font-semibold text-emerald-800">Ovaj oglas je prodat.</p>
+              <p className="mt-1 text-xs text-[var(--muted)]">Slanje upita je onemogućeno.</p>
+            </div>
+          ) : (
+            <InquiryForm listingId={listing.id} />
+          )}
         </aside>
       </div>
     </div>

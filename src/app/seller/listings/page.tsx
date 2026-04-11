@@ -292,7 +292,7 @@ export default function ProdavacOglasiPage() {
                         <FontAwesomeIcon icon={faPenToSquare} className="h-3 w-3" aria-hidden="true" />
                         Izmeni
                       </Link>
-                      {listing.status === 'PUBLISHED' && (
+                      {(listing.status === 'PUBLISHED' || listing.status === 'SOLD') && (
                         <Link
                           href={`/listing/${listing.slug}`}
                           className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-1.5 text-xs font-medium text-[var(--text)] transition hover:border-[var(--brand)]/35 hover:text-[var(--brand)]"
