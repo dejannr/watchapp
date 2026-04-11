@@ -61,9 +61,9 @@ export default async function PretragaPage({
       <AnalyticsPageView eventName="browse_view" properties={{ resultCount: items.length }} />
       <BrowseFilters brands={brandOptions} />
       <section className="space-y-4">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {items.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
+            <ListingCard key={listing.id} listing={listing} showDescription={false} />
           ))}
         </div>
         {items.length === 0 && (

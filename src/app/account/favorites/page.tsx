@@ -13,11 +13,16 @@ export default function FavoritesPage() {
   return (
     <div className="container space-y-4">
       <h1 className="text-2xl font-bold">Favoriti</h1>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {(favorites.data ?? []).map((fav) => (
-          <ListingCard key={fav.id} listing={fav.listing} />
+          <ListingCard key={fav.id} listing={fav.listing} showDescription={false} />
         ))}
       </div>
+      {favorites.data?.length === 0 && (
+        <div className="card p-4 text-sm text-[var(--muted)]">
+          Još nema sačuvanih oglasa u favoritima.
+        </div>
+      )}
     </div>
   );
 }
