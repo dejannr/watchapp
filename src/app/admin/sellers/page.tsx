@@ -4,7 +4,23 @@ import Link from 'next/link';
 import { Suspense, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
+import { LoadingCard } from '@/components/loading-card';
 import { ApiError, apiRequest } from '@/lib/api';
+
+type SellerApplicationListItem = {
+  id: string;
+  status: string;
+  sellerType?: string;
+  displayName?: string;
+  user: {
+    email: string;
+  };
+};
+
+type SellerApplicationListResponse = {
+  items: SellerApplicationListItem[];
+  pagination: { page: number; pageCount: number; total: number };
+};
 
 function AdministratorProdavacsPageContent() {
   const router = useRouter();
@@ -18,7 +34,7 @@ function AdministratorProdavacsPageContent() {
   const applications = useQuery({
     queryKey: ['admin-seller-applications', status, q, page],
     queryFn: () =>
-      apiRequest<{ items: any[]; pagination: { page: number; pageCount: number; total: number } }>(
+      apiRequest<SellerApplicationListResponse>(
         `/admin/seller-applications?status=${encodeURIComponent(status)}&q=${encodeURIComponent(q)}&page=${page}&pageSize=12`,
         'GET',
         undefined,
@@ -62,6 +78,11 @@ function AdministratorProdavacsPageContent() {
         </form>
         {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
         {success && <p className="mt-3 text-sm text-green-700">{success}</p>}
+        {applications.isLoading && (
+          <div className="mt-3">
+            <LoadingCard message="Učitavanje prijava..." />
+          </div>
+        )}
         <div className="mt-3 space-y-2">
           {(applications.data?.items ?? []).map((app) => (
             <div key={app.id} className="space-y-2 rounded border p-3 text-sm">
@@ -150,7 +171,13 @@ function AdministratorProdavacsPageContent() {
 
 export default function AdministratorProdavacsPage() {
   return (
-    <Suspense fallback={<div className="container">Učitavanje...</div>}>
+    <Suspense
+      fallback={
+        <div className="container py-4">
+          <LoadingCard />
+        </div>
+      }
+    >
       <AdministratorProdavacsPageContent />
     </Suspense>
   );

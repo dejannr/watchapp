@@ -1,26 +1,96 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { AnalyticsPageView } from '@/components/analytics-page-view';
 import { ListingCard } from '@/components/listing-card';
+import { LoadingCard } from '@/components/loading-card';
 import { API_URL } from '@/lib/config';
 
-export default async function Home() {
+type HomeListing = {
+  id: string;
+  slug: string;
+  title: string;
+  priceAmount: number;
+  currency: string;
+  locationCity?: string | null;
+  locationCountry?: string | null;
+  images?: Array<{ url: string }>;
+};
+
+type HomeBrand = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+async function fetchFeaturedListings(): Promise<HomeListing[]> {
   const featuredRaw = await fetch(`${API_URL}/listings?limit=10`, { cache: 'no-store' })
     .then((r) => r.json())
     .catch(() => ({ items: [] }));
+  return Array.isArray(featuredRaw?.items) ? featuredRaw.items : [];
+}
+
+async function fetchBrands(): Promise<HomeBrand[]> {
   const brandsRaw = await fetch(`${API_URL}/brands`, { cache: 'no-store' })
     .then((r) => r.json())
     .catch(() => []);
+  return Array.isArray(brandsRaw) ? brandsRaw : [];
+}
 
-  const featuredItems: any[] = Array.isArray(featuredRaw?.items) ? featuredRaw.items : [];
-  const brands = Array.isArray(brandsRaw) ? brandsRaw : [];
-  const citySet = new Set<string>();
-  for (const item of featuredItems) {
-    if (typeof item?.locationCity === 'string' && item.locationCity.trim().length > 0) {
-      citySet.add(item.locationCity);
-    }
-  }
-  const cities = Array.from(citySet).slice(0, 8);
+async function FeaturedListingsSection() {
+  const featuredItems = await fetchFeaturedListings();
 
+  return (
+    <section className="space-y-4">
+      <h2 className="text-2xl font-bold">Istaknuti oglasi</h2>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {featuredItems.map((listing) => (
+          <ListingCard key={listing.id} listing={listing} showDescription={false} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function FeaturedListingsFallback() {
+  return (
+    <section className="space-y-4">
+      <h2 className="text-2xl font-bold">Istaknuti oglasi</h2>
+      <LoadingCard message="Učitavanje istaknutih oglasa..." />
+    </section>
+  );
+}
+
+async function PopularBrandsSection() {
+  const brands = await fetchBrands();
+
+  return (
+    <section className="space-y-4">
+      <h2 className="text-2xl font-bold">Popularni brendovi</h2>
+      <div className="flex flex-wrap gap-2">
+        {brands.slice(0, 18).map((brand) => (
+          <Link
+            key={brand.id}
+            href={`/browse?brand=${brand.slug}`}
+            className="rounded-full border border-[var(--line)] px-3 py-1 text-sm"
+          >
+            {brand.name}
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PopularBrandsFallback() {
+  return (
+    <section className="space-y-4">
+      <h2 className="text-2xl font-bold">Popularni brendovi</h2>
+      <LoadingCard message="Učitavanje brendova..." />
+    </section>
+  );
+}
+
+export default function Home() {
   return (
     <div className="container space-y-10">
       <AnalyticsPageView eventName="homepage_view" />
@@ -50,29 +120,13 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl font-bold">Istaknuti oglasi</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {featuredItems.map((listing: any) => (
-            <ListingCard key={listing.id} listing={listing} showDescription={false} />
-          ))}
-        </div>
-      </section>
+      <Suspense fallback={<FeaturedListingsFallback />}>
+        <FeaturedListingsSection />
+      </Suspense>
 
-      <section className="space-y-4">
-        <h2 className="text-2xl font-bold">Popularni brendovi</h2>
-        <div className="flex flex-wrap gap-2">
-          {brands.slice(0, 18).map((brand: any) => (
-            <Link
-              key={brand.id}
-              href={`/browse?brand=${brand.slug}`}
-              className="rounded-full border border-[var(--line)] px-3 py-1 text-sm"
-            >
-              {brand.name}
-            </Link>
-          ))}
-        </div>
-      </section>
+      <Suspense fallback={<PopularBrandsFallback />}>
+        <PopularBrandsSection />
+      </Suspense>
 
       <section className="card grid gap-4 p-6 md:grid-cols-[1fr_auto] md:items-center">
         <div>
@@ -85,7 +139,6 @@ export default async function Home() {
           Postani prodavac
         </Link>
       </section>
-
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { SellerApplyForm } from '@/components/forms/seller-apply-form';
 import { apiRequest } from '@/lib/api';
 import { useCurrentUser } from '@/hooks/use-current-user';
+import { LoadingCard } from '@/components/loading-card';
 
 type ProdavacProfil = {
   id?: string;
@@ -52,7 +53,7 @@ export default function ProdavacPrimeniPage() {
   if (userLoading) {
     return (
       <div className="container">
-        <div className="card p-4 text-sm">Provera sesije...</div>
+        <LoadingCard message="Provera sesije..." />
       </div>
     );
   }
@@ -92,7 +93,11 @@ export default function ProdavacPrimeniPage() {
   }
 
   if (user.sellerStatus === 'APPROVED') {
-    return null;
+    return (
+      <div className="container">
+        <LoadingCard message="Preusmeravanje na kontrolnu tablu..." />
+      </div>
+    );
   }
 
   if (user.sellerStatus === 'PENDING') {

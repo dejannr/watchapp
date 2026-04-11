@@ -3,6 +3,7 @@
 import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { ApiError, apiRequest } from '@/lib/api';
+import { LoadingCard } from '@/components/loading-card';
 
 function VerifikujEmailPageContent() {
   const searchParams = useSearchParams();
@@ -48,7 +49,15 @@ function VerifikujEmailPageContent() {
 
 export default function VerifikujEmailPage() {
   return (
-    <Suspense fallback={<div className="container">Učitavanje...</div>}>
+    <Suspense
+      fallback={
+        <div className="container">
+          <div className="mx-auto max-w-md">
+            <LoadingCard />
+          </div>
+        </div>
+      }
+    >
       <VerifikujEmailPageContent />
     </Suspense>
   );

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { use, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { LoadingCard } from '@/components/loading-card';
 import { ApiError, apiRequest } from '@/lib/api';
 import { useCurrentUser } from '@/hooks/use-current-user';
 
@@ -116,6 +117,14 @@ export default function RazgovorDetailPage({ params }: { params: Promise<{ id: s
     return 'Učitavanje razgovora...';
   }, [chat.data, currentKorisnik]);
 
+  if (chat.isLoading && !chat.data) {
+    return (
+      <div className="container py-3">
+        <LoadingCard message="Učitavanje razgovora..." />
+      </div>
+    );
+  }
+
   return (
     <div className="container space-y-3">
       <div className="flex items-center gap-2 text-xs text-[var(--muted)]">
@@ -158,6 +167,9 @@ export default function RazgovorDetailPage({ params }: { params: Promise<{ id: s
         </div>
 
         <div ref={messagesRef} className="flex-1 space-y-2 overflow-y-auto bg-[var(--bg)] p-3 sm:p-4">
+          {messages.isLoading && (messages.data?.length ?? 0) === 0 && (
+            <LoadingCard message="Učitavanje poruka..." />
+          )}
           {(messages.data ?? []).map((msg) => {
             const mine = currentKorisnik?.id === msg.senderId;
             return (
@@ -170,7 +182,6 @@ export default function RazgovorDetailPage({ params }: { params: Promise<{ id: s
               </div>
             );
           })}
-          {messages.isLoading && <p className="text-sm text-[var(--muted)]">Učitavanje poruka...</p>}
         </div>
 
         <div className="border-t border-[var(--line)] bg-[var(--card)] p-3">

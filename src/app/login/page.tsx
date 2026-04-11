@@ -5,6 +5,7 @@ import { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { LoginForm } from '@/components/forms/login-form';
 import { useCurrentUser } from '@/hooks/use-current-user';
+import { LoadingCard } from '@/components/loading-card';
 
 function PrijavaPageContent() {
   const router = useRouter();
@@ -21,13 +22,21 @@ function PrijavaPageContent() {
   if (isLoading) {
     return (
       <div className="container">
-        <div className="card mx-auto max-w-md p-4 text-sm">Provera sesije...</div>
+        <div className="mx-auto max-w-md">
+          <LoadingCard message="Provera sesije..." />
+        </div>
       </div>
     );
   }
 
   if (user) {
-    return null;
+    return (
+      <div className="container">
+        <div className="mx-auto max-w-md">
+          <LoadingCard message="Preusmeravanje..." />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -51,7 +60,9 @@ export default function PrijavaPage() {
     <Suspense
       fallback={
         <div className="container">
-          <div className="card mx-auto max-w-md p-4 text-sm">Učitavanje...</div>
+          <div className="mx-auto max-w-md">
+            <LoadingCard />
+          </div>
         </div>
       }
     >

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Suspense, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { LoadingCard } from '@/components/loading-card';
 import { ApiError, apiRequest } from '@/lib/api';
 
 type AdministratorListingListItem = {
@@ -197,6 +198,7 @@ function AdministratorOglasiPageContent() {
         {error && <p className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
         {success && <p className="mt-4 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">{success}</p>}
         <div className="mt-4 space-y-3">
+          {listings.isLoading && <LoadingCard message="Učitavanje oglasa..." />}
           {(listings.data?.items ?? []).map((listing) => (
             <div key={listing.id} className="rounded-xl border border-[var(--line)] p-4 shadow-sm">
               <div className="flex items-start justify-between gap-3">
@@ -310,7 +312,13 @@ function AdministratorOglasiPageContent() {
 
 export default function AdministratorOglasiPage() {
   return (
-    <Suspense fallback={<div className="container">Učitavanje...</div>}>
+    <Suspense
+      fallback={
+        <div className="container py-4">
+          <LoadingCard />
+        </div>
+      }
+    >
       <AdministratorOglasiPageContent />
     </Suspense>
   );

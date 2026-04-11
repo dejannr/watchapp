@@ -77,6 +77,9 @@ export function TopNav() {
       {loggedIn && (
         <Link href="/account" className="relative pr-1">
           Nalog
+          {unread.isLoading && (
+            <span className="absolute -right-3 -top-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-[var(--line)] border-t-[var(--brand)]" />
+          )}
           {(unread.data?.unread ?? 0) > 0 && (
             <span className="absolute -right-3 -top-2 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white">
               {unread.data?.unread}
@@ -87,6 +90,9 @@ export function TopNav() {
       {loggedIn && (
         <Link href="/chats" className="relative pr-1">
           Poruke
+          {chatUnread.isLoading && (
+            <span className="absolute -right-3 -top-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-[var(--line)] border-t-[var(--brand)]" />
+          )}
           {(chatUnread.data?.unread ?? 0) > 0 && (
             <span className="absolute -right-3 -top-2 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white">
               {chatUnread.data?.unread}

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
+import { LoadingCard } from '@/components/loading-card';
 import { apiRequest } from '@/lib/api';
 import { useCurrentUser } from '@/hooks/use-current-user';
 
@@ -69,7 +70,7 @@ export default function PorukePage() {
     <div className="container space-y-4">
       <h1 className="text-2xl font-bold">Poruke</h1>
       <div className="card p-3 sm:p-4">
-        {chats.isLoading && <p className="text-sm text-[var(--muted)]">Učitavanje razgovora...</p>}
+        {chats.isLoading && <LoadingCard message="Učitavanje razgovora..." />}
         {!chats.isLoading && (chats.data ?? []).length === 0 && (
           <p className="text-sm text-[var(--muted)]">Još nema razgovora. Počnite slanjem upita na oglasu.</p>
         )}

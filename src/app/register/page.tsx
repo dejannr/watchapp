@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { RegisterForm } from '@/components/forms/register-form';
 import { useCurrentUser } from '@/hooks/use-current-user';
+import { LoadingCard } from '@/components/loading-card';
 
 export default function RegistracijaPage() {
   const router = useRouter();
@@ -19,13 +20,21 @@ export default function RegistracijaPage() {
   if (isLoading) {
     return (
       <div className="container">
-        <div className="card mx-auto max-w-md p-4 text-sm">Provera sesije...</div>
+        <div className="mx-auto max-w-md">
+          <LoadingCard message="Provera sesije..." />
+        </div>
       </div>
     );
   }
 
   if (user) {
-    return null;
+    return (
+      <div className="container">
+        <div className="mx-auto max-w-md">
+          <LoadingCard message="Preusmeravanje..." />
+        </div>
+      </div>
+    );
   }
 
   return (

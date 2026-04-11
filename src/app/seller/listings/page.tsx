@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { LoadingCard } from '@/components/loading-card';
 import { useNotify } from '@/components/notifications-provider';
 import { ApiError, apiRequest } from '@/lib/api';
 
@@ -222,6 +223,7 @@ export default function ProdavacOglasiPage() {
           </select>
         </div>
         <div className="space-y-3">
+          {listings.isLoading && <LoadingCard message="Učitavanje oglasa..." />}
           {items.map((listing) => {
             const busy = activeAction?.startsWith(`${listing.id}:`) || false;
             const firstImage = listing.images?.[0]?.url;

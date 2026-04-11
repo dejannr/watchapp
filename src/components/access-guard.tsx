@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCurrentUser } from '@/hooks/use-current-user';
+import { LoadingCard } from '@/components/loading-card';
 
 export function AccessGuard({
   children,
@@ -33,7 +34,7 @@ export function AccessGuard({
   if (isLoading) {
     return (
       <div className="container">
-        <div className="card p-4 text-sm">Provera sesije...</div>
+        <LoadingCard message="Provera sesije..." />
       </div>
     );
   }
@@ -41,7 +42,7 @@ export function AccessGuard({
   if (!user) {
     return (
       <div className="container">
-        <div className="card p-4 text-sm">Preusmeravanje na prijavu...</div>
+        <LoadingCard message="Preusmeravanje na prijavu..." />
       </div>
     );
   }
@@ -49,7 +50,7 @@ export function AccessGuard({
   if (requireAdmin && user?.role !== 'ADMIN') {
     return (
       <div className="container">
-        <div className="card p-4 text-sm">Potreban je administratorski pristup.</div>
+        <LoadingCard message="Preusmeravanje..." />
       </div>
     );
   }
@@ -57,7 +58,7 @@ export function AccessGuard({
   if (requireApprovedSeller && user?.sellerStatus !== 'APPROVED') {
     return (
       <div className="container">
-        <div className="card p-4 text-sm">Potreban je pristup odobrenog prodavca.</div>
+        <LoadingCard message="Preusmeravanje..." />
       </div>
     );
   }
