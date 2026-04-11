@@ -119,17 +119,17 @@ export default function PorukePage() {
                   </div>
                   <div className="relative min-w-0 flex-1 pr-14">
                     <div className="flex items-start justify-between gap-2">
-                      <p className="truncate font-semibold">{chat.listing?.title ?? 'Razgovor o oglasu'}</p>
+                      <div className="flex min-w-0 items-center gap-2">
+                        <p className="truncate font-semibold">{chat.listing?.title ?? 'Razgovor o oglasu'}</p>
+                        {saleStatus && (
+                          <span className={`inline-flex shrink-0 items-center gap-1 text-[11px] ${saleStatus.textClass}`}>
+                            <span className={`h-1.5 w-1.5 rounded-full ${saleStatus.dotClass}`} />
+                            {saleStatus.label}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs">
-                      <p className="text-[var(--muted)]">{counterparty}</p>
-                      {saleStatus && (
-                        <span className={`inline-flex items-center gap-1 ${saleStatus.textClass}`}>
-                          <span className={`h-1.5 w-1.5 rounded-full ${saleStatus.dotClass}`} />
-                          {saleStatus.label}
-                        </span>
-                      )}
-                    </div>
+                    <p className="mt-0.5 text-xs text-[var(--muted)]">{counterparty}</p>
                     <p className="mt-1 text-sm text-[var(--muted)] line-clamp-2 pr-2">{preview}</p>
                     <p className="absolute bottom-0 right-0 text-[11px] text-[var(--muted)]">
                       {formatLastMessageAt(chat.lastMessageAt)}

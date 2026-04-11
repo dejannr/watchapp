@@ -139,7 +139,7 @@ export default async function PublicUserProfilePage({ params }: { params: Promis
             <div key={review.id} className="rounded-lg border border-[var(--line)] bg-[var(--surface-soft)] p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-sm font-semibold">{personName(review.reviewer)}</p>
-                <p className="text-sm tracking-wide text-amber-600">{stars(review.rating)}</p>
+                <p className="text-sm tracking-wide text-[var(--brand)]">{stars(review.rating)}</p>
               </div>
               {review.comment && <p className="mt-2 text-sm text-[var(--text)]">{review.comment}</p>}
               {review.listing?.slug && (

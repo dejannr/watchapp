@@ -340,11 +340,15 @@ export default function RazgovorDetailPage({ params }: { params: Promise<{ id: s
                   aria-label="Opcije prodaje"
                 >
                   <FontAwesomeIcon icon={faHandshake} className="text-[13px]" aria-hidden="true" />
-                  {dealBadge.count > 0 && (
+                  {dealView.canReview ? (
+                    <span className="absolute -right-1.5 -top-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--brand)] px-1 text-[10px] font-semibold text-white">
+                      ★
+                    </span>
+                  ) : dealBadge.count > 0 ? (
                     <span className="absolute -right-1.5 -top-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white">
                       {dealBadge.count}
                     </span>
-                  )}
+                  ) : null}
                 </button>
                 {isDealMenuOpen && (
                   <div className="absolute right-0 z-30 mt-2 w-56 rounded-lg border border-[var(--line)] bg-[var(--card)] p-2 shadow-lg">
@@ -521,7 +525,9 @@ export default function RazgovorDetailPage({ params }: { params: Promise<{ id: s
                       type="button"
                       onClick={() => setReviewRating(star)}
                       className={`text-2xl leading-none transition ${
-                        star <= reviewRating ? 'text-amber-500' : 'text-slate-300 hover:text-amber-300'
+                        star <= reviewRating
+                          ? 'text-[var(--brand)]'
+                          : 'text-slate-300 hover:text-[var(--brand)]/60'
                       }`}
                       aria-label={`${star} zvezdica`}
                     >
