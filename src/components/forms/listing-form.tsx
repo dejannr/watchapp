@@ -42,6 +42,7 @@ type Brend = {
 
 type FormValues = z.infer<typeof listingSchema>;
 const MAX_IMAGES = 10;
+const CURRENT_YEAR = new Date().getFullYear();
 
 export function ListingForm({ listingId }: { listingId?: string }) {
   const [createdId, setCreatedId] = useState<string | null>(null);
@@ -490,52 +491,80 @@ export function ListingForm({ listingId }: { listingId?: string }) {
         <div className="space-y-4">
           <section className="card space-y-3 p-5">
             <h2 className="text-lg font-semibold">Osnovno</h2>
-            <label className="text-sm font-medium">
-              Naslov <span className="text-red-600">*</span>
-            </label>
-            <input className="w-full rounded border p-2" placeholder="Naslov" {...register('title')} />
-            <label className="text-sm font-medium">
-              Brend <span className="text-red-600">*</span>
-            </label>
-            <select className="w-full rounded border p-2" {...register('brandId')}>
-              <option value="">Izaberite brend</option>
-              {brands.map((brand) => (
-                <option key={brand.id} value={brand.id}>
-                  {brand.name}
-                </option>
-              ))}
-            </select>
-            <input className="w-full rounded border p-2" placeholder="Referentni broj" {...register('referenceNumber')} />
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium">
+                Naslov <span className="text-red-600">*</span>
+              </label>
+              <input className="w-full rounded border p-2" placeholder="Naslov" {...register('title')} />
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium">
+                Brend <span className="text-red-600">*</span>
+              </label>
+              <select className="w-full rounded border p-2" {...register('brandId')}>
+                <option value="">Izaberite brend</option>
+                {brands.map((brand) => (
+                  <option key={brand.id} value={brand.id}>
+                    {brand.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium">Referentni broj</label>
+              <input className="w-full rounded border p-2" placeholder="Referentni broj" {...register('referenceNumber')} />
+            </div>
           </section>
 
           <section className="card space-y-3 p-5">
             <h2 className="text-lg font-semibold">Detalji i specifikacije</h2>
             <div className="grid gap-3 sm:grid-cols-2">
-              <input className="rounded border p-2" type="number" placeholder="Godina proizvodnje" {...register('yearOfProduction', { valueAsNumber: true })} />
-              <select className="rounded border p-2" {...register('movementType')}>
-                <option value="AUTOMATIC">Automatski</option>
-                <option value="MANUAL">Ručni</option>
-                <option value="QUARTZ">Quartz</option>
-                <option value="SMART">Pametni</option>
-                <option value="OTHER">Drugo</option>
-              </select>
-              <input className="rounded border p-2" placeholder="Materijal kućišta" {...register('caseMaterial')} />
-              <input className="rounded border p-2" placeholder="Materijal narukvice" {...register('braceletMaterial')} />
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium">Godina proizvodnje</label>
+                <input
+                  className="w-full rounded border p-2"
+                  type="number"
+                  placeholder="Godina proizvodnje"
+                  min={1900}
+                  max={CURRENT_YEAR}
+                  {...register('yearOfProduction', { valueAsNumber: true })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium">Mehanizam</label>
+                <select className="w-full rounded border p-2" {...register('movementType')}>
+                  <option value="AUTOMATIC">Automatski</option>
+                  <option value="MANUAL">Ručni</option>
+                  <option value="QUARTZ">Quartz</option>
+                  <option value="SMART">Pametni</option>
+                  <option value="OTHER">Drugo</option>
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium">Materijal kućišta</label>
+                <input className="w-full rounded border p-2" placeholder="Materijal kućišta" {...register('caseMaterial')} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium">Materijal narukvice</label>
+                <input className="w-full rounded border p-2" placeholder="Materijal narukvice" {...register('braceletMaterial')} />
+              </div>
             </div>
           </section>
 
           <section className="card space-y-3 p-5">
             <h2 className="text-lg font-semibold">Stanje i oprema</h2>
-            <label className="text-sm font-medium">
-              Stanje <span className="text-red-600">*</span>
-            </label>
-            <select className="w-full rounded border p-2" {...register('condition')}>
-              <option value="NEW">Novi oglas</option>
-              <option value="LIKE_NEW">Like Novi oglas</option>
-              <option value="VERY_GOOD">Vrlo dobro</option>
-              <option value="GOOD">Dobro</option>
-              <option value="FAIR">Solidno</option>
-            </select>
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium">
+                Stanje <span className="text-red-600">*</span>
+              </label>
+              <select className="w-full rounded border p-2" {...register('condition')}>
+                <option value="NEW">Novi oglas</option>
+                <option value="LIKE_NEW">Like Novi oglas</option>
+                <option value="VERY_GOOD">Vrlo dobro</option>
+                <option value="GOOD">Dobro</option>
+                <option value="FAIR">Solidno</option>
+              </select>
+            </div>
             <div className="grid gap-2 sm:grid-cols-2">
               <label className="group relative">
                 <input type="checkbox" className="peer sr-only" {...register('hasBox')} />
@@ -619,67 +648,77 @@ export function ListingForm({ listingId }: { listingId?: string }) {
           <section className="card space-y-3 p-5">
             <h2 className="text-lg font-semibold">Cena i lokacija</h2>
             <div className="grid gap-3 sm:grid-cols-2">
-              <label className="text-sm font-medium">
-                Cena <span className="text-red-600">*</span>
-              </label>
-              <label className="text-sm font-medium">Snižena cena</label>
-              <input className="rounded border p-2" type="number" placeholder="Cena" {...register('priceAmount', { valueAsNumber: true })} />
-              <input
-                className="rounded border p-2"
-                type="number"
-                placeholder="Snižena cena"
-                {...register('discountedPriceAmount', { valueAsNumber: true })}
-              />
-              <label className="text-sm font-medium">
-                Država <span className="text-red-600">*</span>
-              </label>
-              <label className="text-sm font-medium">Grad</label>
-              <select
-                className="rounded border p-2"
-                name={locationCountryField.name}
-                ref={locationCountryField.ref}
-                onBlur={locationCountryField.onBlur}
-                onChange={locationCountryField.onChange}
-                value={selectedDržava ?? ''}
-              >
-                <option value="">Izaberite državu *</option>
-                {countries.map((country) => (
-                  <option key={country} value={country}>
-                    {country}
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium">
+                  Cena <span className="text-red-600">*</span>
+                </label>
+                <input className="w-full rounded border p-2" type="number" placeholder="Cena" {...register('priceAmount', { valueAsNumber: true })} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium">Snižena cena</label>
+                <input
+                  className="w-full rounded border p-2"
+                  type="number"
+                  placeholder="Snižena cena"
+                  {...register('discountedPriceAmount', { valueAsNumber: true })}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium">
+                  Država <span className="text-red-600">*</span>
+                </label>
+                <select
+                  className="w-full rounded border p-2"
+                  name={locationCountryField.name}
+                  ref={locationCountryField.ref}
+                  onBlur={locationCountryField.onBlur}
+                  onChange={locationCountryField.onChange}
+                  value={selectedDržava ?? ''}
+                >
+                  <option value="">Izaberite državu *</option>
+                  {countries.map((country) => (
+                    <option key={country} value={country}>
+                      {country}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium">Grad</label>
+                <select
+                  className="w-full rounded border p-2"
+                  name={locationCityField.name}
+                  ref={locationCityField.ref}
+                  onBlur={locationCityField.onBlur}
+                  onChange={locationCityField.onChange}
+                  value={selectedGrad ?? ''}
+                >
+                  <option value="">
+                    {selectedDržava ? 'Izaberite grad' : 'Prvo izaberite državu'}
                   </option>
-                ))}
-              </select>
-              <select
-                className="rounded border p-2"
-                name={locationCityField.name}
-                ref={locationCityField.ref}
-                onBlur={locationCityField.onBlur}
-                onChange={locationCityField.onChange}
-                value={selectedGrad ?? ''}
-              >
-                <option value="">
-                  {selectedDržava ? 'Izaberite grad' : 'Prvo izaberite državu'}
-                </option>
-                {cityOptions.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
+                  {cityOptions.map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </section>
 
           <section className="card space-y-3 p-5">
             <h2 className="text-lg font-semibold">Opis</h2>
-            <label className="text-sm font-medium">
-              Opis <span className="text-red-600">*</span>
-            </label>
-            <textarea
-              className="w-full rounded border p-2"
-              rows={8}
-              placeholder="Detaljan opis"
-              {...register('description')}
-            />
+            <div className="space-y-1.5">
+              <label className="block text-sm font-medium">
+                Opis <span className="text-red-600">*</span>
+              </label>
+              <textarea
+                className="w-full rounded border p-2"
+                rows={8}
+                placeholder="Detaljan opis"
+                {...register('description')}
+              />
+            </div>
           </section>
         </div>
       </div>

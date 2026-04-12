@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 export const registerSchema = z
   .object({
     email: z.string().email('Unesite ispravnu e-poštu'),
@@ -44,7 +46,7 @@ export const listingSchema = z.object({
   discountedPriceAmount: z.coerce.number().int().positive().optional(),
   condition: z.enum(['NEW', 'LIKE_NEW', 'VERY_GOOD', 'GOOD', 'FAIR']),
   referenceNumber: z.string().optional(),
-  yearOfProduction: z.coerce.number().int().min(1900).max(2100).optional(),
+  yearOfProduction: z.coerce.number().int().min(1900).max(CURRENT_YEAR).optional(),
   movementType: z.enum(['AUTOMATIC', 'MANUAL', 'QUARTZ', 'SMART', 'OTHER']).optional(),
   caseMaterial: z.string().optional(),
   braceletMaterial: z.string().optional(),
