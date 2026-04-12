@@ -9,12 +9,18 @@ export const countryOptions = [
   'Makedonija',
 ] as const;
 
-export const registerSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
-  firstName: z.string().optional(),
-  lastName: z.string().optional(),
-});
+export const registerSchema = z
+  .object({
+    email: z.string().email(),
+    password: z.string().min(8),
+    confirmPassword: z.string().min(8),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: 'Lozinke se ne poklapaju',
+    path: ['confirmPassword'],
+  });
 
 export const loginSchema = z.object({
   email: z.string().email(),

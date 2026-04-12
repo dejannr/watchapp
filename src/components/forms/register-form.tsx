@@ -23,7 +23,13 @@ export function RegisterForm() {
     setError('');
     setVerificationToken('');
     try {
-      const res = await apiRequest<{ verificationToken: string }>('/auth/register', 'POST', values);
+      const payload = {
+        email: values.email,
+        password: values.password,
+        firstName: values.firstName,
+        lastName: values.lastName,
+      };
+      const res = await apiRequest<{ verificationToken: string }>('/auth/register', 'POST', payload);
       reset();
       setVerificationToken(res.verificationToken);
       notify.success('Nalog je kreiran. Verifikujte e-poštu za nastavak.');
@@ -49,10 +55,19 @@ export function RegisterForm() {
         placeholder="Lozinka"
         {...register('password')}
       />
+      <input
+        className="w-full rounded border p-2"
+        type="password"
+        placeholder="Ponovite lozinku"
+        {...register('confirmPassword')}
+      />
       <input className="w-full rounded border p-2" placeholder="Ime" {...register('firstName')} />
       <input className="w-full rounded border p-2" placeholder="Prezime" {...register('lastName')} />
       {formState.errors.password && (
         <p className="text-sm text-red-700">{formState.errors.password.message}</p>
+      )}
+      {formState.errors.confirmPassword && (
+        <p className="text-sm text-red-700">{formState.errors.confirmPassword.message}</p>
       )}
       {error && <p className="text-sm text-red-700">{error}</p>}
       {verificationToken && (
