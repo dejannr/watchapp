@@ -558,8 +558,8 @@ export function ListingForm({ listingId }: { listingId?: string }) {
                 Stanje <span className="text-red-600">*</span>
               </label>
               <select className="w-full rounded border p-2" {...register('condition')}>
-                <option value="NEW">Novi oglas</option>
-                <option value="LIKE_NEW">Like Novi oglas</option>
+                <option value="NEW">Novo</option>
+                <option value="LIKE_NEW">Kao novo</option>
                 <option value="VERY_GOOD">Vrlo dobro</option>
                 <option value="GOOD">Dobro</option>
                 <option value="FAIR">Solidno</option>
