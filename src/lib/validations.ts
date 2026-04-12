@@ -41,6 +41,7 @@ export const listingSchema = z.object({
   description: z.string().min(30),
   brandId: z.string().min(1),
   priceAmount: z.coerce.number().int().positive(),
+  discountedPriceAmount: z.coerce.number().int().positive().optional(),
   condition: z.enum(['NEW', 'LIKE_NEW', 'VERY_GOOD', 'GOOD', 'FAIR']),
   referenceNumber: z.string().optional(),
   yearOfProduction: z.coerce.number().int().min(1900).max(2100).optional(),

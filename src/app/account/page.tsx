@@ -8,6 +8,7 @@ import { apiRequest } from '@/lib/api';
 
 const links = [
   ['/account/profile', 'Profil'],
+  ['/account/seller-profile', 'Seller profil'],
   ['/account/favorites', 'Favoriti'],
   ['/account/notifications', 'Obaveštenja'],
 ] as const;
@@ -75,19 +76,11 @@ export default function NalogPage() {
             >
               {statusMeta.label}
             </span>
-            {sellerStatus !== 'APPROVED' && (
-              <Link
-                href="/sell"
-                className="inline-flex items-center rounded-md border border-[var(--line)] px-3 py-1.5 text-sm font-medium text-[var(--brand)] transition hover:bg-[var(--line)]"
-              >
-                Uredi prijavu
-              </Link>
-            )}
           </div>
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {links.map(([href, label]) => (
           <Link
             key={href}
@@ -98,6 +91,8 @@ export default function NalogPage() {
             <p className="mt-1 text-xs text-[var(--muted)]">
               {href === '/account/profile'
                 ? 'Lični podaci i kontakt'
+                : href === '/account/seller-profile'
+                  ? 'Prodavac profil (JSON)'
                 : href === '/account/favorites'
                   ? 'Sačuvani oglasi'
                   : 'Sistem i chat obaveštenja'}

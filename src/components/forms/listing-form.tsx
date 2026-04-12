@@ -14,6 +14,7 @@ type ListingResponse = {
   description: string;
   brandId: string;
   priceAmount: number;
+  discountedPriceAmount?: number;
   condition: 'NEW' | 'LIKE_NEW' | 'VERY_GOOD' | 'GOOD' | 'FAIR';
   locationCity?: string;
   locationCountry?: string;
@@ -49,6 +50,8 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   const [draggingImageId, setDraggingImageId] = useState<string | null>(null);
   const [isLoadingListing, setIsLoadingListing] = useState(Boolean(listingId));
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [sellerDefaultCountry, setSellerDefaultCountry] = useState('');
+  const [sellerDefaultCity, setSellerDefaultCity] = useState('');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const notify = useNotify();
   const isIzmeni = Boolean(listingId);
@@ -59,6 +62,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
       description: '',
       brandId: '',
       priceAmount: 1,
+      discountedPriceAmount: undefined,
       condition: 'VERY_GOOD',
       locationCity: '',
       locationCountry: '',
@@ -74,18 +78,73 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   });
 
   const targetId = useMemo(() => listingId ?? createdId, [listingId, createdId]);
+  const locationCountryField = register('locationCountry');
+  const locationCityField = register('locationCity');
   const selectedDržava = watch('locationCountry');
   const selectedGrad = watch('locationCity');
   const countries = useCountries();
   const cities = useCities(selectedDržava ?? '');
+  const cityOptions = useMemo(() => {
+    if (!selectedGrad) return cities;
+    if (cities.includes(selectedGrad)) return cities;
+    return [selectedGrad, ...cities];
+  }, [cities, selectedGrad]);
 
   useEffect(() => {
-    if (cities.length === 0) return;
+    if (isIzmeni) return;
+    let active = true;
+    void apiRequest<{ locationCountry?: string; locationCity?: string }>(
+      '/seller/default-location',
+      'GET',
+      undefined,
+      true,
+      {
+        suppressErrorToast: true,
+        suppressLoadingIndicator: true,
+      },
+    )
+      .then((resolved) => {
+        if (!active) return;
+        console.log('[listing-prefill] /seller/default-location response:', resolved);
+        const country = resolved?.locationCountry?.trim() || '';
+        const city = resolved?.locationCity?.trim() || '';
+        console.log('[listing-prefill] resolved country/city:', { country, city });
+        setSellerDefaultCountry(country);
+        setSellerDefaultCity(city);
+      })
+      .catch(() => undefined);
+    return () => {
+      active = false;
+    };
+  }, [isIzmeni]);
+
+  useEffect(() => {
+    if (isIzmeni) return;
+    if (!sellerDefaultCountry) return;
+    const currentCountry = (selectedDržava ?? '').trim();
+    console.log('[listing-prefill] apply country check:', {
+      sellerDefaultCountry,
+      currentCountry,
+    });
+    if (currentCountry.length > 0) return;
+    console.log('[listing-prefill] applying country:', sellerDefaultCountry);
+    setValue('locationCountry', sellerDefaultCountry, { shouldDirty: false });
+  }, [isIzmeni, sellerDefaultCountry, selectedDržava, setValue]);
+
+  useEffect(() => {
+    if (isIzmeni) return;
+    if (!sellerDefaultCity) return;
     const currentCity = (selectedGrad ?? '').trim();
-    if (!currentCity) return;
-    if (cities.includes(currentCity)) return;
-    setValue('locationCity', '');
-  }, [cities, selectedGrad, setValue]);
+    console.log('[listing-prefill] apply city check:', {
+      sellerDefaultCity,
+      currentCity,
+      selectedCountry: selectedDržava,
+      cityOptionsCount: cityOptions.length,
+    });
+    if (currentCity.length > 0) return;
+    console.log('[listing-prefill] applying city:', sellerDefaultCity);
+    setValue('locationCity', sellerDefaultCity, { shouldDirty: false });
+  }, [isIzmeni, sellerDefaultCity, selectedGrad, selectedDržava, cityOptions.length, setValue]);
 
   const queueFiles = (incoming: File[]) => {
     if (incoming.length === 0) return;
@@ -160,6 +219,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
       description: data.description ?? '',
       brandId: data.brandId ?? '',
       priceAmount: data.priceAmount ?? 1,
+      discountedPriceAmount: data.discountedPriceAmount,
       condition: data.condition ?? 'VERY_GOOD',
       locationCity: data.locationCity ?? '',
       locationCountry: data.locationCountry ?? '',
@@ -240,6 +300,13 @@ export function ListingForm({ listingId }: { listingId?: string }) {
     }
     if (!values.priceAmount || Number(values.priceAmount) < 1) {
       notify.error('Cena je obavezna.');
+      return;
+    }
+    if (
+      values.discountedPriceAmount &&
+      Number(values.discountedPriceAmount) >= Number(values.priceAmount)
+    ) {
+      notify.error('Snižena cena mora biti manja od regularne cene.');
       return;
     }
     if (!values.locationCountry || values.locationCountry.trim().length === 0) {
@@ -481,11 +548,29 @@ export function ListingForm({ listingId }: { listingId?: string }) {
           <section className="card space-y-3 p-5">
             <h2 className="text-lg font-semibold">Cena i lokacija</h2>
             <div className="grid gap-3 sm:grid-cols-2">
-              <label className="text-sm font-medium sm:col-span-2">
+              <label className="text-sm font-medium">
                 Cena <span className="text-red-600">*</span>
               </label>
+              <label className="text-sm font-medium">Snižena cena</label>
               <input className="rounded border p-2" type="number" placeholder="Cena" {...register('priceAmount', { valueAsNumber: true })} />
-              <select className="rounded border p-2" {...register('locationCountry')}>
+              <input
+                className="rounded border p-2"
+                type="number"
+                placeholder="Snižena cena"
+                {...register('discountedPriceAmount', { valueAsNumber: true })}
+              />
+              <label className="text-sm font-medium">
+                Država <span className="text-red-600">*</span>
+              </label>
+              <label className="text-sm font-medium">Grad</label>
+              <select
+                className="rounded border p-2"
+                name={locationCountryField.name}
+                ref={locationCountryField.ref}
+                onBlur={locationCountryField.onBlur}
+                onChange={locationCountryField.onChange}
+                value={selectedDržava ?? ''}
+              >
                 <option value="">Izaberite državu *</option>
                 {countries.map((country) => (
                   <option key={country} value={country}>
@@ -494,14 +579,17 @@ export function ListingForm({ listingId }: { listingId?: string }) {
                 ))}
               </select>
               <select
-                className="rounded border p-2 disabled:opacity-60"
-                disabled={!selectedDržava}
-                {...register('locationCity')}
+                className="rounded border p-2"
+                name={locationCityField.name}
+                ref={locationCityField.ref}
+                onBlur={locationCityField.onBlur}
+                onChange={locationCityField.onChange}
+                value={selectedGrad ?? ''}
               >
                 <option value="">
                   {selectedDržava ? 'Izaberite grad' : 'Prvo izaberite državu'}
                 </option>
-                {cities.map((city) => (
+                {cityOptions.map((city) => (
                   <option key={city} value={city}>
                     {city}
                   </option>
