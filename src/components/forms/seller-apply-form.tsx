@@ -56,12 +56,6 @@ export function SellerApplyForm({
   const cities = useCities(selectedCountry);
 
   useEffect(() => {
-    if (countries.length === 0) return;
-    if ((getValues('locationCountry') ?? '').trim().length > 0) return;
-    setValue('locationCountry', countries[0], { shouldDirty: false, shouldValidate: true });
-  }, [countries, getValues, setValue]);
-
-  useEffect(() => {
     if (cities.length === 0) return;
     const currentCity = (getValues('locationCity') ?? '').trim();
     if (!currentCity) return;

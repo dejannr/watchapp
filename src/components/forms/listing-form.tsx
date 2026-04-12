@@ -150,26 +150,6 @@ export function ListingForm({ listingId }: { listingId?: string }) {
     };
   }, []);
 
-  useEffect(() => {
-    if (isIzmeni) return;
-    if (selectedDržava && selectedDržava.trim().length > 0) return;
-    let active = true;
-    void apiRequest<{ locationCountry?: string }>('/seller/me', 'GET', undefined, true, {
-      suppressErrorToast: true,
-      suppressLoadingIndicator: true,
-    })
-      .then((profile) => {
-        if (!active) return;
-        if (profile?.locationCountry) {
-          setValue('locationCountry', profile.locationCountry);
-        }
-      })
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, [isIzmeni, selectedDržava, setValue]);
-
   const loadListing = async (id: string) => {
     const data = await apiRequest<ListingResponse>(`/seller/listings/${id}`, 'GET', undefined, true, {
       suppressLoadingIndicator: true,
