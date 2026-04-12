@@ -8,7 +8,7 @@ import { apiRequest } from '@/lib/api';
 
 const links = [
   ['/account/profile', 'Profil'],
-  ['/account/seller-profile', 'Seller profil'],
+  ['/account/seller-profile', 'Profil prodavca'],
   ['/account/favorites', 'Favoriti'],
   ['/account/notifications', 'Obaveštenja'],
 ] as const;
@@ -92,7 +92,7 @@ export default function NalogPage() {
               {href === '/account/profile'
                 ? 'Lični podaci i kontakt'
                 : href === '/account/seller-profile'
-                  ? 'Prodavac profil (JSON)'
+                  ? 'Javno ime, kontakt i lokacija prodavca'
                 : href === '/account/favorites'
                   ? 'Sačuvani oglasi'
                   : 'Sistem i chat obaveštenja'}

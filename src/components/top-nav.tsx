@@ -75,19 +75,6 @@ export function TopNav() {
       {loggedIn && user?.sellerStatus !== 'APPROVED' && <Link href="/sell">Postani prodavac</Link>}
       {loggedIn && user?.sellerStatus === 'APPROVED' && <Link href="/seller-dashboard">Prodavac</Link>}
       {loggedIn && (
-        <Link href="/account" className="relative pr-1">
-          Nalog
-          {unread.isLoading && (
-            <span className="absolute -right-3 -top-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-[var(--line)] border-t-[var(--brand)]" />
-          )}
-          {(unread.data?.unread ?? 0) > 0 && (
-            <span className="absolute -right-3 -top-2 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white">
-              {unread.data?.unread}
-            </span>
-          )}
-        </Link>
-      )}
-      {loggedIn && (
         <Link href="/chats" className="relative pr-1">
           Poruke
           {chatUnread.isLoading && (
@@ -105,21 +92,29 @@ export function TopNav() {
       {loggedIn && (
         <div className="relative" ref={menuRef}>
           <button
-            className="rounded-full border border-[var(--line)] px-3 py-1 text-sm"
+            className="relative rounded-full border border-[var(--line)] px-3 py-1 text-sm"
             onClick={() => setMenuOpen((v) => !v)}
             aria-haspopup="menu"
             aria-expanded={menuOpen}
           >
             {displayName}
+            {unread.isLoading && (
+              <span className="absolute -right-3 -top-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-[var(--line)] border-t-[var(--brand)]" />
+            )}
+            {(unread.data?.unread ?? 0) > 0 && (
+              <span className="absolute -right-3 -top-2 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-semibold text-white">
+                {unread.data?.unread}
+              </span>
+            )}
           </button>
           {menuOpen && (
             <div className="absolute right-0 z-30 mt-2 min-w-40 rounded border border-[var(--line)] bg-[var(--card)] p-1 shadow">
               <Link
-                href="/account/profile"
+                href="/account"
                 className="block rounded px-3 py-2 text-sm hover:bg-[var(--line)]"
                 onClick={() => setMenuOpen(false)}
               >
-                Profil
+                Nalog
               </Link>
               <button
                 className="block w-full rounded px-3 py-2 text-left text-sm hover:bg-[var(--line)] disabled:opacity-60"

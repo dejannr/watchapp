@@ -49,6 +49,17 @@ type Brend = {
 };
 
 type FormValues = z.infer<typeof listingSchema>;
+type PendingImage = {
+  id: string;
+  file: File;
+  url: string;
+};
+type PreviewImage = {
+  id: string;
+  url: string;
+  isLocal: boolean;
+  file?: File;
+};
 const MAX_IMAGES = 10;
 const CURRENT_YEAR = new Date().getFullYear();
 const BRACELET_MATERIAL_OPTIONS = [
@@ -77,11 +88,21 @@ const CASE_MATERIAL_OPTIONS = [
   'Drugo',
 ] as const;
 
+function readFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ''));
+    reader.onerror = () => reject(new Error(`Učitavanje slike ${file.name} nije uspelo`));
+    reader.readAsDataURL(file);
+  });
+}
+
 export function ListingForm({ listingId }: { listingId?: string }) {
   const [createdId, setCreatedId] = useState<string | null>(null);
   const [brands, setBrendovi] = useState<Brend[]>([]);
   const [images, setImages] = useState<Array<{ id: string; url: string }>>([]);
-  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [pendingImages, setPendingImages] = useState<PendingImage[]>([]);
+  const [previewImages, setPreviewImages] = useState<PreviewImage[]>([]);
   const [isFileDropActive, setIsFileDropActive] = useState(false);
   const [draggingImageId, setDraggingImageId] = useState<string | null>(null);
   const [isLoadingListing, setIsLoadingListing] = useState(Boolean(listingId));
@@ -202,18 +223,54 @@ export function ListingForm({ listingId }: { listingId?: string }) {
 
   const queueFiles = (incoming: File[]) => {
     if (incoming.length === 0) return;
-    setPendingFiles((prev) => {
-      const freeSlots = Math.max(0, MAX_IMAGES - images.length - prev.length);
-      if (freeSlots <= 0) {
-        notify.error('Maksimalno 10 slika po oglasu.');
-        return prev;
-      }
-      const next = [...prev, ...incoming.slice(0, freeSlots)];
-      if (incoming.length > freeSlots) {
-        notify.error('Neke slike nisu dodate jer je maksimum 10.');
-      }
-      return next;
+    const freeSlots = Math.max(0, MAX_IMAGES - previewImages.length);
+    if (freeSlots <= 0) {
+      notify.error('Maksimalno 10 slika po oglasu.');
+      return;
+    }
+    const accepted = incoming.slice(0, freeSlots);
+    if (incoming.length > freeSlots) {
+      notify.error('Neke slike nisu dodate jer je maksimum 10.');
+    }
+    void Promise.all(
+      accepted.map(async (file) => ({
+        id: `${file.name}-${file.size}-${file.lastModified}-${crypto.randomUUID()}`,
+        file,
+        url: await readFileAsDataUrl(file),
+      })),
+    ).then((next) => {
+      setPendingImages((prev) => [...prev, ...next]);
+      setPreviewImages((prev) => [
+        ...prev,
+        ...next.map((img) => ({
+          id: img.id,
+          url: img.url,
+          isLocal: true,
+          file: img.file,
+        })),
+      ]);
     });
+  };
+
+  const removePendingImage = (imageId: string) => {
+    setPendingImages((prev) => prev.filter((image) => image.id !== imageId));
+    setPreviewImages((prev) => prev.filter((image) => image.id !== imageId));
+  };
+
+  const removeExistingImage = async (imageId: string) => {
+    const editableId = targetId;
+    if (!editableId) return;
+    try {
+      await apiRequest(`/uploads/listings/${editableId}/images/${imageId}`, 'DELETE', undefined, true, {
+        suppressErrorToast: true,
+        suppressLoadingIndicator: true,
+      });
+      setImages((prev) => prev.filter((image) => image.id !== imageId));
+      setPreviewImages((prev) => prev.filter((image) => image.id !== imageId));
+      notify.success('Slika je uklonjena.');
+    } catch (e) {
+      notify.error(e instanceof Error ? e.message : 'Brisanje slike nije uspelo');
+    }
   };
 
   const reorderImages = async (
@@ -221,31 +278,36 @@ export function ListingForm({ listingId }: { listingId?: string }) {
     toImageId: string,
   ) => {
     if (fromImageId === toImageId) return;
-    const fromIndex = images.findIndex((img) => img.id === fromImageId);
-    const toIndex = images.findIndex((img) => img.id === toImageId);
+    const fromIndex = previewImages.findIndex((img) => img.id === fromImageId);
+    const toIndex = previewImages.findIndex((img) => img.id === toImageId);
     if (fromIndex < 0 || toIndex < 0) return;
-    const reordered = [...images];
+    const reordered = [...previewImages];
     const [moved] = reordered.splice(fromIndex, 1);
     reordered.splice(toIndex, 0, moved);
-    setImages(reordered);
-    if (!targetId) return;
-    try {
-      await apiRequest(
-        `/uploads/listings/${targetId}/images/order`,
-        'PATCH',
-        { imageIds: reordered.map((img) => img.id) },
-        true,
-        {
-          suppressErrorToast: true,
-          suppressLoadingIndicator: true,
-        },
-      );
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Čuvanje redosleda slika nije uspelo';
-      notify.error(msg);
-      await loadListing(targetId);
-    }
+    setPreviewImages(reordered);
+    setImages(
+      reordered
+        .filter((img) => !img.isLocal)
+        .map((img) => ({ id: img.id, url: img.url })),
+    );
+    setPendingImages(
+      reordered
+        .filter((img) => img.isLocal && img.file)
+        .map((img) => ({
+          id: img.id,
+          file: img.file!,
+          url: img.url,
+        })),
+    );
   };
+
+  const pendingFilesInOrder = useMemo(
+    () =>
+      previewImages
+        .filter((img): img is PreviewImage & { isLocal: true; file: File } => img.isLocal && Boolean(img.file))
+        .map((img) => img.file),
+    [previewImages],
+  );
 
   useEffect(() => {
     let active = true;
@@ -287,6 +349,16 @@ export function ListingForm({ listingId }: { listingId?: string }) {
       inquiryEnabled: data.inquiryEnabled ?? true,
     });
     setImages(Array.isArray(data.images) ? data.images : []);
+    setPendingImages([]);
+    setPreviewImages(
+      Array.isArray(data.images)
+        ? data.images.map((img) => ({
+            id: img.id,
+            url: img.url,
+            isLocal: false,
+          }))
+        : [],
+    );
   };
 
   useEffect(() => {
@@ -334,12 +406,10 @@ export function ListingForm({ listingId }: { listingId?: string }) {
         payload,
         true,
       );
-      await loadListing(editableId);
       return { id: editableId, status: updated.status };
     }
     const created = await apiRequest<ListingResponse>('/seller/listings', 'POST', payload, true);
     setCreatedId(created.id);
-    await loadListing(created.id);
     return { id: created.id, status: created.status };
   };
 
@@ -371,19 +441,60 @@ export function ListingForm({ listingId }: { listingId?: string }) {
       notify.error('Država je obavezna.');
       return;
     }
-    if (pendingFiles.length === 0 && images.length === 0) {
+    if (previewImages.length === 0) {
       notify.error('Slika je obavezna pre čuvanja nacrta.');
       return;
     }
     try {
       const result = await upsertDraft(values);
-      if (pendingFiles.length > 0) {
+      const desiredOrder = previewImages.map((image) => image.id);
+      const existingImageIds = previewImages
+        .filter((image) => !image.isLocal)
+        .map((image) => image.id);
+      let uploadedImageIds: string[] = [];
+      if (pendingFilesInOrder.length > 0) {
         const form = new FormData();
-        pendingFiles.forEach((file) => form.append('files', file));
-        await apiFormRequest(`/uploads/listings/${result.id}/images`, 'POST', form, true);
-        setPendingFiles([]);
-        await loadListing(result.id);
+        pendingFilesInOrder.forEach((file) => form.append('files', file));
+        const uploadResult = await apiFormRequest<{ items?: Array<{ id: string }> }>(
+          `/uploads/listings/${result.id}/images`,
+          'POST',
+          form,
+          true,
+        );
+        uploadedImageIds = Array.isArray(uploadResult.items)
+          ? uploadResult.items.map((item) => item.id)
+          : [];
       }
+      const finalImageIds = desiredOrder.map((imageId) => {
+        const previewImage = previewImages.find((image) => image.id === imageId);
+        if (!previewImage) return imageId;
+        if (!previewImage.isLocal) return imageId;
+        return uploadedImageIds.shift() ?? imageId;
+      });
+      if (finalImageIds.length > 0) {
+        await apiRequest(
+          `/uploads/listings/${result.id}/images/order`,
+          'PATCH',
+          { imageIds: finalImageIds },
+          true,
+          {
+            suppressErrorToast: true,
+            suppressLoadingIndicator: true,
+          },
+        );
+      } else if (existingImageIds.length > 0) {
+        await apiRequest(
+          `/uploads/listings/${result.id}/images/order`,
+          'PATCH',
+          { imageIds: existingImageIds },
+          true,
+          {
+            suppressErrorToast: true,
+            suppressLoadingIndicator: true,
+          },
+        );
+      }
+      await loadListing(result.id);
       notify.success(`Nacrt je sačuvan (${result.status ?? 'updated'}).`);
     } catch (e) {
       if (e instanceof ApiError) {
@@ -478,36 +589,13 @@ export function ListingForm({ listingId }: { listingId?: string }) {
             </div>
           </div>
 
-          {pendingFiles.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-[var(--muted)]">
-                Nove slike za upload ({pendingFiles.length})
-              </p>
-              <div className="space-y-1">
-                {pendingFiles.map((file, index) => (
-                  <div key={`${file.name}-${index}`} className="flex items-center justify-between rounded border border-[var(--line)] px-2 py-1 text-xs">
-                    <span className="truncate">{file.name}</span>
-                    <button
-                      type="button"
-                      className="ml-2 rounded border border-[var(--line)] px-2 py-0.5"
-                      onClick={() => {
-                        setPendingFiles((prev) => prev.filter((_, i) => i !== index));
-                      }}
-                    >
-                      Ukloni
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           <div className="space-y-2">
             <p className="text-xs font-medium text-[var(--muted)]">
-              Trenutne slike ({images.length}) {images.length > 1 ? '· prevucite za redosled prikaza' : ''}
+              Pregled slika ({previewImages.length}){' '}
+              {previewImages.length > 1 ? '· prevucite za redosled prikaza' : ''}
             </p>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {images.map((img, index) => (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {previewImages.map((img, index) => (
                 <div
                   key={img.id}
                   draggable
@@ -520,19 +608,41 @@ export function ListingForm({ listingId }: { listingId?: string }) {
                     void reorderImages(draggingImageId, img.id);
                     setDraggingImageId(null);
                   }}
-                  className={`relative rounded border border-[var(--line)] ${draggingImageId === img.id ? 'opacity-60' : ''}`}
+                  className={`group relative overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--card)] shadow-sm transition duration-200 ${
+                    draggingImageId === img.id ? 'scale-[0.98] opacity-70' : 'hover:-translate-y-0.5 hover:shadow-md'
+                  } ${img.isLocal ? 'ring-1 ring-dashed ring-[var(--brand)]/35' : ''}`}
                 >
                   <img
                     src={img.url}
                     alt={`Listing ${index + 1}`}
-                    className="aspect-square w-full rounded bg-[var(--bg)] object-contain p-1"
+                    className="aspect-square w-full object-cover"
                   />
-                  <span className="absolute left-1 top-1 rounded bg-black/60 px-1.5 py-0.5 text-[10px] text-white">
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />
+                  <button
+                    type="button"
+                    className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition hover:bg-black/75"
+                    onClick={() => {
+                      if (img.isLocal) {
+                        removePendingImage(img.id);
+                        return;
+                      }
+                      void removeExistingImage(img.id);
+                    }}
+                    aria-label={img.isLocal ? 'Ukloni novu sliku' : 'Ukloni postojeću sliku'}
+                  >
+                    ×
+                  </button>
+                  {img.isLocal && (
+                    <span className="absolute bottom-2 right-2 rounded-full bg-[var(--brand)] px-2 py-0.5 text-[10px] font-semibold text-white shadow">
+                      Novi
+                    </span>
+                  )}
+                  <span className="absolute left-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-medium text-white backdrop-blur-sm">
                     {index + 1}
                   </span>
                 </div>
               ))}
-              {images.length === 0 && (
+              {previewImages.length === 0 && (
                 <p className="col-span-2 text-xs text-[var(--muted)] sm:col-span-3">
                   {isLoadingListing ? 'Učitavanje slika...' : 'Još nema sačuvanih slika.'}
                 </p>
