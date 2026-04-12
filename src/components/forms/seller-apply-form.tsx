@@ -171,11 +171,15 @@ export function SellerApplyForm({
 
       <section className="space-y-3">
         <div className="space-y-1.5">
-          <label className="block text-sm font-medium">Kontakt e-pošta</label>
+          <label className="block text-sm font-medium">
+            Kontakt e-pošta <span className="text-red-600">*</span>
+          </label>
           <input className="w-full rounded border p-2" placeholder="Kontakt e-pošta" {...register('contactEmail')} />
         </div>
         <div className="space-y-1.5">
-          <label className="block text-sm font-medium">Kontakt telefon</label>
+          <label className="block text-sm font-medium">
+            Kontakt telefon <span className="text-red-600">*</span>
+          </label>
           <input className="w-full rounded border p-2" placeholder="Kontakt telefon" {...register('contactPhone')} />
         </div>
         <div className="space-y-1.5">
@@ -198,6 +202,12 @@ export function SellerApplyForm({
         )}
         {formState.errors.locationCity && (
           <p className="text-sm text-red-700">{formState.errors.locationCity.message}</p>
+        )}
+        {formState.errors.contactEmail && (
+          <p className="text-sm text-red-700">{formState.errors.contactEmail.message}</p>
+        )}
+        {formState.errors.contactPhone && (
+          <p className="text-sm text-red-700">{formState.errors.contactPhone.message}</p>
         )}
         {error && <p className="text-sm text-red-700">{error}</p>}
         {success && <p className="text-sm text-green-700">{success}</p>}

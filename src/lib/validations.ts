@@ -26,8 +26,8 @@ export const sellerApplySchema = z.object({
   bio: z.string().min(20, 'Biografija mora imati najmanje 20 karaktera'),
   locationCity: z.string().trim().min(1, 'Grad je obavezan'),
   locationCountry: z.string().trim().min(1, 'Država je obavezna'),
-  contactEmail: z.string().email().optional().or(z.literal('')),
-  contactPhone: z.string().optional(),
+  contactEmail: z.string().trim().email('Unesite ispravnu e-poštu'),
+  contactPhone: z.string().trim().min(1, 'Kontakt telefon je obavezan'),
   websiteUrl: z.string().url().optional().or(z.literal('')),
   instagramHandle: z.string().optional(),
 });
