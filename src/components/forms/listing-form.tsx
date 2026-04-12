@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { faBoxOpen, faCheck, faFileLines } from '@fortawesome/free-solid-svg-icons';
+import { faBoxOpen, faCheck, faFileLines, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -442,7 +442,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
       return;
     }
     if (previewImages.length === 0) {
-      notify.error('Slika je obavezna pre čuvanja nacrta.');
+      notify.error('Slika je obavezna pre čuvanja oglasa.');
       return;
     }
     try {
@@ -510,7 +510,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
     try {
       const id = targetId;
       if (!id) {
-        throw new Error('Prvo sačuvajte nacrt.');
+        throw new Error('Prvo sačuvajte oglas.');
       }
       await apiRequest(`/seller/listings/${id}/submit`, 'POST', {}, true);
       notify.success('Oglas je poslat administratoru na proveru.');
@@ -537,7 +537,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
       <div className="card p-5">
         <h1 className="text-xl font-bold">{isIzmeni ? 'Izmeni oglas' : 'Kreiraj oglas'}</h1>
         <p className="text-sm text-[var(--muted)]">
-          Sačuvajte kao nacrt u bilo kom trenutku. Pošaljite kada su obavezni podaci i slike kompletni.
+          Možete sačuvati oglas u bilo kom trenutku. Pošaljite ga kada su obavezni podaci i slike kompletni.
         </p>
       </div>
 
@@ -620,7 +620,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />
                   <button
                     type="button"
-                    className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition hover:bg-black/75"
+                    className="absolute right-2 top-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur-sm transition hover:bg-black/75"
                     onClick={() => {
                       if (img.isLocal) {
                         removePendingImage(img.id);
@@ -630,7 +630,11 @@ export function ListingForm({ listingId }: { listingId?: string }) {
                     }}
                     aria-label={img.isLocal ? 'Ukloni novu sliku' : 'Ukloni postojeću sliku'}
                   >
-                    ×
+                    <FontAwesomeIcon
+                      icon={faXmark}
+                      style={{ width: 8, height: 8 }}
+                      aria-hidden="true"
+                    />
                   </button>
                   {img.isLocal && (
                     <span className="absolute bottom-2 right-2 rounded-full bg-[var(--brand)] px-2 py-0.5 text-[10px] font-semibold text-white shadow">
@@ -910,7 +914,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
           disabled={formState.isSubmitting}
           type="submit"
         >
-          {formState.isSubmitting ? 'Čuvanje...' : 'Sačuvaj nacrt'}
+          {formState.isSubmitting ? 'Čuvanje...' : 'Sačuvaj oglas'}
         </button>
         <button
           className="rounded border border-[var(--line)] px-4 py-2 disabled:cursor-not-allowed disabled:opacity-60"
