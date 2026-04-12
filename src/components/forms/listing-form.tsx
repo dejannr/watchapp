@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { faBoxOpen, faCheck, faFileLines } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { ApiError, apiFormRequest, apiRequest } from '@/lib/api';
@@ -82,6 +84,8 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   const locationCityField = register('locationCity');
   const selectedDržava = watch('locationCountry');
   const selectedGrad = watch('locationCity');
+  const hasBoxSelected = watch('hasBox');
+  const hasPapersSelected = watch('hasPapers');
   const countries = useCountries();
   const cities = useCities(selectedDržava ?? '');
   const cityOptions = useMemo(() => {
@@ -267,7 +271,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   }, [formState.isDirty, formState.isSubmitting]);
 
   const upsertDraft = async (values: FormValues) => {
-    const payload = { ...values };
+    const payload = { ...values, inquiryEnabled: true };
     const editableId = listingId ?? createdId;
     if (editableId) {
       const updated = await apiRequest<ListingResponse>(
@@ -532,15 +536,82 @@ export function ListingForm({ listingId }: { listingId?: string }) {
               <option value="GOOD">Dobro</option>
               <option value="FAIR">Solidno</option>
             </select>
-            <div className="flex flex-wrap gap-4 text-sm">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" {...register('hasBox')} /> Kutija uključena
+            <div className="grid gap-2 sm:grid-cols-2">
+              <label className="group relative">
+                <input type="checkbox" className="peer sr-only" {...register('hasBox')} />
+                <div
+                  className={`relative flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm transition ${
+                    hasBoxSelected
+                      ? 'border-[var(--brand)] bg-[var(--line)] shadow-[0_0_0_1px_var(--brand)]'
+                      : 'border-[var(--line)] bg-[var(--card)]'
+                  }`}
+                >
+                  <span
+                    className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition ${
+                      hasBoxSelected
+                        ? 'bg-[var(--bg)] text-[var(--text)]'
+                        : 'bg-[var(--bg)] text-[var(--muted)]'
+                    }`}
+                  >
+                    <FontAwesomeIcon icon={faBoxOpen} className={`h-4 w-4 ${hasBoxSelected ? '' : 'opacity-85'}`} aria-hidden="true" />
+                  </span>
+                  <span className="flex min-w-0 flex-1 items-center gap-2.5">
+                    <span
+                      className={`transition ${
+                        hasBoxSelected ? 'font-semibold text-[var(--text)]' : 'font-medium text-[var(--muted)]'
+                      }`}
+                    >
+                      Kutija uključena
+                    </span>
+                  </span>
+                  <span
+                    className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border transition ${
+                      hasBoxSelected
+                        ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
+                        : 'border-[var(--line)] bg-[var(--bg)] text-transparent'
+                    }`}
+                  >
+                    <FontAwesomeIcon icon={faCheck} className="h-3 w-3" aria-hidden="true" />
+                  </span>
+                </div>
               </label>
-              <label className="flex items-center gap-2">
-                <input type="checkbox" {...register('hasPapers')} /> Papiri uključeni
-              </label>
-              <label className="flex items-center gap-2">
-                <input type="checkbox" {...register('inquiryEnabled')} /> Upiti omogućeni
+              <label className="group relative">
+                <input type="checkbox" className="peer sr-only" {...register('hasPapers')} />
+                <div
+                  className={`relative flex items-center justify-between gap-3 rounded-lg border px-3 py-2 text-sm transition ${
+                    hasPapersSelected
+                      ? 'border-[var(--brand)] bg-[var(--line)] shadow-[0_0_0_1px_var(--brand)]'
+                      : 'border-[var(--line)] bg-[var(--card)]'
+                  }`}
+                >
+                  <span
+                    className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md transition ${
+                      hasPapersSelected
+                        ? 'bg-[var(--bg)] text-[var(--text)]'
+                        : 'bg-[var(--bg)] text-[var(--muted)]'
+                    }`}
+                  >
+                    <FontAwesomeIcon icon={faFileLines} className={`h-4 w-4 ${hasPapersSelected ? '' : 'opacity-85'}`} aria-hidden="true" />
+                  </span>
+                  <span className="flex min-w-0 flex-1 items-center gap-2.5">
+                    <span
+                      className={`transition ${
+                        hasPapersSelected ? 'font-semibold text-[var(--text)]' : 'font-medium text-[var(--muted)]'
+                      }`}
+                    >
+                      Papiri uključeni
+                    </span>
+                  </span>
+                  <span
+                    className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border transition ${
+                      hasPapersSelected
+                        ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
+                        : 'border-[var(--line)] bg-[var(--bg)] text-transparent'
+                    }`}
+                  >
+                    <FontAwesomeIcon icon={faCheck} className="h-3 w-3" aria-hidden="true" />
+                  </span>
+                </div>
               </label>
             </div>
           </section>
