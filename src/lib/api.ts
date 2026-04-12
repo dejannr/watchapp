@@ -11,6 +11,11 @@ const REQUEST_TIMEOUT_MS = 15000;
 
 const ERROR_TRANSLATIONS: Record<string, string> = {
   'Email already in use': 'E-pošta je već zauzeta',
+  'Slug already in use': 'Slug je već zauzet',
+  'Invalid slug': 'Neispravan slug',
+  'About must be between 20 and 1500 characters':
+    'Biografija mora imati između 20 i 1500 karaktera',
+  'City is required': 'Grad je obavezan',
   'Invalid credentials': 'Neispravni podaci za prijavu. Proverite e-poštu/lozinku i pokušajte ponovo.',
   'Invalid verification token': 'Neispravan verifikacioni token',
   'Invalid refresh token': 'Neispravan token za osvežavanje sesije',

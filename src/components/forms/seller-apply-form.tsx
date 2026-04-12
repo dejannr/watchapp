@@ -10,6 +10,14 @@ import { countryOptions, sellerApplySchema } from '@/lib/validations';
 
 type FormValues = z.infer<typeof sellerApplySchema>;
 
+function toSlug(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 export function SellerApplyForm({
   initialValues,
   submitLabel = 'Primeni',
@@ -26,7 +34,7 @@ export function SellerApplyForm({
   const notify = useNotify();
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
-  const { register, handleSubmit, formState } = useForm<FormValues>({
+  const { register, handleSubmit, formState, setValue } = useForm<FormValues>({
     resolver: zodResolver(sellerApplySchema),
     defaultValues: {
       sellerType: initialValues?.sellerType ?? 'PRIVATE',
@@ -78,7 +86,9 @@ export function SellerApplyForm({
 
       <section className="space-y-3">
         <div className="space-y-1.5">
-          <label className="block text-sm font-medium">Tip prodavca</label>
+          <label className="block text-sm font-medium">
+            Tip prodavca <span className="text-red-600">*</span>
+          </label>
           <select className="w-full rounded border p-2" {...register('sellerType')}>
             <option value="PRIVATE">Privatni prodavac</option>
             <option value="BUSINESS">Kompanija / Diler</option>
@@ -88,7 +98,16 @@ export function SellerApplyForm({
           <label className="block text-sm font-medium">
             Javno ime <span className="text-red-600">*</span>
           </label>
-          <input className="w-full rounded border p-2" placeholder="Javno ime" {...register('displayName')} />
+          <input
+            className="w-full rounded border p-2"
+            placeholder="Javno ime"
+            {...register('displayName', {
+              onChange: (event) => {
+                const nextSlug = toSlug(String(event.target.value ?? ''));
+                setValue('slug', nextSlug, { shouldValidate: true, shouldDirty: true });
+              },
+            })}
+          />
         </div>
         <div className="space-y-1.5">
           <label className="block text-sm font-medium">
@@ -97,14 +116,12 @@ export function SellerApplyForm({
           <input className="w-full rounded border p-2" placeholder="Javni slug" {...register('slug')} />
         </div>
         <div className="space-y-1.5">
-          <label className="block text-sm font-medium">Kratka biografija</label>
+          <label className="block text-sm font-medium">
+            Kratka biografija <span className="text-red-600">*</span>
+          </label>
           <textarea className="w-full rounded border p-2" placeholder="Kratka biografija" {...register('bio')} />
         </div>
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-          <div className="space-y-1.5">
-            <label className="block text-sm font-medium">Grad</label>
-            <input className="w-full rounded border p-2" placeholder="Grad" {...register('locationCity')} />
-          </div>
           <div className="space-y-1.5">
             <label className="block text-sm font-medium">
               Država <span className="text-red-600">*</span>
@@ -116,6 +133,12 @@ export function SellerApplyForm({
                 </option>
               ))}
             </select>
+          </div>
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium">
+              Grad <span className="text-red-600">*</span>
+            </label>
+            <input className="w-full rounded border p-2" placeholder="Grad" {...register('locationCity')} />
           </div>
         </div>
       </section>
