@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { useNotify } from '@/components/notifications-provider';
+import { useCities, useCountries } from '@/hooks/use-locations';
 import { ApiError, apiRequest } from '@/lib/api';
-import { countryOptions, sellerApplySchema } from '@/lib/validations';
+import { sellerApplySchema } from '@/lib/validations';
 
 type FormValues = z.infer<typeof sellerApplySchema>;
 
@@ -34,7 +35,7 @@ export function SellerApplyForm({
   const notify = useNotify();
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
-  const { register, handleSubmit, formState, setValue } = useForm<FormValues>({
+  const { register, handleSubmit, formState, setValue, getValues, control } = useForm<FormValues>({
     resolver: zodResolver(sellerApplySchema),
     defaultValues: {
       sellerType: initialValues?.sellerType ?? 'PRIVATE',
@@ -43,13 +44,30 @@ export function SellerApplyForm({
       slug: initialValues?.slug ?? '',
       bio: initialValues?.bio ?? '',
       locationCity: initialValues?.locationCity ?? '',
-      locationCountry: initialValues?.locationCountry ?? countryOptions[0],
+      locationCountry: initialValues?.locationCountry ?? '',
       contactEmail: initialValues?.contactEmail ?? '',
       contactPhone: initialValues?.contactPhone ?? '',
       websiteUrl: initialValues?.websiteUrl ?? '',
       instagramHandle: initialValues?.instagramHandle ?? '',
     },
   });
+  const countries = useCountries();
+  const selectedCountry = useWatch({ control, name: 'locationCountry' }) ?? '';
+  const cities = useCities(selectedCountry);
+
+  useEffect(() => {
+    if (countries.length === 0) return;
+    if ((getValues('locationCountry') ?? '').trim().length > 0) return;
+    setValue('locationCountry', countries[0], { shouldDirty: false, shouldValidate: true });
+  }, [countries, getValues, setValue]);
+
+  useEffect(() => {
+    if (cities.length === 0) return;
+    const currentCity = (getValues('locationCity') ?? '').trim();
+    if (!currentCity) return;
+    if (cities.includes(currentCity)) return;
+    setValue('locationCity', '', { shouldDirty: true, shouldValidate: true });
+  }, [cities, getValues, setValue]);
 
   const onSubmit = handleSubmit(async (values) => {
     setError('');
@@ -127,7 +145,8 @@ export function SellerApplyForm({
               Država <span className="text-red-600">*</span>
             </label>
             <select className="w-full rounded border p-2" {...register('locationCountry')}>
-              {countryOptions.map((country) => (
+              <option value="">Izaberite državu</option>
+              {countries.map((country) => (
                 <option key={country} value={country}>
                   {country}
                 </option>
@@ -138,7 +157,20 @@ export function SellerApplyForm({
             <label className="block text-sm font-medium">
               Grad <span className="text-red-600">*</span>
             </label>
-            <input className="w-full rounded border p-2" placeholder="Grad" {...register('locationCity')} />
+            <select
+              className="w-full rounded border p-2 disabled:opacity-60"
+              disabled={!selectedCountry}
+              {...register('locationCity')}
+            >
+              <option value="">
+                {selectedCountry ? 'Izaberite grad' : 'Prvo izaberite državu'}
+              </option>
+              {cities.map((city) => (
+                <option key={city} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </section>
@@ -167,6 +199,12 @@ export function SellerApplyForm({
       </section>
 
       <div className="space-y-1.5">
+        {formState.errors.locationCountry && (
+          <p className="text-sm text-red-700">{formState.errors.locationCountry.message}</p>
+        )}
+        {formState.errors.locationCity && (
+          <p className="text-sm text-red-700">{formState.errors.locationCity.message}</p>
+        )}
         {error && <p className="text-sm text-red-700">{error}</p>}
         {success && <p className="text-sm text-green-700">{success}</p>}
       </div>

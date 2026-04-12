@@ -16,6 +16,8 @@ const ERROR_TRANSLATIONS: Record<string, string> = {
   'About must be between 20 and 1500 characters':
     'Biografija mora imati između 20 i 1500 karaktera',
   'City is required': 'Grad je obavezan',
+  'Country is required': 'Država je obavezna',
+  'Invalid city for selected country': 'Neispravan grad za izabranu državu',
   'Invalid credentials': 'Neispravni podaci za prijavu. Proverite e-poštu/lozinku i pokušajte ponovo.',
   'Invalid verification token': 'Neispravan verifikacioni token',
   'Invalid refresh token': 'Neispravan token za osvežavanje sesije',

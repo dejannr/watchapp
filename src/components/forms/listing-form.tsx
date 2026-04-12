@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { ApiError, apiFormRequest, apiRequest } from '@/lib/api';
+import { useCities, useCountries } from '@/hooks/use-locations';
 import { listingSchema } from '@/lib/validations';
 import { useNotify } from '@/components/notifications-provider';
 
@@ -37,15 +38,6 @@ type Brend = {
 };
 
 type FormValues = z.infer<typeof listingSchema>;
-
-const COUNTRY_OPTIONS = [
-  'Srbija',
-  'Crna Gora',
-  'Bosna i Hercegovina',
-  'Hrvatska',
-  'Slovenija',
-  'Makedonija',
-] as const;
 const MAX_IMAGES = 10;
 
 export function ListingForm({ listingId }: { listingId?: string }) {
@@ -83,6 +75,17 @@ export function ListingForm({ listingId }: { listingId?: string }) {
 
   const targetId = useMemo(() => listingId ?? createdId, [listingId, createdId]);
   const selectedDržava = watch('locationCountry');
+  const selectedGrad = watch('locationCity');
+  const countries = useCountries();
+  const cities = useCities(selectedDržava ?? '');
+
+  useEffect(() => {
+    if (cities.length === 0) return;
+    const currentCity = (selectedGrad ?? '').trim();
+    if (!currentCity) return;
+    if (cities.includes(currentCity)) return;
+    setValue('locationCity', '');
+  }, [cities, selectedGrad, setValue]);
 
   const queueFiles = (incoming: File[]) => {
     if (incoming.length === 0) return;
@@ -504,18 +507,26 @@ export function ListingForm({ listingId }: { listingId?: string }) {
               <input className="rounded border p-2" type="number" placeholder="Cena" {...register('priceAmount', { valueAsNumber: true })} />
               <select className="rounded border p-2" {...register('locationCountry')}>
                 <option value="">Izaberite državu *</option>
-                {COUNTRY_OPTIONS.map((country) => (
+                {countries.map((country) => (
                   <option key={country} value={country}>
                     {country}
                   </option>
                 ))}
               </select>
-              <input
+              <select
                 className="rounded border p-2 disabled:opacity-60"
-                placeholder={selectedDržava ? 'Grad' : 'Prvo izaberite državu'}
                 disabled={!selectedDržava}
                 {...register('locationCity')}
-              />
+              >
+                <option value="">
+                  {selectedDržava ? 'Izaberite grad' : 'Prvo izaberite državu'}
+                </option>
+                {cities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
             </div>
           </section>
 

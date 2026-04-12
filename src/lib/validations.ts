@@ -1,14 +1,5 @@
 import { z } from 'zod';
 
-export const countryOptions = [
-  'Srbija',
-  'Crna Gora',
-  'Bosna i Hercegovina',
-  'Hrvatska',
-  'Slovenija',
-  'Makedonija',
-] as const;
-
 export const registerSchema = z
   .object({
     email: z.string().email('Unesite ispravnu e-poštu'),
@@ -34,7 +25,7 @@ export const sellerApplySchema = z.object({
   businessName: z.string().optional(),
   bio: z.string().min(20, 'Biografija mora imati najmanje 20 karaktera'),
   locationCity: z.string().trim().min(1, 'Grad je obavezan'),
-  locationCountry: z.enum(countryOptions),
+  locationCountry: z.string().trim().min(1, 'Država je obavezna'),
   contactEmail: z.string().email().optional().or(z.literal('')),
   contactPhone: z.string().optional(),
   websiteUrl: z.string().url().optional().or(z.literal('')),

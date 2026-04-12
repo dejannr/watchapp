@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useCities, useCountries } from '@/hooks/use-locations';
 
 type BrandOption = {
   name: string;
@@ -41,6 +42,10 @@ export function BrowseFilters({ brands }: BrowseFiltersProps) {
     () => brands.some((brand) => brand.slug === defaults.brand),
     [brands, defaults.brand],
   );
+  const [selectedCountry, setSelectedCountry] = useState(defaults.locationCountry);
+  const [selectedCity, setSelectedCity] = useState(defaults.locationCity);
+  const countries = useCountries();
+  const cities = useCities(selectedCountry);
 
   return (
     <form
@@ -53,6 +58,16 @@ export function BrowseFilters({ brands }: BrowseFiltersProps) {
           const text = String(value).trim();
           if (!text) continue;
           query.set(key, text);
+        }
+        if (selectedCountry.trim()) {
+          query.set('locationCountry', selectedCountry.trim());
+        } else {
+          query.delete('locationCountry');
+        }
+        if (selectedCity.trim()) {
+          query.set('locationCity', selectedCity.trim());
+        } else {
+          query.delete('locationCity');
         }
         router.push(`${pathname}?${query.toString()}`);
       }}
@@ -110,7 +125,11 @@ export function BrowseFilters({ brands }: BrowseFiltersProps) {
         <button
           className="rounded border border-[var(--line)] px-3 py-1.5 text-sm"
           type="button"
-          onClick={() => router.push('/browse')}
+          onClick={() => {
+            setSelectedCountry('');
+            setSelectedCity('');
+            router.push('/browse');
+          }}
         >
           Obriši
         </button>
@@ -147,8 +166,37 @@ export function BrowseFilters({ brands }: BrowseFiltersProps) {
             <option value="BASIC_VERIFIED">Osnovno verifikovan</option>
             <option value="ENHANCED_VERIFIED">Napredno verifikovan</option>
           </select>
-          <input name="locationCountry" defaultValue={defaults.locationCountry} className="rounded border p-2 text-sm" placeholder="Država" />
-          <input name="locationCity" defaultValue={defaults.locationCity} className="rounded border p-2 text-sm" placeholder="Grad" />
+          <select
+            name="locationCountry"
+            value={selectedCountry}
+            className="rounded border p-2 text-sm"
+            onChange={(e) => {
+              const nextCountry = e.target.value;
+              setSelectedCountry(nextCountry);
+              setSelectedCity('');
+            }}
+          >
+            <option value="">Sve države</option>
+            {countries.map((country) => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </select>
+          <select
+            name="locationCity"
+            value={selectedCity}
+            className="rounded border p-2 text-sm disabled:opacity-60"
+            disabled={!selectedCountry}
+            onChange={(e) => setSelectedCity(e.target.value)}
+          >
+            <option value="">{selectedCountry ? 'Svi gradovi' : 'Prvo izaberite državu'}</option>
+            {cities.map((city) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
+          </select>
           <select name="hasBox" defaultValue={defaults.hasBox} className="rounded border p-2 text-sm">
             <option value="">Kutija: bilo koja</option>
             <option value="true">Sa kutijom</option>
