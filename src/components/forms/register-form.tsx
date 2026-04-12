@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -15,6 +17,8 @@ export function RegisterForm() {
   const notify = useNotify();
   const [error, setError] = useState('');
   const [verificationToken, setVerificationToken] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { register, handleSubmit, formState, reset } = useForm<FormValues>({
     resolver: zodResolver(registerSchema),
   });
@@ -49,20 +53,44 @@ export function RegisterForm() {
         Novi nalozi počinju kao kupci. Kasnije možete podneti zahtev za prodavca.
       </p>
       <input className="w-full rounded border p-2" placeholder="E-pošta" {...register('email')} />
-      <input
-        className="w-full rounded border p-2"
-        type="password"
-        placeholder="Lozinka"
-        {...register('password')}
-      />
-      <input
-        className="w-full rounded border p-2"
-        type="password"
-        placeholder="Ponovite lozinku"
-        {...register('confirmPassword')}
-      />
       <input className="w-full rounded border p-2" placeholder="Ime" {...register('firstName')} />
       <input className="w-full rounded border p-2" placeholder="Prezime" {...register('lastName')} />
+      <div className="relative">
+        <input
+          className="w-full rounded border p-2 pr-10"
+          type={showPassword ? 'text' : 'password'}
+          placeholder="Lozinka"
+          {...register('password')}
+        />
+        <button
+          type="button"
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--muted)] transition-colors hover:text-[var(--text)]"
+          onClick={() => setShowPassword((value) => !value)}
+          aria-label={showPassword ? 'Sakrij lozinku' : 'Prikaži lozinku'}
+        >
+          <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} className="h-4 w-4" aria-hidden="true" />
+        </button>
+      </div>
+      <div className="relative">
+        <input
+          className="w-full rounded border p-2 pr-10"
+          type={showConfirmPassword ? 'text' : 'password'}
+          placeholder="Ponovite lozinku"
+          {...register('confirmPassword')}
+        />
+        <button
+          type="button"
+          className="absolute right-2 top-1/2 -translate-y-1/2 text-[var(--muted)] transition-colors hover:text-[var(--text)]"
+          onClick={() => setShowConfirmPassword((value) => !value)}
+          aria-label={showConfirmPassword ? 'Sakrij potvrdu lozinke' : 'Prikaži potvrdu lozinke'}
+        >
+          <FontAwesomeIcon
+            icon={showConfirmPassword ? faEyeSlash : faEye}
+            className="h-4 w-4"
+            aria-hidden="true"
+          />
+        </button>
+      </div>
       {formState.errors.password && (
         <p className="text-sm text-red-700">{formState.errors.password.message}</p>
       )}
