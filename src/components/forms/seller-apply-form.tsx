@@ -11,12 +11,44 @@ import { sellerApplySchema } from '@/lib/validations';
 
 type FormValues = z.infer<typeof sellerApplySchema>;
 
+const COUNTRY_PHONE_CODES: Record<string, string> = {
+  Srbija: '+381',
+  'Bosna i Hercegovina': '+387',
+  Hrvatska: '+385',
+  Slovenija: '+386',
+  'Crna Gora': '+382',
+  Makedonija: '+389',
+};
+
+const PHONE_CODE_OPTIONS = [
+  { label: '🇷🇸 +381', value: '+381' },
+  { label: '🇧🇦 +387', value: '+387' },
+  { label: '🇭🇷 +385', value: '+385' },
+  { label: '🇸🇮 +386', value: '+386' },
+  { label: '🇲🇪 +382', value: '+382' },
+  { label: '🇲🇰 +389', value: '+389' },
+];
+
 function toSlug(value: string) {
   return value
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
+}
+
+function splitPhone(rawPhone: string | undefined) {
+  const phone = String(rawPhone ?? '').trim();
+  if (!phone) {
+    return { code: '', number: '' };
+  }
+  const match = phone.match(/^\+\d{1,4}/);
+  if (!match) {
+    return { code: '', number: phone };
+  }
+  const code = match[0];
+  const number = phone.slice(code.length).trim();
+  return { code, number };
 }
 
 export function SellerApplyForm({
@@ -35,6 +67,9 @@ export function SellerApplyForm({
   const notify = useNotify();
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
+  const parsedPhone = splitPhone(initialValues?.contactPhone);
+  const [dialCode, setDialCode] = useState(parsedPhone.code);
+  const [dialCodeTouched, setDialCodeTouched] = useState(Boolean(parsedPhone.code));
   const { register, handleSubmit, formState, setValue, getValues, control } = useForm<FormValues>({
     resolver: zodResolver(sellerApplySchema),
     defaultValues: {
@@ -46,7 +81,7 @@ export function SellerApplyForm({
       locationCity: initialValues?.locationCity ?? '',
       locationCountry: initialValues?.locationCountry ?? '',
       contactEmail: initialValues?.contactEmail ?? '',
-      contactPhone: initialValues?.contactPhone ?? '',
+      contactPhone: parsedPhone.number,
       websiteUrl: initialValues?.websiteUrl ?? '',
       instagramHandle: initialValues?.instagramHandle ?? '',
     },
@@ -66,9 +101,14 @@ export function SellerApplyForm({
   const onSubmit = handleSubmit(async (values) => {
     setError('');
     setSuccess('');
+    if (!dialCode) {
+      setError('Pozivni broj je obavezan');
+      return;
+    }
     try {
       const payload = {
         ...values,
+        contactPhone: `${dialCode} ${values.contactPhone.trim()}`.trim(),
         businessName: values.displayName,
       };
       if (mode === 'resubmit' && applicationId) {
@@ -138,7 +178,17 @@ export function SellerApplyForm({
             <label className="block text-sm font-medium">
               Država <span className="text-red-600">*</span>
             </label>
-            <select className="w-full rounded border p-2" {...register('locationCountry')}>
+            <select
+              className="w-full rounded border p-2"
+              {...register('locationCountry', {
+                onChange: (event) => {
+                  const country = String(event.target.value ?? '');
+                  if (!dialCodeTouched || !dialCode) {
+                    setDialCode(COUNTRY_PHONE_CODES[country] ?? '');
+                  }
+                },
+              })}
+            >
               <option value="">Izaberite državu</option>
               {countries.map((country) => (
                 <option key={country} value={country}>
@@ -180,7 +230,28 @@ export function SellerApplyForm({
           <label className="block text-sm font-medium">
             Kontakt telefon <span className="text-red-600">*</span>
           </label>
-          <input className="w-full rounded border p-2" placeholder="Kontakt telefon" {...register('contactPhone')} />
+          <div className="flex gap-2">
+            <select
+              className="w-40 rounded border p-2"
+              value={dialCode}
+              onChange={(e) => {
+                setDialCodeTouched(true);
+                setDialCode(e.target.value);
+              }}
+            >
+              <option value="">🌍 Pozivni</option>
+              {PHONE_CODE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <input
+              className="w-full rounded border p-2"
+              placeholder="Kontakt telefon"
+              {...register('contactPhone')}
+            />
+          </div>
         </div>
         <div className="space-y-1.5">
           <label className="block text-sm font-medium">Veb sajt URL</label>
