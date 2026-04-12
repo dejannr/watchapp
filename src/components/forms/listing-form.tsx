@@ -97,14 +97,14 @@ export function ListingForm({ listingId }: { listingId?: string }) {
       title: '',
       description: '',
       brandId: '',
-      priceAmount: 1,
+      priceAmount: undefined,
       discountedPriceAmount: undefined,
       condition: 'VERY_GOOD',
       locationCity: '',
       locationCountry: '',
       referenceNumber: '',
       yearOfProduction: undefined,
-      movementType: 'AUTOMATIC',
+      movementType: undefined,
       caseMaterial: '',
       braceletMaterial: '',
       hasBox: false,
@@ -272,14 +272,14 @@ export function ListingForm({ listingId }: { listingId?: string }) {
       title: data.title ?? '',
       description: data.description ?? '',
       brandId: data.brandId ?? '',
-      priceAmount: data.priceAmount ?? 1,
+      priceAmount: data.priceAmount ?? undefined,
       discountedPriceAmount: data.discountedPriceAmount,
       condition: data.condition ?? 'VERY_GOOD',
       locationCity: data.locationCity ?? '',
       locationCountry: data.locationCountry ?? '',
       referenceNumber: data.referenceNumber ?? '',
       yearOfProduction: data.yearOfProduction,
-      movementType: data.movementType ?? 'AUTOMATIC',
+      movementType: data.movementType ?? undefined,
       caseMaterial: data.caseMaterial ?? '',
       braceletMaterial: data.braceletMaterial ?? '',
       hasBox: Boolean(data.hasBox),
@@ -321,7 +321,11 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   }, [formState.isDirty, formState.isSubmitting]);
 
   const upsertDraft = async (values: FormValues) => {
-    const payload = { ...values, inquiryEnabled: true };
+    const payload = {
+      ...values,
+      movementType: values.movementType || undefined,
+      inquiryEnabled: true,
+    };
     const editableId = listingId ?? createdId;
     if (editableId) {
       const updated = await apiRequest<ListingResponse>(
@@ -582,6 +586,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
               <div className="space-y-1.5">
                 <label className="block text-sm font-medium">Mehanizam</label>
                 <select className="w-full rounded border p-2" {...register('movementType')}>
+                  <option value="">Izaberite</option>
                   <option value="QUARTZ">Kvarcni</option>
                   <option value="AUTOMATIC">Automatski</option>
                   <option value="MANUAL">Ručno navijanje</option>
