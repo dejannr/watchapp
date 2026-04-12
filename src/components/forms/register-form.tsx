@@ -13,6 +13,11 @@ import { registerSchema } from '@/lib/validations';
 
 type FormValues = z.infer<typeof registerSchema>;
 
+function toSerbianError(message: string) {
+  if (message === 'Email already in use') return 'E-pošta je već zauzeta';
+  return message;
+}
+
 export function RegisterForm() {
   const notify = useNotify();
   const [error, setError] = useState('');
@@ -39,10 +44,10 @@ export function RegisterForm() {
       notify.success('Nalog je kreiran. Verifikujte e-poštu za nastavak.');
     } catch (e) {
       if (e instanceof ApiError && e.status === 400) {
-        setError(e.message);
+        setError(toSerbianError(e.message));
         return;
       }
-      setError(e instanceof Error ? e.message : 'Registracija nije uspela');
+      setError(e instanceof Error ? toSerbianError(e.message) : 'Registracija nije uspela');
     }
   });
 

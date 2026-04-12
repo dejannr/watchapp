@@ -12,6 +12,13 @@ import { loginSchema } from '@/lib/validations';
 
 type FormValues = z.infer<typeof loginSchema>;
 
+function toSerbianError(message: string) {
+  if (message === 'Invalid credentials') {
+    return 'Neispravni podaci za prijavu. Proverite e-poštu/lozinku i pokušajte ponovo.';
+  }
+  return message;
+}
+
 export function LoginForm() {
   const searchParams = useSearchParams();
   const next = searchParams.get('next') || '/';
@@ -43,7 +50,7 @@ export function LoginForm() {
         setError('Neispravni podaci za prijavu. Proverite e-poštu/lozinku i pokušajte ponovo.');
         return;
       }
-      setError(e instanceof Error ? e.message : 'Prijava failed');
+      setError(e instanceof Error ? toSerbianError(e.message) : 'Prijava nije uspela');
     }
   });
 

@@ -9,6 +9,26 @@ type RequestOptions = {
 };
 const REQUEST_TIMEOUT_MS = 15000;
 
+const ERROR_TRANSLATIONS: Record<string, string> = {
+  'Email already in use': 'E-pošta je već zauzeta',
+  'Invalid credentials': 'Neispravni podaci za prijavu. Proverite e-poštu/lozinku i pokušajte ponovo.',
+  'Invalid verification token': 'Neispravan verifikacioni token',
+  'Invalid refresh token': 'Neispravan token za osvežavanje sesije',
+  'Invalid reset token': 'Neispravan token za reset lozinke',
+  'Invalid token subject': 'Neispravan token',
+  'If account exists, reset email was sent': 'Ako nalog postoji, poslat je e-mail za reset lozinke',
+  'Reset email prepared': 'E-mail za reset lozinke je pripremljen',
+  'Password reset complete': 'Lozinka je uspešno resetovana',
+  'Your account email has been successfully verified.': 'E-pošta naloga je uspešno verifikovana.',
+  'email must be an email': 'Unesite ispravnu e-poštu',
+  'password must be longer than or equal to 8 characters': 'Lozinka mora imati najmanje 8 karaktera',
+  'password should not be empty': 'Lozinka je obavezna',
+};
+
+function toSerbianError(message: string) {
+  return ERROR_TRANSLATIONS[message] ?? message;
+}
+
 export class ApiError extends Error {
   status: number;
 
@@ -49,14 +69,14 @@ async function parseError(res: Response) {
   try {
     const err = (await res.json()) as { message?: string | string[] };
     if (Array.isArray(err.message) && err.message.length > 0) {
-      message = err.message.join(', ');
+      message = err.message.map(toSerbianError).join(', ');
     } else if (typeof err.message === 'string' && err.message) {
-      message = err.message;
+      message = toSerbianError(err.message);
     }
   } catch {
     // no-op
   }
-  return message;
+  return toSerbianError(message);
 }
 
 export async function refreshAccessToken() {

@@ -11,9 +11,9 @@ export const countryOptions = [
 
 export const registerSchema = z
   .object({
-    email: z.string().email(),
-    password: z.string().min(8),
-    confirmPassword: z.string().min(8),
+    email: z.string().email('Unesite ispravnu e-poštu'),
+    password: z.string().min(8, 'Lozinka mora imati najmanje 8 karaktera'),
+    confirmPassword: z.string().min(8, 'Potvrda lozinke mora imati najmanje 8 karaktera'),
     firstName: z.string().optional(),
     lastName: z.string().optional(),
   })
@@ -23,8 +23,8 @@ export const registerSchema = z
   });
 
 export const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+  email: z.string().email('Unesite ispravnu e-poštu'),
+  password: z.string().min(1, 'Lozinka je obavezna'),
 });
 
 export const sellerApplySchema = z.object({

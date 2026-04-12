@@ -33,6 +33,10 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
     }, 5000);
   }, []);
 
+  const dismissToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  }, []);
+
   useEffect(() => {
     const onRequestEvent = (evt: Event) => {
       const detail = (evt as CustomEvent<{ type?: string; message?: string; requestId?: string }>).detail;
@@ -96,7 +100,7 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className={`rounded border px-3 py-2 text-sm shadow ${
+            className={`pointer-events-auto flex items-start justify-between gap-3 rounded border px-3 py-2 text-sm shadow ${
               toast.type === 'success'
                 ? 'border-green-300 bg-green-50 text-green-800'
                 : toast.type === 'error'
@@ -104,7 +108,15 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
                   : 'border-[var(--line)] bg-[var(--card)] text-[var(--text)]'
             }`}
           >
-            {toast.message}
+            <span>{toast.message}</span>
+            <button
+              type="button"
+              className="shrink-0 rounded px-1 leading-none opacity-70 transition-opacity hover:opacity-100"
+              onClick={() => dismissToast(toast.id)}
+              aria-label="Zatvori notifikaciju"
+            >
+              X
+            </button>
           </div>
         ))}
       </div>
