@@ -47,10 +47,14 @@ export function SellerApplyForm({
     setError('');
     setSuccess('');
     try {
+      const payload = {
+        ...values,
+        businessName: values.displayName,
+      };
       if (mode === 'resubmit' && applicationId) {
-        await apiRequest(`/seller-application/${applicationId}/resubmit`, 'PATCH', values, true);
+        await apiRequest(`/seller-application/${applicationId}/resubmit`, 'PATCH', payload, true);
       } else {
-        await apiRequest('/seller-application', 'POST', values, true);
+        await apiRequest('/seller-application', 'POST', payload, true);
       }
       setSuccess('Prijava je uspešno poslata.');
       notify.success('Prijava za prodavca je uspešno poslata.');
@@ -69,38 +73,89 @@ export function SellerApplyForm({
   });
 
   return (
-    <form onSubmit={onSubmit} className="card mx-auto max-w-xl space-y-3 p-5">
+    <form onSubmit={onSubmit} className="card mx-auto max-w-xl space-y-4 p-5">
       <h1 className="text-xl font-bold">Prijava za prodavca</h1>
-      <select className="w-full rounded border p-2" {...register('sellerType')}>
-        <option value="PRIVATE">Privatni prodavac</option>
-        <option value="BUSINESS">Kompanija / Diler</option>
-      </select>
-      <input className="w-full rounded border p-2" placeholder="Javno ime" {...register('displayName')} />
-      <input className="w-full rounded border p-2" placeholder="Naziv firme (ako je kompanija)" {...register('businessName')} />
-      <input className="w-full rounded border p-2" placeholder="Javni slug" {...register('slug')} />
-      <textarea className="w-full rounded border p-2" placeholder="Kratka biografija" {...register('bio')} />
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <input className="w-full rounded border p-2" placeholder="Grad" {...register('locationCity')} />
-        <select className="w-full rounded border p-2" {...register('locationCountry')}>
-          {countryOptions.map((country) => (
-            <option key={country} value={country}>
-              {country}
-            </option>
-          ))}
-        </select>
+
+      <section className="space-y-3">
+        <div className="space-y-1.5">
+          <label className="block text-sm font-medium">Tip prodavca</label>
+          <select className="w-full rounded border p-2" {...register('sellerType')}>
+            <option value="PRIVATE">Privatni prodavac</option>
+            <option value="BUSINESS">Kompanija / Diler</option>
+          </select>
+        </div>
+        <div className="space-y-1.5">
+          <label className="block text-sm font-medium">
+            Javno ime <span className="text-red-600">*</span>
+          </label>
+          <input className="w-full rounded border p-2" placeholder="Javno ime" {...register('displayName')} />
+        </div>
+        <div className="space-y-1.5">
+          <label className="block text-sm font-medium">
+            Javni slug <span className="text-red-600">*</span>
+          </label>
+          <input className="w-full rounded border p-2" placeholder="Javni slug" {...register('slug')} />
+        </div>
+        <div className="space-y-1.5">
+          <label className="block text-sm font-medium">Kratka biografija</label>
+          <textarea className="w-full rounded border p-2" placeholder="Kratka biografija" {...register('bio')} />
+        </div>
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium">Grad</label>
+            <input className="w-full rounded border p-2" placeholder="Grad" {...register('locationCity')} />
+          </div>
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium">
+              Država <span className="text-red-600">*</span>
+            </label>
+            <select className="w-full rounded border p-2" {...register('locationCountry')}>
+              {countryOptions.map((country) => (
+                <option key={country} value={country}>
+                  {country}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-3">
+        <div className="space-y-1.5">
+          <label className="block text-sm font-medium">Kontakt e-pošta</label>
+          <input className="w-full rounded border p-2" placeholder="Kontakt e-pošta" {...register('contactEmail')} />
+        </div>
+        <div className="space-y-1.5">
+          <label className="block text-sm font-medium">Kontakt telefon</label>
+          <input className="w-full rounded border p-2" placeholder="Kontakt telefon" {...register('contactPhone')} />
+        </div>
+        <div className="space-y-1.5">
+          <label className="block text-sm font-medium">Veb sajt URL</label>
+          <input className="w-full rounded border p-2" placeholder="Veb sajt URL" {...register('websiteUrl')} />
+        </div>
+        <div className="space-y-1.5">
+          <label className="block text-sm font-medium">Instagram korisničko ime</label>
+          <input
+            className="w-full rounded border p-2"
+            placeholder="Instagram korisničko ime"
+            {...register('instagramHandle')}
+          />
+        </div>
+      </section>
+
+      <div className="space-y-1.5">
+        {error && <p className="text-sm text-red-700">{error}</p>}
+        {success && <p className="text-sm text-green-700">{success}</p>}
       </div>
-      <input className="w-full rounded border p-2" placeholder="Kontakt e-pošta" {...register('contactEmail')} />
-      <input className="w-full rounded border p-2" placeholder="Kontakt telefon" {...register('contactPhone')} />
-      <input className="w-full rounded border p-2" placeholder="Veb sajt URL" {...register('websiteUrl')} />
-      <input className="w-full rounded border p-2" placeholder="Instagram korisničko ime" {...register('instagramHandle')} />
-      {error && <p className="text-sm text-red-700">{error}</p>}
-      {success && <p className="text-sm text-green-700">{success}</p>}
-      <button
-        className="rounded bg-[var(--brand)] px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
-        disabled={formState.isSubmitting}
-      >
-        {formState.isSubmitting ? 'Slanje...' : submitLabel}
-      </button>
+
+      <div>
+        <button
+          className="rounded bg-[var(--brand)] px-4 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
+          disabled={formState.isSubmitting}
+        >
+          {formState.isSubmitting ? 'Slanje...' : submitLabel}
+        </button>
+      </div>
     </form>
   );
 }
