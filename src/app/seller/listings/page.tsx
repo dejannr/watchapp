@@ -4,7 +4,12 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowUpRightFromSquare, faPenToSquare, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowUpRightFromSquare,
+  faPenToSquare,
+  faTrashCan,
+  faPlus,
+} from '@fortawesome/free-solid-svg-icons';
 import { LoadingCard } from '@/components/loading-card';
 import { useNotify } from '@/components/notifications-provider';
 import { ApiError, apiRequest } from '@/lib/api';
@@ -194,8 +199,9 @@ export default function ProdavacOglasiPage() {
           </div>
           <Link
             href="/seller-dashboard/listings/new"
-            className="rounded-md bg-[var(--brand)] px-3 py-2 text-sm font-medium text-white"
+            className="inline-flex items-center gap-2 rounded-md bg-[var(--brand)] px-3 py-2 text-sm font-medium text-white transition duration-150 hover:bg-[var(--brand)]/90 hover:shadow-md"
           >
+            <FontAwesomeIcon icon={faPlus} className="h-3.5 w-3.5" aria-hidden="true" />
             Novi oglas
           </Link>
         </div>
@@ -227,7 +233,7 @@ export default function ProdavacOglasiPage() {
                   key={status}
                   type="button"
                   onClick={() => setStatusFilter(status)}
-                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
+                  className={`cursor-pointer rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-150 ${
                     isActive
                       ? 'border-[var(--brand)] bg-[var(--brand)] text-white'
                       : 'border-[var(--line)] bg-[var(--surface-soft)] text-[var(--text)]/80 hover:border-[var(--line)] hover:bg-[var(--card)] hover:text-[var(--text)] hover:shadow-sm'

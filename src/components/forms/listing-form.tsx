@@ -109,6 +109,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
   const [sellerDefaultCountry, setSellerDefaultCountry] = useState('');
   const [sellerDefaultCity, setSellerDefaultCity] = useState('');
+  const [listingStatus, setListingStatus] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const notify = useNotify();
   const isIzmeni = Boolean(listingId);
@@ -359,6 +360,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
           }))
         : [],
     );
+    setListingStatus(data.status ?? null);
   };
 
   useEffect(() => {
@@ -410,7 +412,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
     }
     const created = await apiRequest<ListingResponse>('/seller/listings', 'POST', payload, true);
     setCreatedId(created.id);
-    return { id: created.id, status: created.status };
+      return { id: created.id, status: created.status };
   };
 
   const onSaveDraft = handleSubmit(async (values) => {
@@ -916,14 +918,16 @@ export function ListingForm({ listingId }: { listingId?: string }) {
         >
           {formState.isSubmitting ? 'Čuvanje...' : 'Sačuvaj oglas'}
         </button>
-        <button
-          className="rounded border border-[var(--line)] px-4 py-2 disabled:cursor-not-allowed disabled:opacity-60"
-          disabled={isSubmittingReview}
-          type="button"
-          onClick={() => void submitForReview()}
-        >
-          {isSubmittingReview ? 'Slanje...' : 'Pošalji na proveru'}
-        </button>
+        {listingStatus !== 'PUBLISHED' && (
+          <button
+            className="rounded border border-[var(--line)] px-4 py-2 disabled:cursor-not-allowed disabled:opacity-60"
+            disabled={isSubmittingReview}
+            type="button"
+            onClick={() => void submitForReview()}
+          >
+            {isSubmittingReview ? 'Slanje...' : 'Pošalji na proveru'}
+          </button>
+        )}
       </div>
     </form>
   );
