@@ -189,7 +189,7 @@ export function SellerApplyForm({
                 },
               })}
             >
-              <option value="">Izaberite državu</option>
+              <option value="">Izaberite</option>
               {countries.map((country) => (
                 <option key={country} value={country}>
                   {country}
@@ -207,7 +207,7 @@ export function SellerApplyForm({
               {...register('locationCity')}
             >
               <option value="">
-                {selectedCountry ? 'Izaberite grad' : 'Prvo izaberite državu'}
+                {selectedCountry ? 'Izaberite' : 'Prvo izaberite državu'}
               </option>
               {cities.map((city) => (
                 <option key={city} value={city}>

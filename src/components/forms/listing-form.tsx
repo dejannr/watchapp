@@ -22,7 +22,15 @@ type ListingResponse = {
   locationCountry?: string;
   referenceNumber?: string;
   yearOfProduction?: number;
-  movementType?: 'AUTOMATIC' | 'MANUAL' | 'QUARTZ' | 'SMART' | 'OTHER';
+  movementType?:
+    | 'AUTOMATIC'
+    | 'MANUAL'
+    | 'QUARTZ'
+    | 'SOLAR'
+    | 'KINETIC'
+    | 'DIGITAL'
+    | 'SMART'
+    | 'OTHER';
   caseMaterial?: string;
   braceletMaterial?: string;
   hasBox?: boolean;
@@ -43,6 +51,31 @@ type Brend = {
 type FormValues = z.infer<typeof listingSchema>;
 const MAX_IMAGES = 10;
 const CURRENT_YEAR = new Date().getFullYear();
+const BRACELET_MATERIAL_OPTIONS = [
+  'Koža',
+  'Metal',
+  'Guma',
+  'Silikon',
+  'Najlon',
+  'Tekstil',
+  'Plastika',
+  'Keramika',
+  'Titanijum',
+  'Drugo',
+] as const;
+const CASE_MATERIAL_OPTIONS = [
+  'Nerđajući čelik',
+  'Titanijum',
+  'Aluminijum',
+  'Zlato',
+  'Platina',
+  'Keramika',
+  'Bronza',
+  'Mesing',
+  'Plastika',
+  'Smola',
+  'Drugo',
+] as const;
 
 export function ListingForm({ listingId }: { listingId?: string }) {
   const [createdId, setCreatedId] = useState<string | null>(null);
@@ -85,6 +118,8 @@ export function ListingForm({ listingId }: { listingId?: string }) {
   const locationCityField = register('locationCity');
   const selectedDržava = watch('locationCountry');
   const selectedGrad = watch('locationCity');
+  const selectedCaseMaterial = watch('caseMaterial');
+  const selectedBraceletMaterial = watch('braceletMaterial');
   const hasBoxSelected = watch('hasBox');
   const hasPapersSelected = watch('hasPapers');
   const countries = useCountries();
@@ -94,6 +129,20 @@ export function ListingForm({ listingId }: { listingId?: string }) {
     if (cities.includes(selectedGrad)) return cities;
     return [selectedGrad, ...cities];
   }, [cities, selectedGrad]);
+  const braceletMaterialOptions = useMemo(() => {
+    if (!selectedBraceletMaterial) return [...BRACELET_MATERIAL_OPTIONS];
+    if ((BRACELET_MATERIAL_OPTIONS as readonly string[]).includes(selectedBraceletMaterial)) {
+      return [...BRACELET_MATERIAL_OPTIONS];
+    }
+    return [selectedBraceletMaterial, ...BRACELET_MATERIAL_OPTIONS];
+  }, [selectedBraceletMaterial]);
+  const caseMaterialOptions = useMemo(() => {
+    if (!selectedCaseMaterial) return [...CASE_MATERIAL_OPTIONS];
+    if ((CASE_MATERIAL_OPTIONS as readonly string[]).includes(selectedCaseMaterial)) {
+      return [...CASE_MATERIAL_OPTIONS];
+    }
+    return [selectedCaseMaterial, ...CASE_MATERIAL_OPTIONS];
+  }, [selectedCaseMaterial]);
 
   useEffect(() => {
     if (isIzmeni) return;
@@ -502,7 +551,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
                 Brend <span className="text-red-600">*</span>
               </label>
               <select className="w-full rounded border p-2" {...register('brandId')}>
-                <option value="">Izaberite brend</option>
+                <option value="">Izaberite</option>
                 {brands.map((brand) => (
                   <option key={brand.id} value={brand.id}>
                     {brand.name}
@@ -533,20 +582,37 @@ export function ListingForm({ listingId }: { listingId?: string }) {
               <div className="space-y-1.5">
                 <label className="block text-sm font-medium">Mehanizam</label>
                 <select className="w-full rounded border p-2" {...register('movementType')}>
+                  <option value="QUARTZ">Kvarcni</option>
                   <option value="AUTOMATIC">Automatski</option>
-                  <option value="MANUAL">Ručni</option>
-                  <option value="QUARTZ">Quartz</option>
+                  <option value="MANUAL">Ručno navijanje</option>
+                  <option value="SOLAR">Solarni</option>
+                  <option value="KINETIC">Kinetički</option>
+                  <option value="DIGITAL">Digitalni</option>
                   <option value="SMART">Pametni</option>
                   <option value="OTHER">Drugo</option>
                 </select>
               </div>
               <div className="space-y-1.5">
                 <label className="block text-sm font-medium">Materijal kućišta</label>
-                <input className="w-full rounded border p-2" placeholder="Materijal kućišta" {...register('caseMaterial')} />
+                <select className="w-full rounded border p-2" {...register('caseMaterial')}>
+                  <option value="">Izaberite</option>
+                  {caseMaterialOptions.map((material) => (
+                    <option key={material} value={material}>
+                      {material}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-1.5">
                 <label className="block text-sm font-medium">Materijal narukvice</label>
-                <input className="w-full rounded border p-2" placeholder="Materijal narukvice" {...register('braceletMaterial')} />
+                <select className="w-full rounded border p-2" {...register('braceletMaterial')}>
+                  <option value="">Izaberite</option>
+                  {braceletMaterialOptions.map((material) => (
+                    <option key={material} value={material}>
+                      {material}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           </section>
@@ -675,7 +741,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
                   onChange={locationCountryField.onChange}
                   value={selectedDržava ?? ''}
                 >
-                  <option value="">Izaberite državu *</option>
+                  <option value="">Izaberite</option>
                   {countries.map((country) => (
                     <option key={country} value={country}>
                       {country}
@@ -694,7 +760,7 @@ export function ListingForm({ listingId }: { listingId?: string }) {
                   value={selectedGrad ?? ''}
                 >
                   <option value="">
-                    {selectedDržava ? 'Izaberite grad' : 'Prvo izaberite državu'}
+                    {selectedDržava ? 'Izaberite' : 'Prvo izaberite državu'}
                   </option>
                   {cityOptions.map((city) => (
                     <option key={city} value={city}>

@@ -29,9 +29,12 @@ function formatCondition(value?: string) {
 
 function formatMovement(value?: string) {
   const map: Record<string, string> = {
+    QUARTZ: 'Kvarcni',
     AUTOMATIC: 'Automatski',
-    MANUAL: 'Ručni',
-    QUARTZ: 'Quartz',
+    MANUAL: 'Ručno navijanje',
+    SOLAR: 'Solarni',
+    KINETIC: 'Kinetički',
+    DIGITAL: 'Digitalni',
     SMART: 'Pametni',
     OTHER: 'Drugo',
   };

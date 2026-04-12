@@ -13,6 +13,42 @@ type BrowseFiltersProps = {
   brands: BrandOption[];
 };
 
+const BRACELET_MATERIAL_OPTIONS = [
+  'Koža',
+  'Metal',
+  'Guma',
+  'Silikon',
+  'Najlon',
+  'Tekstil',
+  'Plastika',
+  'Keramika',
+  'Titanijum',
+  'Drugo',
+] as const;
+const CASE_MATERIAL_OPTIONS = [
+  'Nerđajući čelik',
+  'Titanijum',
+  'Aluminijum',
+  'Zlato',
+  'Platina',
+  'Keramika',
+  'Bronza',
+  'Mesing',
+  'Plastika',
+  'Smola',
+  'Drugo',
+] as const;
+const MOVEMENT_TYPE_OPTIONS = [
+  { value: 'QUARTZ', label: 'Kvarcni' },
+  { value: 'AUTOMATIC', label: 'Automatski' },
+  { value: 'MANUAL', label: 'Ručno navijanje' },
+  { value: 'SOLAR', label: 'Solarni' },
+  { value: 'KINETIC', label: 'Kinetički' },
+  { value: 'DIGITAL', label: 'Digitalni' },
+  { value: 'SMART', label: 'Pametni' },
+  { value: 'OTHER', label: 'Drugo' },
+] as const;
+
 export function BrowseFilters({ brands }: BrowseFiltersProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -29,8 +65,11 @@ export function BrowseFilters({ brands }: BrowseFiltersProps) {
       yearFrom: searchParams.get('yearFrom') ?? '',
       yearTo: searchParams.get('yearTo') ?? '',
       condition: searchParams.get('condition') ?? '',
+      movementType: searchParams.get('movementType') ?? '',
       locationCountry: searchParams.get('locationCountry') ?? '',
       locationCity: searchParams.get('locationCity') ?? '',
+      caseMaterial: searchParams.get('caseMaterial') ?? '',
+      braceletMaterial: searchParams.get('braceletMaterial') ?? '',
       hasBox: searchParams.get('hasBox') ?? '',
       hasPapers: searchParams.get('hasPapers') ?? '',
       sellerVerification: searchParams.get('sellerVerification') ?? '',
@@ -158,6 +197,18 @@ export function BrowseFilters({ brands }: BrowseFiltersProps) {
           <input name="yearFrom" defaultValue={defaults.yearFrom} className="rounded border p-2 text-sm" placeholder="Godina od" />
           <input name="yearTo" defaultValue={defaults.yearTo} className="rounded border p-2 text-sm" placeholder="Godina do" />
           <select
+            name="movementType"
+            defaultValue={defaults.movementType}
+            className="rounded border p-2 text-sm"
+          >
+            <option value="">Mehanizam: bilo koji</option>
+            {MOVEMENT_TYPE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <select
             name="sellerVerification"
             defaultValue={defaults.sellerVerification}
             className="rounded border p-2 text-sm"
@@ -194,6 +245,30 @@ export function BrowseFilters({ brands }: BrowseFiltersProps) {
             {cities.map((city) => (
               <option key={city} value={city}>
                 {city}
+              </option>
+            ))}
+          </select>
+          <select
+            name="braceletMaterial"
+            defaultValue={defaults.braceletMaterial}
+            className="rounded border p-2 text-sm"
+          >
+            <option value="">Materijal narukvice: bilo koji</option>
+            {BRACELET_MATERIAL_OPTIONS.map((material) => (
+              <option key={material} value={material}>
+                {material}
+              </option>
+            ))}
+          </select>
+          <select
+            name="caseMaterial"
+            defaultValue={defaults.caseMaterial}
+            className="rounded border p-2 text-sm"
+          >
+            <option value="">Materijal kućišta: bilo koji</option>
+            {CASE_MATERIAL_OPTIONS.map((material) => (
+              <option key={material} value={material}>
+                {material}
               </option>
             ))}
           </select>

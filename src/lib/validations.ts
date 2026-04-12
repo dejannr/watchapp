@@ -47,7 +47,9 @@ export const listingSchema = z.object({
   condition: z.enum(['NEW', 'LIKE_NEW', 'VERY_GOOD', 'GOOD', 'FAIR']),
   referenceNumber: z.string().optional(),
   yearOfProduction: z.coerce.number().int().min(1900).max(CURRENT_YEAR).optional(),
-  movementType: z.enum(['AUTOMATIC', 'MANUAL', 'QUARTZ', 'SMART', 'OTHER']).optional(),
+  movementType: z
+    .enum(['AUTOMATIC', 'MANUAL', 'QUARTZ', 'SOLAR', 'KINETIC', 'DIGITAL', 'SMART', 'OTHER'])
+    .optional(),
   caseMaterial: z.string().optional(),
   braceletMaterial: z.string().optional(),
   locationCity: z.string().optional(),
